@@ -12,7 +12,7 @@ const TopMenu = () => {
 
   // 菜单项配置
   const menuItems = [
-    { label: t('menu.asset'), icon: 'search-f', path: '/asset' },
+    { label: t('menu.search'), icon: 'search-f', path: '/search' },
   ];
 
   return (

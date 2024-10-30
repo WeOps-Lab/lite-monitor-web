@@ -68,5 +68,18 @@
   },
   "cutomTable": {
     "fieldSetting": "List field settings"
+  },
+  "minitor": {
+    "source": "Source",
+    "searchCriteria": "Search Criteria",
+    "objectType": "Type",
+    "object": "Object",
+    "metric": "Metric",
+    "filter": "Filter",
+    "label": "Label",
+    "value": "Value",
+    "condition": "Term",
+    "area": "Area",
+    "table": "Table"
   }
 }

@@ -5,7 +5,10 @@ import customTableStyle from './index.module.less';
 import FieldSettingModal from './fieldSettingModal';
 import { ColumnItem } from '@/types';
 interface CustomTableProps
-  extends Omit<TableProps, 'bordered' | 'size' | 'showSetting'> {
+  extends Omit<
+    TableProps,
+    'bordered' | 'size' | 'fieldSetting' | 'onSelectFields'
+  > {
   bordered?: boolean;
   size?: 'large' | 'middle' | 'small';
   fieldSetting?: {

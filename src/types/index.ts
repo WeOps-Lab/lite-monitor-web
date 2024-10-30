@@ -5,3 +5,11 @@ export interface ColumnItem {
   render?: (_: unknown, record: any) => JSX.Element;
   [key: string]: unknown;
 }
+
+export interface ListItem {
+  title?: string;
+  label?: string;
+  name?: string;
+  id?: string | number;
+  value?: string | number;
+}
