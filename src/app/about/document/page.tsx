@@ -5,12 +5,14 @@ import PermissionWrapper from '@/components/permission';
 import Icon from '@/components/icon';
 import CustomTable from '@/components/custom-table';
 import { ColumnItem } from '@/types';
+import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 
 const DocumentPage = () => {
   const initColums = [
     { key: 'name', title: 'Name', dataIndex: 'name' },
     { key: 'age', title: 'Age', dataIndex: 'age' },
   ];
+  const { convertToLocalizedTime } = useLocalizedTime();
   const [displayFieldKeys, setDisplayFieldKeys] = useState<string[]>([]);
   const [columns, setColumns] = useState<ColumnItem[]>(initColums);
   const handleSettingsClick = () => {
@@ -49,6 +51,7 @@ const DocumentPage = () => {
         rowKey="id"
         onSelectFields={onSelectFields}
       />
+      <div>eg:时区转时间 - {convertToLocalizedTime('2024-10-28T10:20:31+0000')}</div>
     </div>
   );
 };
