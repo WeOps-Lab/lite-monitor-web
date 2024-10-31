@@ -258,19 +258,18 @@ const Search = () => {
       </div>
       <div className={searchStyle.criteria}>
         <Collapse
-          title={t('minitor.searchCriteria')}
-          icon={<BellOutlined />}
-          onIconClick={createPolicy}
+          title={t('monitor.searchCriteria')}
+          icon={<BellOutlined onClick={createPolicy} />}
         >
-          <div className={searchStyle.condition}>
+          <div className={`${searchStyle.condition} px-[10px]`}>
             <div className={searchStyle.conditionItem}>
-              <div className={searchStyle.itemLabel}>{t('minitor.source')}</div>
+              <div className={searchStyle.itemLabel}>{t('monitor.source')}</div>
               <div
                 className={`${searchStyle.itemOption} ${searchStyle.source}`}
               >
                 <Select
                   className={`w-[100px] ${searchStyle.sourceObjectType}`}
-                  placeholder={t('minitor.objectType')}
+                  placeholder={t('monitor.objectType')}
                   showSearch
                   value={objectType}
                   onChange={handleObjectTypeChange}
@@ -285,7 +284,7 @@ const Search = () => {
                 </Select>
                 <Select
                   mode="multiple"
-                  placeholder={t('minitor.object')}
+                  placeholder={t('monitor.object')}
                   className={`w-[200px] ${searchStyle.sourceObject}`}
                   maxTagCount="responsive"
                   value={object}
@@ -302,11 +301,11 @@ const Search = () => {
               </div>
             </div>
             <div className={searchStyle.conditionItem}>
-              <div className={searchStyle.itemLabel}>{t('minitor.metric')}</div>
+              <div className={searchStyle.itemLabel}>{t('monitor.metric')}</div>
               <div className={searchStyle.itemOption}>
                 <Select
                   className="w-[200px]"
-                  placeholder={t('minitor.metric')}
+                  placeholder={t('monitor.metric')}
                   showSearch
                   value={metric}
                   onChange={handleMetricChange}
@@ -322,7 +321,7 @@ const Search = () => {
               </div>
             </div>
             <div className={searchStyle.conditionItem}>
-              <div className={searchStyle.itemLabel}>{t('minitor.filter')}</div>
+              <div className={searchStyle.itemLabel}>{t('monitor.filter')}</div>
               <ul className={searchStyle.conditions}>
                 {conditions.map((conditionItem, index) => (
                   <li
@@ -331,7 +330,7 @@ const Search = () => {
                   >
                     <Select
                       className={`w-[100px] ${searchStyle.filterLabel}`}
-                      placeholder={t('minitor.label')}
+                      placeholder={t('monitor.label')}
                       showSearch
                       value={conditionItem.label}
                       onChange={(val) => handleLabelChange(val, index)}
@@ -346,7 +345,7 @@ const Search = () => {
                     </Select>
                     <Select
                       className="w-[100px]"
-                      placeholder={t('minitor.condition')}
+                      placeholder={t('monitor.condition')}
                       value={conditionItem.condition}
                       onChange={(val) => handleConditionChange(val, index)}
                     >
@@ -360,7 +359,7 @@ const Search = () => {
                     </Select>
                     <Select
                       className="w-[150px]"
-                      placeholder={t('minitor.value')}
+                      placeholder={t('monitor.value')}
                       showSearch
                       value={conditionItem.value}
                       onChange={(val) => handleValueChange(val, index)}
@@ -400,7 +399,7 @@ const Search = () => {
                 label: (
                   <div className="flex items-center">
                     <Icon type="duijimianjitu" className="mr-[8px]" />
-                    {t('minitor.area')}
+                    {t('monitor.area')}
                   </div>
                 ),
                 value: 'area',
@@ -409,7 +408,7 @@ const Search = () => {
                 label: (
                   <div className="flex items-center">
                     <Icon type="tabulation" className="mr-[8px]" />
-                    {t('minitor.table')}
+                    {t('monitor.table')}
                   </div>
                 ),
                 value: 'table',

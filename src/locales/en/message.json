@@ -61,15 +61,27 @@
     "selectAll": "Select All",
     "clear": "Clear",
     "selected": "Selected",
-    "items": "item(s)"
+    "items": "item(s)",
+    "searchPlaceHolder": "Search...",
+    "setting": "setting",
+    "id": "ID",
+    "action": "Actions",
+    "name": "Name",
+    "type": "Type",
+    "descripition": "Descripition",
+    "unit": "Unit",
+    "deleteTitle": "Do you want to delete this item?",
+    "deleteContent": "After deletion, the data cannot be recovered.",
+    "successfullyDeleted": "Delete successfully !"
   },
   "menu": {
-    "search": "Search"
+    "search": "Search",
+    "intergration": "Intergration"
   },
   "cutomTable": {
     "fieldSetting": "List field settings"
   },
-  "minitor": {
+  "monitor": {
     "source": "Source",
     "searchCriteria": "Search Criteria",
     "objectType": "Type",
@@ -80,6 +92,15 @@
     "value": "Value",
     "condition": "Term",
     "area": "Area",
-    "table": "Table"
+    "table": "Table",
+    "intergration": "Intergration",
+    "asset": "Asset",
+    "configure": "Configure",
+    "configureTitle": "Please follow the following guidelines to install the collector.",
+    "metricTitle": "The following monitoring indicators are supported by this collector",
+    "addGroup": "Add Group",
+    "addMetric": "Add Metric",
+    "dimension": "Dimension",
+    "keyMetric": "Key Metric"
   }
 }
