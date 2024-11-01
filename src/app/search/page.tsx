@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Spin, Select, Button, Segmented, Progress } from 'antd';
+import { Spin, Select, Button, Segmented, Progress, Input } from 'antd';
 import { BellOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import useApiClient from '@/utils/request';
 import TimeSelector from './timeSelector';
@@ -26,25 +26,43 @@ import CustomTable from '@/components/custom-table';
 interface ConditionItem {
   label: string | null;
   condition: string | null;
-  value: string | null;
+  value: string;
+}
+
+interface ObectItem {
+  id: number;
+  name: string;
+  type: string;
+  [key: string]: unknown;
+}
+
+interface metricItem {
+  id: number;
+  metric_group: number;
+  metric_object: number;
+  name: string;
+  type: string;
+  dimensions: any[];
+  [key: string]: unknown;
 }
 
 const Search = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const [objectType, setObjectType] = useState<string>();
-  const [metric, setMetric] = useState<string>();
-  const [object, setObject] = useState<string[]>([]);
+  const [objLoading, setObjLoading] = useState<boolean>(false);
+  const [metric, setMetric] = useState<number | null>();
+  const [metrics, setMetrics] = useState<metricItem[]>([]);
+  const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
+  const [instanceId, setInstanceId] = useState<string[]>();
+  const [instances, setInstances] = useState<any[]>([]);
+  const [labels, setLabels] = useState<string[]>([]);
+  const [object, setObject] = useState<string>();
+  const [objects, setObjects] = useState<ObectItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('area');
-  const [conditions, setConditions] = useState<ConditionItem[]>([
-    {
-      label: null,
-      condition: null,
-      value: null,
-    },
-  ]);
+  const [conditions, setConditions] = useState<ConditionItem[]>([]);
   const [objectTypeList, setObjectTypeList] = useState<ListItem[]>([]);
+  const [objectList, setObjectTList] = useState<ListItem[]>([]);
   const [pagination, setPagination] = useState<any>({
     current: 1,
     total: 0,
@@ -150,30 +168,59 @@ const Search = () => {
     },
   ]);
 
-  //   useEffect(() => {
-  //     if (isLoading) return;
-  //     getInitData();
-  //   }, [isLoading]);
+  const conditionList: ListItem[] = [
+    { id: '=', name: '=' },
+    { id: '!=', name: '!=' },
+    { id: 'include', name: 'include' },
+    { id: 'exclude', name: 'exclude' },
+  ];
 
-  const getInitData = () => {
-    const getAttrList = get(`/api/model/host/attr_list/`);
-    setPageLoading(true);
+  useEffect(() => {
+    if (isLoading) return;
+    getObjects();
+  }, [isLoading]);
+
+  const getObjects = async () => {
     try {
-      Promise.all([getAttrList])
-        .then((res) => {
-          const objTypes = res[0].map((item: any) => ({
-            name: item.attr_name,
-            id: item.attr_id,
-          }));
-          setObjectTypeList(objTypes);
-        })
-        .finally(() => {
-          setPageLoading(false);
-        });
-    } catch (error) {
-      setPageLoading(false);
+      setObjLoading(true);
+      const data = await get(`/api/metrics_object/`);
+      setObjects(data);
+    } finally {
+      setObjLoading(false);
     }
   };
+
+  const getMetrics = async (params = {}) => {
+    try {
+      setMetricsLoading(true);
+      const data = await get(`/api/metrics/`, {
+        params,
+      });
+      setMetrics(data);
+    } finally {
+      setMetricsLoading(false);
+    }
+  };
+
+  //   const getInitData = () => {
+  //     const getAttrList = get(`/api/metrics_object/`);
+  //     setPageLoading(true);
+  //     try {
+  //       Promise.all([getAttrList])
+  //         .then((res) => {
+  //           const objTypes = res[0].map((item: any) => ({
+  //             name: item.attr_name,
+  //             id: item.attr_id,
+  //           }));
+  //           setObjectTypeList(objTypes);
+  //         })
+  //         .finally(() => {
+  //           setPageLoading(false);
+  //         });
+  //     } catch (error) {
+  //       setPageLoading(false);
+  //     }
+  //   };
 
   const onTimeChange = (val: string[]) => {
     console.log(val);
@@ -191,16 +238,27 @@ const Search = () => {
     console.log(122);
   };
 
-  const handleObjectTypeChange = (val: string) => {
-    setObjectType(val);
+  const handleInstanceChange = (val: string[]) => {
+    setInstanceId(val);
   };
 
-  const handleMetricChange = (val: string) => {
+  const handleMetricChange = (val: number) => {
     setMetric(val);
+    const _labels = (
+      metrics.find((item) => item.id === val)?.dimensions || []
+    ).map((item) => item.name);
+    setLabels(_labels);
   };
 
-  const handleObjectChange = (val: string[]) => {
+  const handleObjectChange = (val: string) => {
     setObject(val);
+    setMetrics([]);
+    setLabels([]);
+    setMetric(null);
+    setConditions([]);
+    getMetrics({
+      metric_object: val,
+    });
   };
 
   const handleLabelChange = (val: string, index: number) => {
@@ -215,9 +273,12 @@ const Search = () => {
     setConditions(_conditions);
   };
 
-  const handleValueChange = (val: string, index: number) => {
+  const handleValueChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const _conditions = deepClone(conditions);
-    _conditions[index].value = val;
+    _conditions[index].value = e.target.value;
     setConditions(_conditions);
   };
 
@@ -245,6 +306,10 @@ const Search = () => {
     setPagination(pagination);
   };
 
+  const handleSearch = () => {
+    console.log(123);
+  };
+
   return (
     <div className={searchStyle.search}>
       <div className={searchStyle.time}>
@@ -255,6 +320,9 @@ const Search = () => {
           onFrequenceChange={onFrequenceChange}
           onRefresh={onRefresh}
         />
+        <Button type="primary" className="ml-[8px]" onClick={handleSearch}>
+          {t('common.search')}
+        </Button>
       </div>
       <div className={searchStyle.criteria}>
         <Collapse
@@ -268,15 +336,16 @@ const Search = () => {
                 className={`${searchStyle.itemOption} ${searchStyle.source}`}
               >
                 <Select
-                  className={`w-[100px] ${searchStyle.sourceObjectType}`}
-                  placeholder={t('monitor.objectType')}
+                  className={`w-[150px] ${searchStyle.sourceObjectType}`}
+                  placeholder={t('monitor.object')}
                   showSearch
-                  value={objectType}
-                  onChange={handleObjectTypeChange}
+                  loading={objLoading}
+                  value={object}
+                  onChange={handleObjectChange}
                 >
-                  {objectTypeList.map((item, index) => {
+                  {objects.map((item, index) => {
                     return (
-                      <Option value={item.id} key={index}>
+                      <Option value={item.name} key={index}>
                         {item.name}
                       </Option>
                     );
@@ -284,13 +353,14 @@ const Search = () => {
                 </Select>
                 <Select
                   mode="multiple"
-                  placeholder={t('monitor.object')}
-                  className={`w-[200px] ${searchStyle.sourceObject}`}
+                  placeholder={t('monitor.instance')}
+                  className={`w-[250px] ${searchStyle.sourceObject}`}
                   maxTagCount="responsive"
-                  value={object}
-                  onChange={handleObjectChange}
+                  loading={objLoading}
+                  value={instanceId}
+                  onChange={handleInstanceChange}
                 >
-                  {objectTypeList.map((item, index) => {
+                  {instances.map((item, index) => {
                     return (
                       <Option value={item.id} key={index}>
                         {item.name}
@@ -304,13 +374,14 @@ const Search = () => {
               <div className={searchStyle.itemLabel}>{t('monitor.metric')}</div>
               <div className={searchStyle.itemOption}>
                 <Select
-                  className="w-[200px]"
+                  className="w-[250px]"
                   placeholder={t('monitor.metric')}
                   showSearch
                   value={metric}
+                  loading={metricsLoading}
                   onChange={handleMetricChange}
                 >
-                  {objectTypeList.map((item, index) => {
+                  {metrics.map((item, index) => {
                     return (
                       <Option value={item.id} key={index}>
                         {item.name}
@@ -322,69 +393,68 @@ const Search = () => {
             </div>
             <div className={searchStyle.conditionItem}>
               <div className={searchStyle.itemLabel}>{t('monitor.filter')}</div>
-              <ul className={searchStyle.conditions}>
-                {conditions.map((conditionItem, index) => (
-                  <li
-                    className={`${searchStyle.itemOption} ${searchStyle.filter}`}
-                    key={index}
-                  >
-                    <Select
-                      className={`w-[100px] ${searchStyle.filterLabel}`}
-                      placeholder={t('monitor.label')}
-                      showSearch
-                      value={conditionItem.label}
-                      onChange={(val) => handleLabelChange(val, index)}
-                    >
-                      {objectTypeList.map((item, index) => {
-                        return (
-                          <Option value={item.id} key={index}>
-                            {item.name}
-                          </Option>
-                        );
-                      })}
-                    </Select>
-                    <Select
-                      className="w-[100px]"
-                      placeholder={t('monitor.condition')}
-                      value={conditionItem.condition}
-                      onChange={(val) => handleConditionChange(val, index)}
-                    >
-                      {objectTypeList.map((item, index) => {
-                        return (
-                          <Option value={item.id} key={index}>
-                            {item.name}
-                          </Option>
-                        );
-                      })}
-                    </Select>
-                    <Select
-                      className="w-[150px]"
-                      placeholder={t('monitor.value')}
-                      showSearch
-                      value={conditionItem.value}
-                      onChange={(val) => handleValueChange(val, index)}
-                    >
-                      {objectTypeList.map((item, index) => {
-                        return (
-                          <Option value={item.id} key={index}>
-                            {item.name}
-                          </Option>
-                        );
-                      })}
-                    </Select>
-                    {!!index && (
-                      <Button
-                        icon={<CloseOutlined />}
-                        onClick={() => deleteConditionItem(index)}
-                      />
-                    )}
-                    <Button
-                      icon={<PlusOutlined />}
-                      onClick={addConditionItem}
-                    />
-                  </li>
-                ))}
-              </ul>
+              <div className="flex">
+                {conditions.length ? (
+                  <ul className={searchStyle.conditions}>
+                    {conditions.map((conditionItem, index) => (
+                      <li
+                        className={`${searchStyle.itemOption} ${searchStyle.filter}`}
+                        key={index}
+                      >
+                        <Select
+                          className={`w-[150px] ${searchStyle.filterLabel}`}
+                          placeholder={t('monitor.label')}
+                          showSearch
+                          value={conditionItem.label}
+                          onChange={(val) => handleLabelChange(val, index)}
+                        >
+                          {labels.map((item, index) => {
+                            return (
+                              <Option value={item} key={index}>
+                                {item}
+                              </Option>
+                            );
+                          })}
+                        </Select>
+                        <Select
+                          className="w-[100px]"
+                          placeholder={t('monitor.condition')}
+                          value={conditionItem.condition}
+                          onChange={(val) => handleConditionChange(val, index)}
+                        >
+                          {conditionList.map((item, index) => {
+                            return (
+                              <Option value={item.id} key={index}>
+                                {item.name}
+                              </Option>
+                            );
+                          })}
+                        </Select>
+                        <Input
+                          className="w-[250px]"
+                          placeholder={t('monitor.value')}
+                          value={conditionItem.value}
+                          onChange={(val) => handleValueChange(val, index)}
+                        ></Input>
+                        <Button
+                          icon={<CloseOutlined />}
+                          onClick={() => deleteConditionItem(index)}
+                        />
+                        <Button
+                          icon={<PlusOutlined />}
+                          onClick={addConditionItem}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Button
+                    disabled={!metric}
+                    icon={<PlusOutlined />}
+                    onClick={addConditionItem}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </Collapse>
@@ -430,12 +500,12 @@ const Search = () => {
                 >
                   <XAxis
                     dataKey="time"
-                    tick={{ fill: 'var(--color-text-3)' }}
+                    tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'var(--color-text-3)' }}
+                    tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
                     tickFormatter={(value) => `${value}%`}
                     domain={[0, 100]}
                   />

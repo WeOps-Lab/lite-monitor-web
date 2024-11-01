@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Input, Button, Switch, Modal, message } from 'antd';
 import useApiClient from '@/utils/request';
@@ -9,6 +9,9 @@ import { deepClone } from '@/utils/common';
 import CustomTable from '@/components/custom-table';
 import { ColumnItem } from '@/types';
 import Collapse from '@/components/collapse';
+import GroupModal from './groupModal';
+import MetricModal from './metricModal';
+import { ModalRef } from '@/types';
 const { confirm } = Modal;
 interface ListItem {
   id: string;
@@ -19,6 +22,8 @@ interface ListItem {
 const Configure = () => {
   const { del, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const groupRef = useRef<ModalRef>(null);
+  const metricRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [metricData, setMetricData] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -110,7 +115,7 @@ const Configure = () => {
           <Button
             type="link"
             className="mr-[10px]"
-            onClick={() => showMetricModal(record)}
+            onClick={() => openMetricModal('add', record)}
           >
             {t('common.edit')}
           </Button>
@@ -169,10 +174,6 @@ const Configure = () => {
     });
   };
 
-  const showMetricModal = (row: any) => {
-    console.log(row);
-  };
-
   const getInitData = () => {
     const data = deepClone(responseData);
     setMetricData(data);
@@ -188,6 +189,34 @@ const Configure = () => {
 
   const onTxtClear = () => {
     getInitData();
+  };
+
+  const openGroupModal = (type: string, row = {}) => {
+    const title = t(type === 'add' ? 'monitor.addGroup' : 'monitor.editGroup');
+    groupRef.current?.showModal({
+      title,
+      type,
+      form: row,
+    });
+  };
+
+  const openMetricModal = (type: string, row = {}) => {
+    const title = t(
+      type === 'add' ? 'monitor.addMetric' : 'monitor.editMetric'
+    );
+    metricRef.current?.showModal({
+      title,
+      type,
+      form: row,
+    });
+  };
+
+  const operateGroup = () => {
+    console.log(123);
+  };
+
+  const operateMtric = () => {
+    console.log(456);
   };
 
   return (
@@ -206,10 +235,16 @@ const Configure = () => {
           onClear={onTxtClear}
         />
         <div>
-          <Button type="primary" className="mr-[8px]">
+          <Button
+            type="primary"
+            className="mr-[8px]"
+            onClick={() => openGroupModal('add')}
+          >
             {t('monitor.addGroup')}
           </Button>
-          <Button type="primary"> {t('monitor.addMetric')}</Button>
+          <Button type="primary" onClick={() => openMetricModal('add')}>
+            {t('monitor.addMetric')}
+          </Button>
         </div>
       </div>
       {metricData.map((metricItem, index) => (
@@ -220,7 +255,12 @@ const Configure = () => {
           isOpen={!index}
           icon={
             <div>
-              <Button type="link" size="small" icon={<EditOutlined />}></Button>
+              <Button
+                type="link"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => openGroupModal('edit', metricItem)}
+              ></Button>
               <Button
                 type="link"
                 size="small"
@@ -240,6 +280,8 @@ const Configure = () => {
           />
         </Collapse>
       ))}
+      <GroupModal ref={groupRef} onSuccess={operateGroup} />
+      <MetricModal ref={metricRef} onSuccess={operateMtric} />
     </div>
   );
 };

@@ -13,3 +13,15 @@ export interface ListItem {
   id?: string | number;
   value?: string | number;
 }
+
+export interface ModalConfig {
+  type: string;
+  form: any;
+  subTitle?: string;
+  title: string;
+  [key: string]: any;
+}
+
+export interface ModalRef {
+  showModal: (config: ModalConfig) => void;
+}

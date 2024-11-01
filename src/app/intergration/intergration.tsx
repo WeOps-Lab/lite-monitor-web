@@ -141,7 +141,7 @@ const Intergration = () => {
               <div className="border shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-4 relative cursor-pointer group">
                 <div className="flex items-center space-x-4 my-2">
                   <Icon type={app.icon} className="text-6xl" />
-                  <div className="flex flex-col items-center">
+                  <div>
                     <h2 className="text-xl font-bold m-0">{app.group_id}</h2>
                     <Tag className="mt-[4px]">{app.name}</Tag>
                   </div>

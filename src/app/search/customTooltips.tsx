@@ -11,6 +11,7 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
       <div
         className="custom-tooltip"
         style={{
+          fontSize: '14px',
           backgroundColor: 'var(--color-bg-1)',
           border: '1px solid var(--color-border-1)',
           padding: '10px',
