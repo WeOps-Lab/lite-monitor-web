@@ -6,7 +6,7 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
   payload,
   label,
 }) => {
-  if (active && payload && payload.length) {
+  if (active && payload?.length) {
     return (
       <div
         className="custom-tooltip"
@@ -19,36 +19,22 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
         }}
       >
         <p className="label font-[600]">{`${label}`}</p>
-        <div className="intro flex items-center mt-[4px]">
-          <span
-            style={{
-              display: 'inline-block',
-              width: '10px',
-              height: '10px',
-              backgroundColor: payload[0].color,
-              borderRadius: '50%',
-              marginRight: '5px',
-            }}
-          ></span>
-          {payload[0].payload.title}
-          <span className="font-[600] ml-[10px]">{`${payload[0].value}%`}</span>
-        </div>
-        {payload[1] && (
-          <div className="intro flex items-center mt-[4px]">
+        {payload.map((item: any, index: number) => (
+          <div key={index} className="intro flex items-center mt-[4px]">
             <span
               style={{
                 display: 'inline-block',
                 width: '10px',
                 height: '10px',
-                backgroundColor: payload[1].color,
+                backgroundColor: item.color,
                 borderRadius: '50%',
                 marginRight: '5px',
               }}
             ></span>
-            {payload[1].payload.title}
-            <span className="font-[600] ml-[10px]">{`${payload[1].value}%`}</span>
+            {item.payload.title}
+            <span className="font-[600] ml-[10px]">{item.value}</span>
           </div>
-        )}
+        ))}
       </div>
     );
   }

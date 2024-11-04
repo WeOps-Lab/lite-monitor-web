@@ -46,12 +46,41 @@ interface metricItem {
   [key: string]: unknown;
 }
 
+const colors = [
+  '#8884d8',
+  '#82ca9d',
+  '#ffc658',
+  '#ff7300',
+  '#387908',
+  '#ff0000',
+];
+
+const processData = (data: any) => {
+  const result: any[] = [];
+  data.forEach((item: any, index: number) => {
+    item.values.forEach(([timestamp, value]: [number, string]) => {
+      const time = new Date(timestamp * 1000).toLocaleString();
+      const existing = result.find((entry) => entry.time === time);
+      if (existing) {
+        existing[`value${index + 1}`] = parseFloat(value);
+      } else {
+        result.push({
+          time,
+          title: `${item.metric.job_name} - ${item.metric['__name__']}`,
+          [`value${index + 1}`]: parseFloat(value),
+        });
+      }
+    });
+  });
+  return result;
+};
+
 const Search = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [objLoading, setObjLoading] = useState<boolean>(false);
-  const [metric, setMetric] = useState<number | null>();
+  const [metric, setMetric] = useState<string | null>();
   const [metrics, setMetrics] = useState<metricItem[]>([]);
   const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
   const [instanceId, setInstanceId] = useState<string[]>();
@@ -61,8 +90,7 @@ const Search = () => {
   const [objects, setObjects] = useState<ObectItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('area');
   const [conditions, setConditions] = useState<ConditionItem[]>([]);
-  const [objectTypeList, setObjectTypeList] = useState<ListItem[]>([]);
-  const [objectList, setObjectTList] = useState<ListItem[]>([]);
+  const [timeRange, setTimeRange] = useState<string[]>([]);
   const [pagination, setPagination] = useState<any>({
     current: 1,
     total: 0,
@@ -88,91 +116,13 @@ const Search = () => {
     },
   ];
   const isArea: boolean = activeTab === 'area';
-  const [tableData, setTableData] = useState<any[]>([
-    {
-      id: 1,
-      time: '2024-09-20 13:12',
-      value1: '20.11',
-      value2: 30,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 2,
-      time: '2024-09-20 13:18',
-      value1: '30.00',
-      value2: 20,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 3,
-      time: '2024-09-20 13:24',
-      value1: '10.00',
-      value2: 50,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 4,
-      time: '2024-09-20 13:30',
-      value1: '50.00',
-      value2: 40,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 5,
-      time: '2024-09-20 13:36',
-      value1: '40.00',
-      value2: 60,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 6,
-      time: '2024-09-20 13:42',
-      value1: '60.00',
-      value2: 70,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 7,
-      time: '2024-09-20 13:48',
-      value1: '70.00',
-      value2: 60,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 8,
-      time: '2024-09-20 13:54',
-      value1: '60.00',
-      value2: 80,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 9,
-      time: '2024-09-20 14:00',
-      value1: '80.00',
-      value2: 70,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 10,
-      time: '2024-09-20 14:06',
-      value1: '70.00',
-      value2: 60,
-      title: '172.99.100-cpu-total',
-    },
-    {
-      id: 11,
-      time: '2024-09-20 14:12',
-      value1: '60.00',
-      value2: 50,
-      title: '172.99.100-cpu-total',
-    },
-  ]);
+  const [tableData, setTableData] = useState<any[]>([]);
 
   const conditionList: ListItem[] = [
     { id: '=', name: '=' },
     { id: '!=', name: '!=' },
-    { id: 'include', name: 'include' },
-    { id: 'exclude', name: 'exclude' },
+    { id: '=~', name: 'include' },
+    { id: '!~', name: 'exclude' },
   ];
 
   useEffect(() => {
@@ -202,28 +152,46 @@ const Search = () => {
     }
   };
 
-  //   const getInitData = () => {
-  //     const getAttrList = get(`/api/metrics_object/`);
-  //     setPageLoading(true);
-  //     try {
-  //       Promise.all([getAttrList])
-  //         .then((res) => {
-  //           const objTypes = res[0].map((item: any) => ({
-  //             name: item.attr_name,
-  //             id: item.attr_id,
-  //           }));
-  //           setObjectTypeList(objTypes);
-  //         })
-  //         .finally(() => {
-  //           setPageLoading(false);
-  //         });
-  //     } catch (error) {
-  //       setPageLoading(false);
-  //     }
-  //   };
+  const canSearch = () => {
+    return timeRange.every((item) => !!item) && !!metric;
+  };
+
+  const getParams = () => {
+    const params: any = {};
+    const startTime = timeRange.at(0);
+    const endTime = timeRange.at(1);
+    if (startTime && endTime) {
+      params.start = new Date(startTime).getTime();
+      params.end = new Date(endTime).getTime();
+      params.step = Math.ceil((params.end / 1000 - params.start / 1000) / 360);
+      // 生成Prometheus查询语法
+      let query = '';
+      if (instanceId?.length) {
+        query += `instance_id=~"${instanceId.join('|')}"`;
+      }
+      if (conditions?.length) {
+        const conditionQueries = conditions
+          .map((condition) => {
+            if (condition.label && condition.condition && condition.value) {
+              return `${condition.label}${condition.condition}"${condition.value}"`;
+            }
+            return '';
+          })
+          .filter(Boolean);
+        if (conditionQueries.length) {
+          if (query) {
+            query += ',';
+          }
+          query += conditionQueries.join(',');
+        }
+      }
+      params.query = query ? `${metric}{${query}}` : metric;
+    }
+    return params;
+  };
 
   const onTimeChange = (val: string[]) => {
-    console.log(val);
+    setTimeRange(val);
   };
 
   const onFrequenceChange = (val: number) => {
@@ -242,10 +210,10 @@ const Search = () => {
     setInstanceId(val);
   };
 
-  const handleMetricChange = (val: number) => {
+  const handleMetricChange = (val: string) => {
     setMetric(val);
     const _labels = (
-      metrics.find((item) => item.id === val)?.dimensions || []
+      metrics.find((item) => item.name === val)?.dimensions || []
     ).map((item) => item.name);
     setLabels(_labels);
   };
@@ -306,9 +274,71 @@ const Search = () => {
     setPagination(pagination);
   };
 
-  const handleSearch = () => {
-    console.log(123);
+  const handleSearch = async () => {
+    try {
+      setPageLoading(true);
+      const params = getParams();
+      const responseData = await get('/api/metrics_instance/query_range/', {
+        params,
+      });
+      setTableData(processData(responseData.result || []));
+    } finally {
+      setPageLoading(false);
+    }
   };
+
+  useEffect(() => {
+    const initialData = [
+      {
+        metric: {
+          job_name: 'lite-cmdb-init-job',
+          __name__: 'kube_job_info_gauge',
+        },
+        values: [
+          [1730169690, '1'],
+          [1730171460, '1'],
+          [1730175000, '1'],
+          [1730182080, '1'],
+          [1730183850, '1'],
+          [1730189160, '1'],
+          [1730267040, '1'],
+        ],
+      },
+      {
+        metric: {
+          job_name: 'lite-monitor-init-job',
+          __name__: 'kube_job_info_gauge',
+        },
+        values: [[1730456430, '1']],
+      },
+      {
+        metric: {
+          job_name: 'lite-node-mgmt-init-job',
+          __name__: 'kube_job_info_gauge',
+        },
+        values: [[1730693610, '1']],
+      },
+      {
+        metric: {
+          job_name: 'munchkin-init-job',
+          __name__: 'kube_job_info_gauge',
+        },
+        values: [
+          [1730175000, '1'],
+          [1730176770, '1'],
+          [1730182080, '1'],
+          [1730189160, '1'],
+          [1730190930, '1'],
+          [1730192700, '1'],
+          [1730194470, '1'],
+          [1730451120, '1'],
+          [1730700690, '1'],
+          [1730704230, '1'],
+        ],
+      },
+    ];
+    setTableData(processData(initialData));
+  }, [metric]);
 
   return (
     <div className={searchStyle.search}>
@@ -320,7 +350,12 @@ const Search = () => {
           onFrequenceChange={onFrequenceChange}
           onRefresh={onRefresh}
         />
-        <Button type="primary" className="ml-[8px]" onClick={handleSearch}>
+        <Button
+          type="primary"
+          className="ml-[8px]"
+          disabled={!canSearch()}
+          onClick={handleSearch}
+        >
           {t('common.search')}
         </Button>
       </div>
@@ -383,7 +418,7 @@ const Search = () => {
                 >
                   {metrics.map((item, index) => {
                     return (
-                      <Option value={item.id} key={index}>
+                      <Option value={item.name} key={index}>
                         {item.name}
                       </Option>
                     );
@@ -506,25 +541,20 @@ const Search = () => {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-                    tickFormatter={(value) => `${value}%`}
-                    domain={[0, 100]}
+                    tickFormatter={(value) => `${value}`}
                   />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Area
-                    type="monotone"
-                    dataKey="value1"
-                    stroke="#8884d8"
-                    fillOpacity={0.1}
-                    fill="#8884d8"
-                  />
-                  {/* <Area
-                type="monotone"
-                dataKey="value2"
-                stroke="#82ca9d"
-                fillOpacity={0.1}
-                fill="#82ca9d"
-              /> */}
+                  {tableData.map((key, index) => (
+                    <Area
+                      key={index}
+                      type="monotone"
+                      dataKey={`value${index + 1}`}
+                      stroke={colors[index % colors.length]}
+                      fillOpacity={0.1}
+                      fill={colors[index % colors.length]}
+                    />
+                  ))}
                 </AreaChart>
               </ResponsiveContainer>
             </div>
