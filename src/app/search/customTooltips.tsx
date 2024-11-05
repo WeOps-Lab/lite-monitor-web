@@ -11,6 +11,9 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
       <div
         className="custom-tooltip"
         style={{
+          pointerEvents: 'auto',
+          maxHeight: '500px',
+          overflowY: 'auto',
           fontSize: '14px',
           backgroundColor: 'var(--color-bg-1)',
           border: '1px solid var(--color-border-1)',
@@ -38,7 +41,6 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
       </div>
     );
   }
-
   return null;
 };
 

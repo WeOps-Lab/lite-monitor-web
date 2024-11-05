@@ -1,6 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Spin, Select, Button, Segmented, Progress, Input } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Spin, Select, Button, Segmented, Input } from 'antd';
 import { BellOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import useApiClient from '@/utils/request';
 import TimeSelector from './timeSelector';
@@ -91,32 +91,11 @@ const Search = () => {
   const [activeTab, setActiveTab] = useState<string>('area');
   const [conditions, setConditions] = useState<ConditionItem[]>([]);
   const [timeRange, setTimeRange] = useState<string[]>([]);
-  const [pagination, setPagination] = useState<any>({
-    current: 1,
-    total: 0,
-    pageSize: 20,
-  });
-  const [loading, setLoading] = useState<boolean>(false);
-  const columns: ColumnItem[] = [
-    {
-      title: 'Name',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Time',
-      dataIndex: 'time',
-      key: 'time',
-    },
-    {
-      title: 'Value1',
-      dataIndex: 'value1',
-      key: 'value1',
-      render: (_, { value1 }) => <Progress percent={value1} />,
-    },
-  ];
-  const isArea: boolean = activeTab === 'area';
+  const [columns, setColumns] = useState<ColumnItem[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const isArea: boolean = activeTab === 'area';
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const conditionList: ListItem[] = [
     { id: '=', name: '=' },
@@ -130,10 +109,20 @@ const Search = () => {
     getObjects();
   }, [isLoading]);
 
+  useEffect(() => {
+    return () => {
+      clearTimer();
+    };
+  }, []);
+
+  useEffect(() => {
+    handleSearch('refresh');
+  }, [activeTab]);
+
   const getObjects = async () => {
     try {
       setObjLoading(true);
-      const data = await get(`/api/metrics_object/`);
+      const data = await get(`/api/monitor_object/`);
       setObjects(data);
     } finally {
       setObjLoading(false);
@@ -153,7 +142,7 @@ const Search = () => {
   };
 
   const canSearch = () => {
-    return timeRange.every((item) => !!item) && !!metric;
+    return timeRange.length && timeRange.every((item) => !!item) && !!metric;
   };
 
   const getParams = () => {
@@ -194,16 +183,27 @@ const Search = () => {
     setTimeRange(val);
   };
 
+  const clearTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+  };
+
   const onFrequenceChange = (val: number) => {
-    console.log(val);
+    clearTimer();
+    if (!val) {
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      handleSearch('timer');
+    }, val);
   };
 
   const onRefresh = () => {
-    console.log(123);
+    handleSearch('refresh');
   };
 
   const createPolicy = () => {
-    console.log(122);
+    console.log('创建监控策略');
   };
 
   const handleInstanceChange = (val: string[]) => {
@@ -266,79 +266,79 @@ const Search = () => {
     setConditions(_conditions);
   };
 
+  const searchData = () => {
+    handleSearch('refresh');
+  };
+
   const onTabChange = (val: string) => {
     setActiveTab(val);
   };
 
-  const handleTableChange = (pagination = {}) => {
-    setPagination(pagination);
-  };
-
-  const handleSearch = async () => {
+  const handleSearch = async (type: string) => {
+    if (type !== 'timer') {
+      setChartData([]);
+      setTableData([]);
+    }
+    if (!canSearch()) {
+      return;
+    }
     try {
-      setPageLoading(true);
-      const params = getParams();
-      const responseData = await get('/api/metrics_instance/query_range/', {
+      setPageLoading(type === 'refresh');
+      const url = isArea
+        ? '/api/metrics_instance/query_range/'
+        : '/api/metrics_instance/query/';
+      let params = getParams();
+      if (!isArea) {
+        params = {
+          time: params.end,
+          query: params.query,
+        };
+      }
+      const responseData = await get(url, {
         params,
       });
-      setTableData(processData(responseData.result || []));
+      clearTimer();
+      const data = responseData.data?.result || [];
+      if (isArea) {
+        setChartData(processData(data));
+      } else {
+        const _tableData = data.map((item: any, index: number) => ({
+          ...item.metric,
+          value: item.value[1] ?? '--',
+          index,
+        }));
+        const tableColumns = Object.keys(_tableData[0])
+          .map((item) => ({
+            title: item,
+            dataIndex: item,
+            key: item,
+            width: 200,
+            ellipsis: {
+              showTitle: true,
+            },
+          }))
+          .filter((item) => item.key !== 'index');
+        const _columns = deepClone(tableColumns);
+        _columns[0].fixed = 'left';
+        setColumns(_columns);
+        setTableData(_tableData);
+      }
     } finally {
       setPageLoading(false);
     }
   };
 
-  useEffect(() => {
-    const initialData = [
-      {
-        metric: {
-          job_name: 'lite-cmdb-init-job',
-          __name__: 'kube_job_info_gauge',
-        },
-        values: [
-          [1730169690, '1'],
-          [1730171460, '1'],
-          [1730175000, '1'],
-          [1730182080, '1'],
-          [1730183850, '1'],
-          [1730189160, '1'],
-          [1730267040, '1'],
-        ],
-      },
-      {
-        metric: {
-          job_name: 'lite-monitor-init-job',
-          __name__: 'kube_job_info_gauge',
-        },
-        values: [[1730456430, '1']],
-      },
-      {
-        metric: {
-          job_name: 'lite-node-mgmt-init-job',
-          __name__: 'kube_job_info_gauge',
-        },
-        values: [[1730693610, '1']],
-      },
-      {
-        metric: {
-          job_name: 'munchkin-init-job',
-          __name__: 'kube_job_info_gauge',
-        },
-        values: [
-          [1730175000, '1'],
-          [1730176770, '1'],
-          [1730182080, '1'],
-          [1730189160, '1'],
-          [1730190930, '1'],
-          [1730192700, '1'],
-          [1730194470, '1'],
-          [1730451120, '1'],
-          [1730700690, '1'],
-          [1730704230, '1'],
-        ],
-      },
-    ];
-    setTableData(processData(initialData));
-  }, [metric]);
+  const getChartAreaKeys = (arr: any[]) => {
+    const keys = new Set();
+    arr.forEach((obj) => {
+      Object.keys(obj).forEach((key) => {
+        if (key.includes('value')) {
+          keys.add(key);
+        }
+      });
+    });
+    return Array.from(keys);
+  };
 
   return (
     <div className={searchStyle.search}>
@@ -354,7 +354,7 @@ const Search = () => {
           type="primary"
           className="ml-[8px]"
           disabled={!canSearch()}
-          onClick={handleSearch}
+          onClick={searchData}
         >
           {t('common.search')}
         </Button>
@@ -525,7 +525,7 @@ const Search = () => {
             <div className={searchStyle.chartArea}>
               <ResponsiveContainer>
                 <AreaChart
-                  data={tableData}
+                  data={chartData}
                   margin={{
                     top: 10,
                     right: 0,
@@ -544,8 +544,8 @@ const Search = () => {
                     tickFormatter={(value) => `${value}`}
                   />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <Tooltip content={<CustomTooltip />} />
-                  {tableData.map((key, index) => (
+                  <Tooltip content={<CustomTooltip />} offset={-10} />
+                  {getChartAreaKeys(chartData).map((key, index) => (
                     <Area
                       key={index}
                       type="monotone"
@@ -563,10 +563,8 @@ const Search = () => {
               scroll={{ y: 300 }}
               columns={columns}
               dataSource={tableData}
-              pagination={pagination}
-              loading={loading}
-              rowKey="id"
-              onChange={handleTableChange}
+              pagination={false}
+              rowKey="index"
             ></CustomTable>
           )}
         </div>
