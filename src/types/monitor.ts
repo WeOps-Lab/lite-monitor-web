@@ -40,3 +40,11 @@ export interface MetricItem {
   dimensions: any[];
   [key: string]: unknown;
 }
+
+export interface CollectionTargetField {
+  node: string;
+  instance_name: string;
+  interval: number;
+  unit: string;
+  url?: string;
+}

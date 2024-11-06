@@ -109,6 +109,13 @@
     "addMetric": "Add Metric",
     "editMetric": "Edit Metric",
     "dimension": "Dimension",
-    "keyMetric": "Key Metric"
+    "keyMetric": "Key Metric",
+    "configureStepIntro": "Please follow the following guidelines to install the collector.",
+    "configureStep1": "Define collection targets",
+    "configureStep2": "Select collection metrics",
+    "configureStep3": "Configure",
+    "step1": "Step1",
+    "step2": "Step2",
+    "step3": "Step3"
   }
 }
