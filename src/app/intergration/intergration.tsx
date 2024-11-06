@@ -7,10 +7,7 @@ import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
 import { deepClone } from '@/utils/common';
 import { useRouter } from 'next/navigation';
-interface ListItem {
-  label: string;
-  value: string;
-}
+import { IntergrationItem, ObectItem } from '@/types/monitor';
 
 const Intergration = () => {
   const { get, isLoading } = useApiClient();
@@ -19,77 +16,57 @@ const Intergration = () => {
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
-  const [items, setItems] = useState<ListItem[]>([]);
-  const [apps, setApps] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const responseData = [
-    {
-      id: 1,
-      group_id: 'HOST',
-      name: 'OS',
-      des: 'Used for monitoring data collection of Windows operating system, including indicators such as CPU, memory,disk, etc',
-      icon: 'yuzhiguanli',
-    },
-    {
-      id: 2,
-      group_id: 'HOST',
-      name: 'OS',
-      des: 'Used for monitoring data collection of Windows operating system, including indicators such as CPU, memory,disk, etc',
-      icon: 'yuzhiguanli',
-    },
-    {
-      id: 3,
-      group_id: 'HOST',
-      name: 'OS',
-      des: 'Used for monitoring data collection of Windows operating system, including indicators such as CPU, memory,disk, etc',
-      icon: 'yuzhiguanli',
-    },
-    {
-      id: 4,
-      group_id: 'HOST',
-      name: 'DB',
-      des: 'Used for monitoring data collection of Windows operating system, including indicators such as CPU, memory,disk, etc',
-      icon: 'yuzhiguanli',
-    },
-    {
-      id: 5,
-      group_id: 'HOST',
-      name: 'DB',
-      des: 'Used for monitoring data collection of Windows operating system, including indicators such as CPU, memory,disk, etc',
-      icon: 'yuzhiguanli',
-    },
-  ];
+  const [items, setItems] = useState<IntergrationItem[]>([]);
+  const [apps, setApps] = useState<ObectItem[]>([]);
 
   useEffect(() => {
     if (activeTab) {
-      const data = deepClone(responseData);
-      const activeData = data.filter((item: any) => item.name === activeTab);
-      setApps(activeTab === 'All' ? data : activeData);
+      setApps(items.find((item) => item.value === activeTab)?.list || []);
     }
   }, [activeTab]);
 
   useEffect(() => {
     if (isLoading) return;
-    getInitData();
+    getObjects();
   }, [isLoading]);
 
-  const getInitData = () => {
-    setItems([
+  const getObjects = async (text?: string) => {
+    try {
+      setPageLoading(true);
+      const data = await get(`/api/monitor_object/`, {
+        params: {
+          search: text || '',
+        },
+      });
+      const _items = getAppsByType(data);
+      setItems(_items);
+      setActiveTab('All');
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  const getAppsByType = (data: ObectItem[]): IntergrationItem[] => {
+    const groupedData = data.reduce((acc, item) => {
+      if (!acc[item.type]) {
+        acc[item.type] = {
+          label: item.type,
+          value: item.type,
+          list: [],
+        };
+      }
+      acc[item.type].list.push(item);
+      acc[item.type].label = `${item.type}(${acc[item.type].list.length})`;
+      return acc;
+    }, {} as Record<string, IntergrationItem>);
+    return [
       {
-        label: 'All (5)',
+        label: `All(${data.length})`,
         value: 'All',
+        list: data,
       },
-      {
-        label: 'OS (3)',
-        value: 'OS',
-      },
-      {
-        label: 'DB (2)',
-        value: 'DB',
-      },
-    ]);
-    setApps(responseData);
-    setActiveTab('All');
+      ...Object.values(groupedData),
+    ];
   };
 
   const onTabChange = (val: string) => {
@@ -101,15 +78,17 @@ const Intergration = () => {
   };
 
   const onTxtPressEnter = () => {
-    getInitData();
+    getObjects(searchText);
   };
 
   const onTxtClear = () => {
-    getInitData();
+    setSearchText('');
+    getObjects('');
   };
 
-  const linkToDetial = (app: any) => {
-    const params = new URLSearchParams(app);
+  const linkToDetial = (app: ObectItem) => {
+    const row = deepClone(app);
+    const params = new URLSearchParams(row);
     const targetUrl = `/intergration/detail?${params.toString()}`;
     router.push(targetUrl);
   };
@@ -140,16 +119,16 @@ const Intergration = () => {
             >
               <div className="border shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-4 relative cursor-pointer group">
                 <div className="flex items-center space-x-4 my-2">
-                  <Icon type={app.icon} className="text-6xl" />
+                  <Icon type={app.name} className="text-6xl" />
                   <div>
-                    <h2 className="text-xl font-bold m-0">{app.group_id}</h2>
+                    <h2 className="text-xl font-bold m-0">{app.type}</h2>
                     <Tag className="mt-[4px]">{app.name}</Tag>
                   </div>
                 </div>
                 <p
                   className={`mb-[15px] text-[var(--color-text-3)] text-[13px] ${intergrationStyle.lineClamp3}`}
                 >
-                  {app.des}
+                  {app.description}
                 </p>
                 <div
                   className={`w-full h-[32px] flex justify-center items-end ${intergrationStyle.setting}`}

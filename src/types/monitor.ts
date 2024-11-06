@@ -17,10 +17,17 @@ export interface MetricInfo {
   descripition?: string;
 }
 
+export interface IntergrationItem {
+  label: string;
+  value: string;
+  list: ObectItem[];
+}
+
 export interface ObectItem {
   id: number;
   name: string;
   type: string;
+  description: string;
   [key: string]: unknown;
 }
 

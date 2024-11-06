@@ -16,10 +16,9 @@ const IntergrationDetailLayout = ({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const groupId = searchParams.get('group_id');
-  const name = searchParams.get('name');
-  const desc = searchParams.get('des');
-  const icon = searchParams.get('icon') || '';
+  const groupId = searchParams.get('name');
+  const desc = searchParams.get('description');
+  const icon = searchParams.get('name') || '';
 
   const handleBackButtonClick = () => {
     router.push(`/intergration`);
