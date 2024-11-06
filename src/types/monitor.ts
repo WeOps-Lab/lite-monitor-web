@@ -16,3 +16,20 @@ export interface MetricInfo {
   unit?: string;
   descripition?: string;
 }
+
+export interface ObectItem {
+  id: number;
+  name: string;
+  type: string;
+  [key: string]: unknown;
+}
+
+export interface MetricItem {
+  id: number;
+  metric_group: number;
+  metric_object: number;
+  name: string;
+  type: string;
+  dimensions: any[];
+  [key: string]: unknown;
+}

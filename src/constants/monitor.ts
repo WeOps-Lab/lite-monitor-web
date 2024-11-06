@@ -6,4 +6,11 @@ const FREQUENCY_LIST: ListItem[] = [
   { label: '10m', value: 600000 },
 ];
 
-export { FREQUENCY_LIST };
+const CONDITION_LIST: ListItem[] = [
+  { id: '=', name: '=' },
+  { id: '!=', name: '!=' },
+  { id: '=~', name: 'include' },
+  { id: '!~', name: 'exclude' },
+];
+
+export { FREQUENCY_LIST, CONDITION_LIST };

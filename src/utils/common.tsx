@@ -47,3 +47,20 @@ export const getRandomColor = () => {
   const randomIndex = Math.floor(Math.random() * colors.length);
   return colors[randomIndex];
 };
+
+// 获取随机颜色
+export const generateUniqueRandomColor = (() => {
+  const generatedColors = new Set<string>();
+  return (): string => {
+    const letters = '0123456789ABCDEF';
+    let color;
+    do {
+      color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+    } while (generatedColors.has(color));
+    generatedColors.add(color);
+    return color;
+  };
+})();

@@ -10,7 +10,9 @@ import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
 const { Option } = Select;
 import { ListItem, ColumnItem } from '@/types';
-import { deepClone } from '@/utils/common';
+import { ObectItem, MetricItem } from '@/types/monitor';
+import { deepClone, generateUniqueRandomColor } from '@/utils/common';
+import { CONDITION_LIST } from '@/constants/monitor';
 import {
   XAxis,
   YAxis,
@@ -29,31 +31,13 @@ interface ConditionItem {
   value: string;
 }
 
-interface ObectItem {
-  id: number;
-  name: string;
-  type: string;
-  [key: string]: unknown;
+interface SearchParams {
+  time?: number;
+  end?: number;
+  start?: number;
+  step?: number;
+  query: string;
 }
-
-interface metricItem {
-  id: number;
-  metric_group: number;
-  metric_object: number;
-  name: string;
-  type: string;
-  dimensions: any[];
-  [key: string]: unknown;
-}
-
-const colors = [
-  '#8884d8',
-  '#82ca9d',
-  '#ffc658',
-  '#ff7300',
-  '#387908',
-  '#ff0000',
-];
 
 const processData = (data: any) => {
   const result: any[] = [];
@@ -66,7 +50,7 @@ const processData = (data: any) => {
       } else {
         result.push({
           time,
-          title: `${item.metric.job_name} - ${item.metric['__name__']}`,
+          title: `${item.metric['__name__']}`,
           [`value${index + 1}`]: parseFloat(value),
         });
       }
@@ -81,7 +65,7 @@ const Search = () => {
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [objLoading, setObjLoading] = useState<boolean>(false);
   const [metric, setMetric] = useState<string | null>();
-  const [metrics, setMetrics] = useState<metricItem[]>([]);
+  const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
   const [instanceId, setInstanceId] = useState<string[]>();
   const [instances, setInstances] = useState<any[]>([]);
@@ -94,15 +78,9 @@ const Search = () => {
   const [columns, setColumns] = useState<ColumnItem[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [frequence, setFrequence] = useState<number>(0);
   const isArea: boolean = activeTab === 'area';
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const conditionList: ListItem[] = [
-    { id: '=', name: '=' },
-    { id: '!=', name: '!=' },
-    { id: '=~', name: 'include' },
-    { id: '!~', name: 'exclude' },
-  ];
 
   useEffect(() => {
     if (isLoading) return;
@@ -110,14 +88,17 @@ const Search = () => {
   }, [isLoading]);
 
   useEffect(() => {
+    if (!frequence) {
+      clearTimer();
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      handleSearch('timer', activeTab);
+    }, frequence);
     return () => {
       clearTimer();
     };
-  }, []);
-
-  useEffect(() => {
-    handleSearch('refresh');
-  }, [activeTab]);
+  }, [activeTab, frequence, object, metric, conditions, instances, timeRange]);
 
   const getObjects = async () => {
     try {
@@ -146,7 +127,7 @@ const Search = () => {
   };
 
   const getParams = () => {
-    const params: any = {};
+    const params: SearchParams = { query: '' };
     const startTime = timeRange.at(0);
     const endTime = timeRange.at(1);
     if (startTime && endTime) {
@@ -174,7 +155,7 @@ const Search = () => {
           query += conditionQueries.join(',');
         }
       }
-      params.query = query ? `${metric}{${query}}` : metric;
+      params.query = query ? `${metric}{${query}}` : metric || '';
     }
     return params;
   };
@@ -189,17 +170,11 @@ const Search = () => {
   };
 
   const onFrequenceChange = (val: number) => {
-    clearTimer();
-    if (!val) {
-      return;
-    }
-    timerRef.current = setInterval(() => {
-      handleSearch('timer');
-    }, val);
+    setFrequence(val);
   };
 
   const onRefresh = () => {
-    handleSearch('refresh');
+    handleSearch('refresh', activeTab);
   };
 
   const createPolicy = () => {
@@ -267,14 +242,15 @@ const Search = () => {
   };
 
   const searchData = () => {
-    handleSearch('refresh');
+    handleSearch('refresh', activeTab);
   };
 
   const onTabChange = (val: string) => {
     setActiveTab(val);
+    handleSearch('refresh', val);
   };
 
-  const handleSearch = async (type: string) => {
+  const handleSearch = async (type: string, tab: string) => {
     if (type !== 'timer') {
       setChartData([]);
       setTableData([]);
@@ -284,11 +260,12 @@ const Search = () => {
     }
     try {
       setPageLoading(type === 'refresh');
-      const url = isArea
+      const areaCurrent = tab === 'area';
+      const url = areaCurrent
         ? '/api/metrics_instance/query_range/'
         : '/api/metrics_instance/query/';
       let params = getParams();
-      if (!isArea) {
+      if (!areaCurrent) {
         params = {
           time: params.end,
           query: params.query,
@@ -297,9 +274,8 @@ const Search = () => {
       const responseData = await get(url, {
         params,
       });
-      clearTimer();
       const data = responseData.data?.result || [];
-      if (isArea) {
+      if (areaCurrent) {
         setChartData(processData(data));
       } else {
         const _tableData = data.map((item: any, index: number) => ({
@@ -457,13 +433,15 @@ const Search = () => {
                           value={conditionItem.condition}
                           onChange={(val) => handleConditionChange(val, index)}
                         >
-                          {conditionList.map((item, index) => {
-                            return (
-                              <Option value={item.id} key={index}>
-                                {item.name}
-                              </Option>
-                            );
-                          })}
+                          {CONDITION_LIST.map(
+                            (item: ListItem, index: number) => {
+                              return (
+                                <Option value={item.id} key={index}>
+                                  {item.name}
+                                </Option>
+                              );
+                            }
+                          )}
                         </Select>
                         <Input
                           className="w-[250px]"
@@ -550,9 +528,9 @@ const Search = () => {
                       key={index}
                       type="monotone"
                       dataKey={`value${index + 1}`}
-                      stroke={colors[index % colors.length]}
+                      stroke={generateUniqueRandomColor()}
                       fillOpacity={0.1}
-                      fill={colors[index % colors.length]}
+                      fill={generateUniqueRandomColor()}
                     />
                   ))}
                 </AreaChart>
