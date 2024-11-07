@@ -116,6 +116,10 @@
     "configureStep3": "Configure",
     "step1": "Step1",
     "step2": "Step2",
-    "step3": "Step3"
+    "step3": "Step3",
+    "collectionNode": "Collection Node",
+    "url": "URL",
+    "interval": "Interval",
+    "instanceName": "Instance Name"
   }
 }

@@ -96,14 +96,18 @@ const Configure: React.FC = () => {
         >
           <Form form={form} name="basic" onValuesChange={handleValuesChange}>
             <Form.Item<CollectionTargetField>
-              label={<span className="w-[100px]">Instance</span>}
+              label={
+                <span className="w-[100px]">{t('monitor.instanceName')}</span>
+              }
               name="instance_name"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Input className="w-[300px]" />
             </Form.Item>
             <Form.Item<CollectionTargetField>
-              label={<span className="w-[100px]">Collection Node</span>}
+              label={
+                <span className="w-[100px]">{t('monitor.collectionNode')}</span>
+              }
               name="node"
               rules={[{ required: true, message: t('common.required') }]}
             >
@@ -111,7 +115,7 @@ const Configure: React.FC = () => {
             </Form.Item>
             {name === 'Website' && (
               <Form.Item<CollectionTargetField>
-                label={<span className="w-[100px]">URL</span>}
+                label={<span className="w-[100px]">{t('monitor.url')}</span>}
                 name="url"
                 rules={[{ required: true, message: t('common.required') }]}
               >
@@ -119,7 +123,7 @@ const Configure: React.FC = () => {
               </Form.Item>
             )}
             <Form.Item<CollectionTargetField>
-              label={<span className="w-[100px]">Interval</span>}
+              label={<span className="w-[100px]">{t('monitor.interval')}</span>}
               className={configureStyle.interval}
             >
               <Form.Item
