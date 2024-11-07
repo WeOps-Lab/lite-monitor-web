@@ -4,6 +4,7 @@ import { useTranslation } from '@/utils/i18n';
 import { MetricItem } from '@/types/monitor';
 import { Tag, Button, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
+import ReactDOMServer from 'react-dom/server';
 const { CheckableTag } = Tag;
 
 interface Step1Props {
@@ -13,6 +14,7 @@ interface Step1Props {
 interface Step2Props {
   options: MetricItem[];
   selectedOptions: number[];
+  disabled: boolean;
   onChange: (selected: number[]) => void;
 }
 
@@ -23,6 +25,7 @@ interface Step3Props {
 interface ThreeStepComponentProps {
   step2Options: MetricItem[];
   step3Content: JSX.Element;
+  metricsDisabled: boolean;
   onStep2Change: (selected: number[]) => void;
   children: ReactNode;
 }
@@ -43,6 +46,7 @@ const Step1: React.FC<Step1Props> = ({ children }) => {
 const Step2: React.FC<Step2Props> = ({
   options,
   selectedOptions,
+  disabled,
   onChange,
 }) => {
   const { t } = useTranslation();
@@ -64,6 +68,7 @@ const Step2: React.FC<Step2Props> = ({
           <CheckableTag
             key={option.id}
             checked={selectedOptions.includes(option.id)}
+            style={disabled ? { pointerEvents: 'none' } : {}}
             onChange={(checked) => handleCheckboxChange(option.id, checked)}
           >
             {option.name}
@@ -76,9 +81,14 @@ const Step2: React.FC<Step2Props> = ({
 
 const Step3: React.FC<Step3Props> = ({ content }) => {
   const { t } = useTranslation();
-  const onCopy = (value: any) => {
-    const copyVal = String(value);
-    navigator.clipboard.writeText(copyVal);
+
+  // 复制jsx里面的内容，不要标签
+  const onCopy = (value: JSX.Element) => {
+    const elementString = ReactDOMServer.renderToString(value);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(elementString, 'text/html');
+    const text = doc.body.textContent || '';
+    navigator.clipboard.writeText(text);
     message.success(t('common.successfulCopied'));
   };
 
@@ -105,6 +115,7 @@ const Step3: React.FC<Step3Props> = ({ content }) => {
 const ThreeStepComponent: React.FC<ThreeStepComponentProps> = ({
   step2Options,
   step3Content,
+  metricsDisabled,
   onStep2Change,
   children,
 }) => {
@@ -123,6 +134,7 @@ const ThreeStepComponent: React.FC<ThreeStepComponentProps> = ({
     <div className={threeStepStyle.threeStep}>
       <Step1>{children}</Step1>
       <Step2
+        disabled={metricsDisabled}
         options={step2Options}
         selectedOptions={selectedOptions}
         onChange={handleStep2Change}

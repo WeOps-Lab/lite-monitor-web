@@ -1,34 +1,63 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import ThreeStep from './threeStep';
-import { Spin, Form, Input } from 'antd';
+import { Spin, Form, Input, Select } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { MetricItem, CollectionTargetField } from '@/types/monitor';
 import { useSearchParams } from 'next/navigation';
 import configureStyle from './index.module.less';
+const { Option } = Select;
 
-const ParentComponent: React.FC = () => {
+const Configure: React.FC = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const name = searchParams.get('name') || '';
   const [form] = Form.useForm();
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const [step3Content, setStep3Content] = useState<JSX.Element>(
-    <div>Initial Step 3 Content</div>
-  );
+  const [step3Content, setStep3Content] = useState<JSX.Element>(<></>);
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
+  const [originMetrics, setoriginMetrics] = useState<MetricItem[]>([]);
+  const [intervalUnit, setIntervalUnit] = useState<string>('s');
 
   useEffect(() => {
     if (isLoading) return;
     getMetrics();
   }, [isLoading]);
 
-  const handleStep2Change = (selected: number[]) => {
-    setStep3Content(
-      <div>Updated Step 3 Content from Step2: {selected.join(', ')}</div>
+  useEffect(() => {
+    changeStep3Content();
+  }, [name, intervalUnit, metrics]);
+
+  const changeStep3Content = () => {
+    const formData = form.getFieldsValue();
+    const html = (
+      <>
+        <ul>
+          {metrics.map((item) => (
+            <li className="mb-[10px]" key={item.id}>{`[[${item.name}]]`}</li>
+          ))}
+        </ul>
+        <ul>
+          {Object.entries(formData).map(([key, value]) =>
+            key === 'interval' ? (
+              <li key={key}>{`${key}='${value}${intervalUnit}'`}</li>
+            ) : (
+              <li className="mb-[10px]" key={key}>{`${key}='${value}'`}</li>
+            )
+          )}
+        </ul>
+      </>
     );
+    setStep3Content(html);
+  };
+
+  const handleStep2Change = (selected: number[]) => {
+    const metricsIds = originMetrics.filter((item) =>
+      selected.includes(item.id)
+    );
+    setMetrics(metricsIds);
   };
 
   const getMetrics = async () => {
@@ -41,10 +70,18 @@ const ParentComponent: React.FC = () => {
         params,
       });
       setMetrics(data);
-      console.log(data);
+      setoriginMetrics(data);
     } finally {
       setPageLoading(false);
     }
+  };
+
+  const handleValuesChange = (changedValues: any, allValues: any) => {
+    changeStep3Content();
+  };
+
+  const handleIntervalChange = (value: string) => {
+    setIntervalUnit(value);
   };
 
   return (
@@ -52,11 +89,12 @@ const ParentComponent: React.FC = () => {
       <Spin spinning={pageLoading}>
         <p className="mb-[20px]">{t('monitor.configureStepIntro')}</p>
         <ThreeStep
-          step2Options={metrics}
+          metricsDisabled={name === 'K8S'}
+          step2Options={originMetrics}
           step3Content={step3Content}
           onStep2Change={handleStep2Change}
         >
-          <Form form={form} name="basic" labelWrap>
+          <Form form={form} name="basic" onValuesChange={handleValuesChange}>
             <Form.Item<CollectionTargetField>
               label={<span className="w-[100px]">Instance</span>}
               name="instance_name"
@@ -82,10 +120,24 @@ const ParentComponent: React.FC = () => {
             )}
             <Form.Item<CollectionTargetField>
               label={<span className="w-[100px]">Interval</span>}
-              name="interval"
-              rules={[{ required: true, message: t('common.required') }]}
+              className={configureStyle.interval}
             >
-              <Input className="w-[300px]" />
+              <Form.Item
+                name="interval"
+                noStyle
+                rules={[{ required: true, message: t('common.required') }]}
+              >
+                <Input className="w-[300px]" />
+              </Form.Item>
+              <Select
+                className="ml-[10px]"
+                style={{ width: '100px' }}
+                onChange={handleIntervalChange}
+                value={intervalUnit}
+              >
+                <Option value="s">s</Option>
+                <Option value="m">min</Option>
+              </Select>
             </Form.Item>
           </Form>
         </ThreeStep>
@@ -94,4 +146,4 @@ const ParentComponent: React.FC = () => {
   );
 };
 
-export default ParentComponent;
+export default Configure;
