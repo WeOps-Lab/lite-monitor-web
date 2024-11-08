@@ -16,11 +16,12 @@ import { GroupInfo } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 
 interface GroupModalProps {
+  monitorObject: number;
   onSuccess: () => void;
 }
 
 const GroupMoadal = forwardRef<ModalRef, GroupModalProps>(
-  ({ onSuccess }, ref) => {
+  ({ onSuccess, monitorObject }, ref) => {
     const { post, put } = useApiClient();
     const { t } = useTranslation();
     const formRef = useRef<FormInstance>(null);
@@ -55,16 +56,14 @@ const GroupMoadal = forwardRef<ModalRef, GroupModalProps>(
         );
         const url: string =
           type === 'add'
-            ? '/api/classification/'
-            : `/api/classification/${groupForm._id}/`;
-        let requestParams = params;
-        if (type !== 'add') {
-          requestParams = {
-            name: params.name,
-          };
-        }
+            ? '/api/metrics_group/'
+            : `/api/metrics_group/${groupForm.id}/`;
+        const requestParams = {
+          ...params,
+          monitor_object: monitorObject,
+        };
         const requestType = type === 'add' ? post : put;
-        await requestType(url, params);
+        await requestType(url, requestParams);
         message.success(msg);
         handleCancel();
         onSuccess();
@@ -88,6 +87,7 @@ const GroupMoadal = forwardRef<ModalRef, GroupModalProps>(
     return (
       <div>
         <OperateModal
+          width={600}
           title={title}
           visible={groupVisible}
           onCancel={handleCancel}
@@ -105,19 +105,7 @@ const GroupMoadal = forwardRef<ModalRef, GroupModalProps>(
             </div>
           }
         >
-          <Form
-            ref={formRef}
-            name="basic"
-            labelCol={{ span: 4 }}
-            wrapperCol={{ span: 20 }}
-          >
-            <Form.Item<GroupInfo>
-              label="ID"
-              name="id"
-              rules={[{ required: true, message: t('common.required') }]}
-            >
-              <Input disabled={type === 'edit'} />
-            </Form.Item>
+          <Form ref={formRef} name="basic">
             <Form.Item<GroupInfo>
               label="Name"
               name="name"

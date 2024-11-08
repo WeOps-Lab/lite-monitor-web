@@ -1,74 +1,38 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Input, Button, Switch, Modal, message } from 'antd';
+import { Input, Button, Switch, Modal, message, Spin } from 'antd';
 import useApiClient from '@/utils/request';
 import metricStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
-import { deepClone } from '@/utils/common';
 import CustomTable from '@/components/custom-table';
-import { ColumnItem } from '@/types';
+import { ColumnItem, ModalRef } from '@/types';
+import { DimensionItem, MetricItem, GroupInfo } from '@/types/monitor';
 import Collapse from '@/components/collapse';
 import GroupModal from './groupModal';
 import MetricModal from './metricModal';
-import { ModalRef } from '@/types';
+import { useSearchParams } from 'next/navigation';
 const { confirm } = Modal;
 interface ListItem {
   id: string;
   name: string;
-  child: any[];
+  child: MetricItem[];
 }
 
 const Configure = () => {
-  const { del, isLoading } = useApiClient();
+  const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const name = searchParams.get('name') || '';
+  const monitorObjectId = searchParams.get('id') || '';
   const groupRef = useRef<ModalRef>(null);
   const metricRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [metricData, setMetricData] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const responseData = [
-    {
-      id: 'group1',
-      name: 'Group1',
-      child: [
-        {
-          id: 1,
-          dimension: 'Disk',
-          name: 'CPU usage',
-          descripition: 'Used for monitoring data',
-          type: 'float',
-          unit: 'percent',
-          keyMetric: true,
-        },
-      ],
-    },
-    {
-      id: 'group2',
-      name: 'Group2',
-      child: [
-        {
-          id: 2,
-          dimension: 'Disk1',
-          name: 'CPU usage',
-          descripition: 'Used for monitoring data',
-          type: 'float',
-          unit: 'percent',
-          keyMetric: false,
-        },
-      ],
-    },
-  ];
+  const [groupList, setGroupList] = useState<ListItem[]>([]);
 
   const columns: ColumnItem[] = [
-    {
-      title: t('common.id'),
-      dataIndex: 'id',
-      key: 'id',
-      ellipsis: {
-        showTitle: true,
-      },
-    },
     {
       title: t('common.name'),
       dataIndex: 'name',
@@ -76,13 +40,25 @@ const Configure = () => {
     },
     {
       title: t('monitor.dimension'),
-      dataIndex: 'dimension',
-      key: 'dimension',
+      dataIndex: 'dimensions',
+      key: 'dimensions',
+      render: (_, record) => (
+        <>
+          {record.dimensions?.length
+            ? record.dimensions
+              .map((item: DimensionItem) => item.name)
+              .join(',')
+            : '--'}
+        </>
+      ),
     },
     {
       title: t('common.type'),
       dataIndex: 'type',
       key: 'type',
+      render: (_, record) => (
+        <>{record.type === 'metric' ? 'Metric' : 'Calculated Metric'}</>
+      ),
     },
     {
       title: t('common.unit'),
@@ -91,21 +67,21 @@ const Configure = () => {
     },
     {
       title: t('common.descripition'),
-      dataIndex: 'descripition',
-      key: 'descripition',
+      dataIndex: 'description',
+      key: 'description',
     },
-    {
-      title: t('monitor.keyMetric'),
-      dataIndex: 'keyMetric',
-      key: 'keyMetric',
-      render: (_, record) => (
-        <Switch
-          size="small"
-          onChange={handleKeyMetricChange}
-          value={record.keyMetric}
-        />
-      ),
-    },
+    // {
+    //   title: t('monitor.keyMetric'),
+    //   dataIndex: 'keyMetric',
+    //   key: 'keyMetric',
+    //   render: (_, record) => (
+    //     <Switch
+    //       size="small"
+    //       onChange={handleKeyMetricChange}
+    //       value={record.keyMetric}
+    //     />
+    //   ),
+    // },
     {
       title: t('common.action'),
       key: 'action',
@@ -115,7 +91,7 @@ const Configure = () => {
           <Button
             type="link"
             className="mr-[10px]"
-            onClick={() => openMetricModal('add', record)}
+            onClick={() => openMetricModal('edit', record)}
           >
             {t('common.edit')}
           </Button>
@@ -136,7 +112,7 @@ const Configure = () => {
     console.log(123);
   };
 
-  const showDeleteConfirm = (row: any) => {
+  const showDeleteConfirm = (row: MetricItem) => {
     confirm({
       title: t('common.deleteTitle'),
       content: t('common.deleteContent'),
@@ -144,7 +120,7 @@ const Configure = () => {
       onOk() {
         return new Promise(async (resolve) => {
           try {
-            await del(`/api/instance/${row._id}/`);
+            await del(`/api/metrics/${row.id}/`);
             message.success(t('common.successfullyDeleted'));
             getInitData();
           } finally {
@@ -155,7 +131,7 @@ const Configure = () => {
     });
   };
 
-  const showGroupDeleteConfirm = (row: any) => {
+  const showGroupDeleteConfirm = (row: ListItem) => {
     confirm({
       title: t('common.deleteTitle'),
       content: t('common.deleteContent'),
@@ -163,7 +139,7 @@ const Configure = () => {
       onOk() {
         return new Promise(async (resolve) => {
           try {
-            await del(`/api/instance/${row._id}/`);
+            await del(`/api/metrics_group/${row.id}/`);
             message.success(t('common.successfullyDeleted'));
             getInitData();
           } finally {
@@ -174,9 +150,43 @@ const Configure = () => {
     });
   };
 
-  const getInitData = () => {
-    const data = deepClone(responseData);
-    setMetricData(data);
+  const getInitData = async (type?: string) => {
+    const getGroupList = get(`/api/metrics_group/`, {
+      params: {
+        search: type ? '' : searchText,
+      },
+    });
+    const getMetrics = get('/api/metrics/', {
+      params: {
+        monitor_object_name: name,
+      },
+    });
+    setLoading(true);
+    try {
+      Promise.all([getGroupList, getMetrics])
+        .then((res) => {
+          const groupData = res[0].map((item: GroupInfo) => ({
+            ...item,
+            child: [],
+          }));
+          const metricData = res[1];
+          metricData.forEach((metric: MetricItem) => {
+            const target = groupData.find(
+              (item: GroupInfo) => item.id === metric.metric_group
+            );
+            if (target) {
+              target.child.push(metric);
+            }
+          });
+          setGroupList(groupData);
+          setMetricData(groupData);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
   const onSearchTxtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +198,8 @@ const Configure = () => {
   };
 
   const onTxtClear = () => {
-    getInitData();
+    setSearchText('');
+    getInitData('clear');
   };
 
   const openGroupModal = (type: string, row = {}) => {
@@ -212,11 +223,11 @@ const Configure = () => {
   };
 
   const operateGroup = () => {
-    console.log(123);
+    getInitData();
   };
 
   const operateMtric = () => {
-    console.log(456);
+    getInitData();
   };
 
   return (
@@ -247,41 +258,52 @@ const Configure = () => {
           </Button>
         </div>
       </div>
-      {metricData.map((metricItem, index) => (
-        <Collapse
-          className="mb-[10px]"
-          key={metricItem.id}
-          title={metricItem.name || ''}
-          isOpen={!index}
-          icon={
-            <div>
-              <Button
-                type="link"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => openGroupModal('edit', metricItem)}
-              ></Button>
-              <Button
-                type="link"
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={() => showGroupDeleteConfirm(metricItem)}
-              ></Button>
-            </div>
-          }
-        >
-          <CustomTable
-            pagination={false}
-            dataSource={metricItem.child || []}
-            loading={loading}
-            columns={columns}
-            scroll={{ y: 300 }}
-            rowKey="id"
-          />
-        </Collapse>
-      ))}
-      <GroupModal ref={groupRef} onSuccess={operateGroup} />
-      <MetricModal ref={metricRef} onSuccess={operateMtric} />
+      <Spin spinning={loading}>
+        {metricData.map((metricItem, index) => (
+          <Collapse
+            className="mb-[10px]"
+            key={metricItem.id}
+            title={metricItem.name || ''}
+            isOpen={!index}
+            icon={
+              <div>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => openGroupModal('edit', metricItem)}
+                ></Button>
+                <Button
+                  type="link"
+                  size="small"
+                  disabled={!!metricItem.child?.length}
+                  icon={<DeleteOutlined />}
+                  onClick={() => showGroupDeleteConfirm(metricItem)}
+                ></Button>
+              </div>
+            }
+          >
+            <CustomTable
+              pagination={false}
+              dataSource={metricItem.child || []}
+              columns={columns}
+              scroll={{ y: 300 }}
+              rowKey="id"
+            />
+          </Collapse>
+        ))}
+      </Spin>
+      <GroupModal
+        ref={groupRef}
+        monitorObject={+monitorObjectId}
+        onSuccess={operateGroup}
+      />
+      <MetricModal
+        ref={metricRef}
+        monitorObject={+monitorObjectId}
+        groupList={groupList}
+        onSuccess={operateMtric}
+      />
     </div>
   );
 };

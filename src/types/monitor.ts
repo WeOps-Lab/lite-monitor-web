@@ -1,20 +1,21 @@
 export interface GroupInfo {
-  id?: string;
   name?: string;
-  _id?: number;
+  description?: string;
+  id?: number;
 }
 
 export interface MetricInfo {
-  id?: string;
-  name?: string;
-  _id?: number;
-  group?: string;
-  query?: string;
-  formula?: string;
   type?: string;
-  dataType?: string;
+  name?: string;
+  display_name?: string;
+  metric_group?: number;
+  monitor_object?: number;
+  id?: number;
+  query?: string;
+  data_type?: string;
   unit?: string;
-  descripition?: string;
+  description?: string;
+  dimensions?: string[];
 }
 
 export interface IntergrationItem {
@@ -47,4 +48,9 @@ export interface CollectionTargetField {
   interval: number;
   unit: string;
   url?: string;
+}
+
+export interface DimensionItem {
+  name: string;
+  [key: string]: unknown;
 }

@@ -1,3 +1,5 @@
+import { CascaderItem } from '@/types';
+
 // 深克隆
 export const deepClone = (obj: any, hash = new WeakMap()) => {
   if (Object(obj) !== obj) return obj;
@@ -64,3 +66,30 @@ export const generateUniqueRandomColor = (() => {
     return color;
   };
 })();
+
+// 针对层级组件，当值为最后一级的value时的回显，需要找到其所有父value并转成的数组格式vaule
+export const findCascaderPath = (
+  nodes: CascaderItem[],
+  targetValue: string,
+  path: Array<string | number> = []
+): Array<string | number> => {
+  for (const node of nodes) {
+    // 如果找到目标值，返回当前路径加上目标值
+    if (node.value === targetValue) {
+      return [...path, node.value];
+    }
+    // 如果有子节点，递归查找
+    if (node.children) {
+      const result = findCascaderPath(node.children, targetValue, [
+        ...path,
+        node.value,
+      ]);
+      // 如果在子节点中找到了目标值，返回结果
+      if (result.length) {
+        return result;
+      }
+    }
+  }
+  // 如果没有找到目标值，返回空数组
+  return [];
+};

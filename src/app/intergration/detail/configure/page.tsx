@@ -62,7 +62,7 @@ const Configure: React.FC = () => {
 
   const getMetrics = async () => {
     const params = {
-      metric_object: name,
+      monitor_object_name: name,
     };
     try {
       setPageLoading(true);

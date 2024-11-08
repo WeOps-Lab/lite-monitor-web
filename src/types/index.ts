@@ -25,3 +25,9 @@ export interface ModalConfig {
 export interface ModalRef {
   showModal: (config: ModalConfig) => void;
 }
+
+export interface CascaderItem {
+  label: string;
+  value: string | number;
+  children: CascaderItem[];
+}

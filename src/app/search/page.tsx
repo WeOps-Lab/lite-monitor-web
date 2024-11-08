@@ -200,7 +200,7 @@ const Search = () => {
     setMetric(null);
     setConditions([]);
     getMetrics({
-      metric_object: val,
+      monitor_object_name: val,
     });
   };
 

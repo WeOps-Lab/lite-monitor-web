@@ -77,7 +77,8 @@
     "successfulSetted": "Setting successful !",
     "successfulCopied": "Copy successful !",
     "successfullyModified": "Modified successfully !",
-    "required": "Required"
+    "required": "Required",
+    "valueValidate": "The value cannot be empty"
   },
   "menu": {
     "search": "Search",
