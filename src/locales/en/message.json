@@ -70,6 +70,7 @@
     "type": "Type",
     "descripition": "Descripition",
     "unit": "Unit",
+    "description": "Description",
     "deleteTitle": "Do you want to delete this item?",
     "deleteContent": "After deletion, the data cannot be recovered.",
     "successfullyDeleted": "Delete successfully !",
@@ -78,7 +79,8 @@
     "successfulCopied": "Copy successful !",
     "successfullyModified": "Modified successfully !",
     "required": "Required",
-    "valueValidate": "The value cannot be empty"
+    "valueValidate": "The value cannot be empty",
+    "group": "Group"
   },
   "menu": {
     "search": "Search",
@@ -94,6 +96,7 @@
     "instance": "Instance",
     "object": "Object",
     "metric": "Metric",
+    "calculatedMetric": "Calculated Metric",
     "filter": "Filter",
     "label": "Label",
     "value": "Value",
@@ -110,6 +113,8 @@
     "addMetric": "Add Metric",
     "editMetric": "Edit Metric",
     "dimension": "Dimension",
+    "formula": "Formula",
+    "dataType": "Data Type",
     "keyMetric": "Key Metric",
     "configureStepIntro": "Please follow the following guidelines to install the collector.",
     "configureStep1": "Define collection targets",
@@ -121,6 +126,8 @@
     "collectionNode": "Collection Node",
     "url": "URL",
     "interval": "Interval",
-    "instanceName": "Instance Name"
+    "instanceName": "Instance Name",
+    "number": "Number",
+    "enum": "Enum"
   }
 }

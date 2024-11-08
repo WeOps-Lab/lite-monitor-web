@@ -12,7 +12,7 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
         className="custom-tooltip"
         style={{
           pointerEvents: 'auto',
-          maxHeight: '500px',
+          maxHeight: '300px',
           overflowY: 'auto',
           fontSize: '14px',
           backgroundColor: 'var(--color-bg-1)',

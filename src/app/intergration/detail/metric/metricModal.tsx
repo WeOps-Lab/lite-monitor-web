@@ -53,6 +53,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
         setType(type);
         setTitle(title);
         if (type === 'add') {
+          formData.type = 'metric';
           setDimensions([{ name: '' }]);
         } else {
           setDimensions(formData.dimensions || []);
@@ -163,13 +164,15 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
             wrapperCol={{ span: 18 }}
           >
             <Form.Item<MetricInfo>
-              label="Type"
+              label={t('common.type')}
               name="type"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Radio.Group>
-                <Radio value="metric">Metric</Radio>
-                <Radio value="calculated_metric">Calculated Metric</Radio>
+                <Radio value="metric">{t('monitor.metric')}</Radio>
+                <Radio value="calculated_metric">
+                  {t('monitor.calculatedMetric')}
+                </Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
@@ -179,7 +182,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               }
             >
               <Form.Item<MetricInfo>
-                label="ID"
+                label={t('common.id')}
                 name="name"
                 rules={[{ required: true, message: t('common.required') }]}
               >
@@ -187,14 +190,14 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               </Form.Item>
             </Form.Item>
             <Form.Item<MetricInfo>
-              label="Name"
+              label={t('common.name')}
               name="display_name"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<MetricInfo>
-              label="Group"
+              label={t('common.group')}
               name="metric_group"
               rules={[{ required: true, message: t('common.required') }]}
             >
@@ -215,7 +218,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               {({ getFieldValue }) =>
                 getFieldValue('type') === 'metric' ? (
                   <Form.Item<MetricInfo>
-                    label="Dimension"
+                    label={t('monitor.dimension')}
                     name="dimensions"
                     rules={[{ required: true, validator: validateDimensions }]}
                   >
@@ -252,7 +255,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
                   </Form.Item>
                 ) : (
                   <Form.Item<MetricInfo>
-                    label="Formula"
+                    label={t('monitor.formula')}
                     name="query"
                     rules={[{ required: true, message: t('common.required') }]}
                   >
@@ -270,27 +273,27 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               {({ getFieldValue }) =>
                 getFieldValue('type') === 'metric' ? (
                   <Form.Item<MetricInfo>
-                    label="Data Type"
+                    label={t('monitor.dataType')}
                     name="data_type"
                     rules={[{ required: true, message: t('common.required') }]}
                   >
                     <Select>
-                      <Option value="number">Number</Option>
-                      <Option value="enum">Enum</Option>
+                      <Option value="number">{t('monitor.number')}</Option>
+                      <Option value="enum">{t('monitor.enum')}</Option>
                     </Select>
                   </Form.Item>
                 ) : null
               }
             </Form.Item>
             <Form.Item<MetricInfo>
-              label="Unit"
+              label={t('common.unit')}
               name="unit"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Cascader showSearch options={unitList.current} />
             </Form.Item>
             <Form.Item<MetricInfo>
-              label="Description "
+              label={t('common.description')}
               name="description"
               rules={[{ required: true, message: t('common.required') }]}
             >
