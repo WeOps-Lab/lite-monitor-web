@@ -429,7 +429,7 @@ const Search = () => {
                         </Select>
                         <Select
                           className="w-[100px]"
-                          placeholder={t('monitor.condition')}
+                          placeholder={t('monitor.term')}
                           value={conditionItem.condition}
                           onChange={(val) => handleConditionChange(val, index)}
                         >

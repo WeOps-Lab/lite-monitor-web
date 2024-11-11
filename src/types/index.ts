@@ -31,3 +31,44 @@ export interface CascaderItem {
   value: string | number;
   children: CascaderItem[];
 }
+
+export interface TreeItem {
+  title: JSX.Element | string;
+  key: string | number;
+  children: TreeItem[];
+}
+
+export interface UserItem {
+  id: string;
+  username: string;
+  [key: string]: unknown;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  value?: string;
+  children: Array<SubGroupItem>;
+  [key: string]: unknown;
+}
+
+export interface SubGroupItem {
+  value?: string;
+  label?: string;
+  children?: Array<SubGroupItem>;
+}
+
+export interface OriginSubGroupItem {
+  id: string;
+  name: string;
+  parentId: string;
+  subGroupCount: number;
+  subGroups: Array<OriginSubGroupItem>;
+}
+export interface OriginOrganization {
+  id: string;
+  name: string;
+  subGroupCount: number;
+  subGroups: Array<OriginSubGroupItem>;
+  [key: string]: unknown;
+}

@@ -18,6 +18,26 @@ export interface MetricInfo {
   dimensions?: string[];
 }
 
+export interface RuleInfo {
+  type?: string;
+  name?: string;
+  grouping_rules?: {
+    query?: string;
+    instances?: number[];
+  };
+  organizations?: string[];
+  monitor_object?: number;
+  id?: number;
+}
+
+export interface ObjectInstItem {
+  instance_id: string;
+  agent_id: string;
+  organizations: string[];
+  time: string;
+  [key: string]: unknown;
+}
+
 export interface IntergrationItem {
   label: string;
   value: string;

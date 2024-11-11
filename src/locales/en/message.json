@@ -5,6 +5,7 @@
   "common": {
     "edit": "Edit",
     "delete": "Delete",
+    "detail": "Detail",
     "add": "Add",
     "set": "Set",
     "search": "Search",
@@ -80,7 +81,8 @@
     "successfullyModified": "Modified successfully !",
     "required": "Required",
     "valueValidate": "The value cannot be empty",
-    "group": "Group"
+    "group": "Group",
+    "time": "Time"
   },
   "menu": {
     "search": "Search",
@@ -100,7 +102,7 @@
     "filter": "Filter",
     "label": "Label",
     "value": "Value",
-    "condition": "Term",
+    "term": "Term",
     "area": "Area",
     "table": "Table",
     "intergration": "Intergration",
@@ -128,6 +130,9 @@
     "interval": "Interval",
     "instanceName": "Instance Name",
     "number": "Number",
-    "enum": "Enum"
+    "enum": "Enum",
+    "addRule": "Add Rule",
+    "editRule": "Edit Rule",
+    "condition": "Condition"
   }
 }

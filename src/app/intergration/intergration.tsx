@@ -23,7 +23,7 @@ const Intergration = () => {
     if (activeTab) {
       setApps(items.find((item) => item.value === activeTab)?.list || []);
     }
-  }, [activeTab]);
+  }, [activeTab, items]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -35,7 +35,7 @@ const Intergration = () => {
       setPageLoading(true);
       const data = await get(`/api/monitor_object/`, {
         params: {
-          search: text || '',
+          name: text || '',
         },
       });
       const _items = getAppsByType(data);
