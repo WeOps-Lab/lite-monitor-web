@@ -6,7 +6,7 @@ export default withAntdLess({
     return [
       {
         source: '/reqApi/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*/`, // 代理到后台服务器
+        destination: `${process.env.NEXTAPI_URL}/:path*/`, // 代理到后台服务器
       },
     ];
   },

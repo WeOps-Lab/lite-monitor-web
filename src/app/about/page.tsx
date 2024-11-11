@@ -10,7 +10,6 @@ export default function KnowledgeDetailPage() {
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     const targetUrl = `/about/document?${params.toString()}`;
-    // 执行重定向
     router.push(targetUrl);
   }, [router, searchParams]);
 
