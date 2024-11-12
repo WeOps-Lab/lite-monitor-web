@@ -67,6 +67,7 @@ const Search = () => {
   const [metric, setMetric] = useState<string | null>();
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
+  const [instanceLoading, setInstanceLoading] = useState<boolean>(false);
   const [instanceId, setInstanceId] = useState<string[]>();
   const [instances, setInstances] = useState<any[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
@@ -119,6 +120,23 @@ const Search = () => {
       setMetrics(data);
     } finally {
       setMetricsLoading(false);
+    }
+  };
+
+  const getInstList = async (id: number) => {
+    try {
+      setInstanceLoading(true);
+      const data = await get(
+        `/api/monitor_instance_group_rule/monitor_object_instances/${id}/`,
+        {
+          params: {
+            name: '',
+          },
+        }
+      );
+      setInstances(data);
+    } finally {
+      setInstanceLoading(false);
     }
   };
 
@@ -198,10 +216,18 @@ const Search = () => {
     setMetrics([]);
     setLabels([]);
     setMetric(null);
+    setInstanceId([]);
+    setInstances([]);
     setConditions([]);
-    getMetrics({
-      monitor_object_name: val,
-    });
+    if (val) {
+      getMetrics({
+        monitor_object_name: val,
+      });
+    }
+    const id = objects.find((item) => item.name === val)?.id || 0;
+    if (id) {
+      getInstList(id);
+    }
   };
 
   const handleLabelChange = (val: string, index: number) => {
@@ -367,14 +393,14 @@ const Search = () => {
                   placeholder={t('monitor.instance')}
                   className={`w-[250px] ${searchStyle.sourceObject}`}
                   maxTagCount="responsive"
-                  loading={objLoading}
+                  loading={instanceLoading}
                   value={instanceId}
                   onChange={handleInstanceChange}
                 >
                   {instances.map((item, index) => {
                     return (
-                      <Option value={item.id} key={index}>
-                        {item.name}
+                      <Option value={item.instance_id} key={index}>
+                        {item.instance_id}
                       </Option>
                     );
                   })}
