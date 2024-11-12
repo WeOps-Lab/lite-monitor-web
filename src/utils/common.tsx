@@ -156,7 +156,7 @@ export const filterNodesWithAllParents = (nodes: any, ids: any[]) => {
   return result;
 };
 
-// 根据分组id找出分组名称
+// 根据分组id找出分组名称(单个id展示)
 export const findGroupNameById = (arr: Array<SubGroupItem>, value: unknown) => {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].value === value) {
@@ -170,4 +170,17 @@ export const findGroupNameById = (arr: Array<SubGroupItem>, value: unknown) => {
     }
   }
   return null;
+};
+
+// 根据分组id找出分组名称(多个id展示)
+export const showGroupName = (
+  groupIds: string[],
+  organizationList: Array<SubGroupItem>
+) => {
+  if (!groupIds.length) return '--';
+  const groupNames: any[] = [];
+  groupIds.forEach((el) => {
+    groupNames.push(findGroupNameById(organizationList, el));
+  });
+  return groupNames.filter((item) => !!item).join(',');
 };

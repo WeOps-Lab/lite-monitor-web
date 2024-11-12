@@ -72,3 +72,8 @@ export interface OriginOrganization {
   subGroups: Array<OriginSubGroupItem>;
   [key: string]: unknown;
 }
+export interface TabItem {
+  key: string;
+  label: string;
+  children?: JSX.Element | string;
+}

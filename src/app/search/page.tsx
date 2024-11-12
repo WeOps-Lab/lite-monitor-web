@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Spin, Select, Button, Segmented, Input } from 'antd';
 import { BellOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import useApiClient from '@/utils/request';
-import TimeSelector from './timeSelector';
+import TimeSelector from '@/components/time-selector';
 import Collapse from '@/components/collapse';
 import searchStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';

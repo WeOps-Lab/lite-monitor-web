@@ -86,7 +86,8 @@
   },
   "menu": {
     "search": "Search",
-    "intergration": "Intergration"
+    "intergration": "Intergration",
+    "view": "View"
   },
   "cutomTable": {
     "fieldSetting": "List field settings"
@@ -134,6 +135,8 @@
     "addRule": "Add Rule",
     "editRule": "Edit Rule",
     "condition": "Condition",
+    "rule": "Rule",
+    "ruleTips": "The rules used to set the asset ownership organization for access are unique to each asset model",
     "assetValidate": "The Asset cannot be empty"
   }
 }

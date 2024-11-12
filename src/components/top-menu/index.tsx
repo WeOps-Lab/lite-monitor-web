@@ -13,7 +13,12 @@ const TopMenu = () => {
   // 菜单项配置
   const menuItems = [
     { label: t('menu.search'), icon: 'search-f', path: '/search' },
-    { label: t('menu.intergration'), icon: 'zichan-quanbushebei', path: '/intergration' },
+    {
+      label: t('menu.intergration'),
+      icon: 'zichan-quanbushebei',
+      path: '/intergration',
+    },
+    { label: t('menu.view'), icon: 'zichan-quanbushebei', path: '/view' },
   ];
 
   return (

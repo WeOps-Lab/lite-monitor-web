@@ -7,6 +7,18 @@ import { FREQUENCY_LIST } from '@/constants/monitor';
 import { ReloadOutlined } from '@ant-design/icons';
 import timeSelectorStyle from './index.module.less';
 const { RangePicker } = DatePicker;
+import dayjs from 'dayjs';
+
+const rangePresets: TimeRangePickerProps['presets'] = [
+  { label: 'Last 5 Hours', value: [dayjs().add(-5, 'h'), dayjs()] },
+  { label: 'Last 12 Hours', value: [dayjs().add(-12, 'h'), dayjs()] },
+  { label: 'Last 1 Day', value: [dayjs().add(-1, 'd'), dayjs()] },
+  { label: 'Last 5 Days', value: [dayjs().add(-5, 'd'), dayjs()] },
+  { label: 'Last 7 Days', value: [dayjs().add(-7, 'd'), dayjs()] },
+  { label: 'Last 14 Days', value: [dayjs().add(-14, 'd'), dayjs()] },
+  { label: 'Last 30 Days', value: [dayjs().add(-30, 'd'), dayjs()] },
+  { label: 'Last 90 Days', value: [dayjs().add(-90, 'd'), dayjs()] },
+];
 
 interface TimeSelectorProps
   extends Omit<
@@ -15,6 +27,7 @@ interface TimeSelectorProps
   > {
   showTime?: boolean;
   format?: string;
+  onlyRefresh?: boolean;
   onFrequenceChange: (frequence: number) => void;
   onRefresh: () => void;
 }
@@ -22,6 +35,7 @@ interface TimeSelectorProps
 const TimeSelector: React.FC<TimeSelectorProps> = ({
   showTime = true,
   format = 'YYYY-MM-DD HH:mm:ss',
+  onlyRefresh = false,
   onFrequenceChange,
   onRefresh,
   ...TimeRangePickerProps
@@ -45,11 +59,14 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
 
   return (
     <div className={timeSelectorStyle.timeSelector}>
-      <RangePicker
-        showTime={showTime}
-        format={format}
-        {...TimeRangePickerProps}
-      />
+      {!onlyRefresh && (
+        <RangePicker
+          presets={rangePresets}
+          showTime={showTime}
+          format={format}
+          {...TimeRangePickerProps}
+        />
+      )}
       <div className={`${timeSelectorStyle.refreshBox} flex ml-[8px]`}>
         <Button
           className={timeSelectorStyle.refreshBtn}

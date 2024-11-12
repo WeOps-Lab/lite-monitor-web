@@ -1,18 +1,32 @@
 'use client';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Spin, Input, Button, Tree, Cascader, Modal, message } from 'antd';
+import {
+  Spin,
+  Input,
+  Button,
+  Tree,
+  Cascader,
+  Modal,
+  message,
+  Tooltip,
+} from 'antd';
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import { ColumnItem, TreeItem, ModalRef, Organization } from '@/types';
 import { ObectItem, RuleInfo, ObjectInstItem } from '@/types/monitor';
 import CustomTable from '@/components/custom-table';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
 import Icon from '@/components/icon';
 import RuleModal from './ruleModal';
 const { Search } = Input;
 import { useCommon } from '@/context/common';
-import { findGroupNameById } from '@/utils/common';
+import { showGroupName } from '@/utils/common';
 const { confirm } = Modal;
 
 const Asset = () => {
@@ -56,7 +70,9 @@ const Asset = () => {
       title: t('common.group'),
       dataIndex: 'organization',
       key: 'organization',
-      render: (_, { organization }) => <>{showGroupName(organization)}</>,
+      render: (_, { organization }) => (
+        <>{showGroupName(organization, organizationList)}</>
+      ),
     },
     {
       title: t('common.time'),
@@ -124,15 +140,6 @@ const Asset = () => {
     pagination.pageSize,
     tableData,
   ]);
-
-  const showGroupName = (groupIds: string[]) => {
-    if (!groupIds.length) return '--';
-    const groupNames: any[] = [];
-    groupIds.forEach((el) => {
-      groupNames.push(findGroupNameById(organizationList, el));
-    });
-    return groupNames.filter((item) => !!item).join(',');
-  };
 
   const openRuleModal = (type: string, row = {}) => {
     const title = t(type === 'add' ? 'monitor.addRule' : 'monitor.editRule');
@@ -309,7 +316,12 @@ const Asset = () => {
         </Spin>
         <Spin spinning={ruleLoading}>
           <div className={assetStyle.rule}>
-            <div>Rule</div>
+            <div className={assetStyle.ruleTips}>
+              {t('monitor.rule')}
+              <Tooltip placement="top" title={t('monitor.ruleTips')}>
+                <QuestionCircleOutlined className={assetStyle.ruleIcon} />
+              </Tooltip>
+            </div>
             <ul className={assetStyle.ruleList}>
               <li
                 className={`${assetStyle.ruleItem} ${assetStyle.add}`}
