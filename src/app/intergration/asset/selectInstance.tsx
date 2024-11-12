@@ -213,17 +213,17 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
             <div className={selectInstanceStyle.previewList}>
               <div className="flex items-center justify-between mb-[10px]">
                 <span>
-                  已选择（共
+                  {t('common.selected')}（
                   <span className="text-[var(--color-primary)] px-[4px]">
                     {selectedRowKeys.length}
                   </span>
-                  条）
+                  {t('common.items')}）
                 </span>
                 <span
                   className="text-[var(--color-primary)] cursor-pointer"
                   onClick={handleClearSelection}
                 >
-                  清空
+                  {t('common.clear')}
                 </span>
               </div>
               <ul className={selectInstanceStyle.list}>

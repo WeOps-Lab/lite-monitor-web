@@ -1,4 +1,9 @@
-import { CascaderItem, OriginOrganization, OriginSubGroupItem } from '@/types';
+import {
+  CascaderItem,
+  OriginOrganization,
+  OriginSubGroupItem,
+  SubGroupItem,
+} from '@/types';
 
 // 深克隆
 export const deepClone = (obj: any, hash = new WeakMap()) => {
@@ -149,4 +154,20 @@ export const filterNodesWithAllParents = (nodes: any, ids: any[]) => {
     }
   }
   return result;
+};
+
+// 根据分组id找出分组名称
+export const findGroupNameById = (arr: Array<SubGroupItem>, value: unknown) => {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].value === value) {
+      return arr[i].label;
+    }
+    if (arr[i].children && arr[i].children?.length) {
+      const label: unknown = findGroupNameById(arr[i]?.children || [], value);
+      if (label) {
+        return label;
+      }
+    }
+  }
+  return null;
 };

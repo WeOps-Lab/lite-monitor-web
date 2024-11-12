@@ -12,6 +12,7 @@ import Icon from '@/components/icon';
 import RuleModal from './ruleModal';
 const { Search } = Input;
 import { useCommon } from '@/context/common';
+import { findGroupNameById } from '@/utils/common';
 const { confirm } = Modal;
 
 const Asset = () => {
@@ -55,9 +56,7 @@ const Asset = () => {
       title: t('common.group'),
       dataIndex: 'organization',
       key: 'organization',
-      render: (_, { organization }) => (
-        <>{organization?.length ? organization.join(',') : '--'}</>
-      ),
+      render: (_, { organization }) => <>{showGroupName(organization)}</>,
     },
     {
       title: t('common.time'),
@@ -125,6 +124,15 @@ const Asset = () => {
     pagination.pageSize,
     tableData,
   ]);
+
+  const showGroupName = (groupIds: string[]) => {
+    if (!groupIds.length) return '--';
+    const groupNames: any[] = [];
+    groupIds.forEach((el) => {
+      groupNames.push(findGroupNameById(organizationList, el));
+    });
+    return groupNames.filter((item) => !!item).join(',');
+  };
 
   const openRuleModal = (type: string, row = {}) => {
     const title = t(type === 'add' ? 'monitor.addRule' : 'monitor.editRule');
