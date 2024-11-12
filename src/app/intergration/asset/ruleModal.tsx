@@ -8,12 +8,13 @@ import React, {
   useEffect,
 } from 'react';
 import { Input, Button, Form, message, Radio, Cascader } from 'antd';
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
+import SelectInstance from './selectInstance';
+import { PlusOutlined } from '@ant-design/icons';
 import OperateModal from '@/components/operate-modal';
 import type { FormInstance } from 'antd';
 import useApiClient from '@/utils/request';
 import { ModalRef, ListItem } from '@/types';
-import { RuleInfo, DimensionItem } from '@/types/monitor';
+import { RuleInfo, GroupingRules } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone } from '@/utils/common';
 
@@ -28,14 +29,13 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
     const { post, put } = useApiClient();
     const { t } = useTranslation();
     const formRef = useRef<FormInstance>(null);
+    const instRef = useRef<ModalRef>(null);
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [groupForm, setGroupForm] = useState<RuleInfo>({});
     const [title, setTitle] = useState<string>('');
     const [type, setType] = useState<string>('');
-    const [dimensions, setDimensions] = useState<DimensionItem[]>([
-      { name: '' },
-    ]);
+    const [instList, setInstList] = useState<string[]>([]);
 
     useImperativeHandle(ref, () => ({
       showModal: ({ type, form, title }) => {
@@ -46,10 +46,13 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
         setTitle(title);
         if (type === 'add') {
           formData.type = 'select';
-          setDimensions([{ name: '' }]);
+          setInstList([]);
         } else {
-          if (formData.grouping_rules.query) {
+          if (formData.grouping_rules?.query) {
             formData.grouping_rules = formData.grouping_rules.query;
+          }
+          if (formData.grouping_rules?.instances) {
+            setInstList(formData.grouping_rules.instances);
           }
         }
         setGroupForm(formData);
@@ -62,6 +65,15 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
         formRef.current?.setFieldsValue(groupForm);
       }
     }, [groupVisible, groupForm]);
+
+    const openInstModal = () => {
+      const title = `${t('common.select')} ${t('monitor.asset')}`;
+      instRef.current?.showModal({
+        title,
+        type: 'add',
+        form: {},
+      });
+    };
 
     const operateGroup = async (params: RuleInfo) => {
       try {
@@ -89,20 +101,22 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
 
     const handleSubmit = () => {
       formRef.current?.validateFields().then((values) => {
+        const groupingRules: GroupingRules = {};
+        if (values.type === 'select') {
+          groupingRules.instances = instList;
+        } else {
+          groupingRules.query = values.grouping_rules;
+        }
         operateGroup({
           ...values,
           monitor_object: monitorObject,
-          grouping_rules: {
-            query: values.grouping_rules,
-          },
+          grouping_rules: groupingRules,
         });
       });
     };
 
-    const addDimension = () => {
-      const _dimensions = deepClone(dimensions);
-      _dimensions.push({ name: '' });
-      setDimensions(_dimensions);
+    const operateSelect = (list: string[]) => {
+      setInstList(list)
     };
 
     const handleCancel = () => {
@@ -111,8 +125,8 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
 
     // 自定义验证枚举列表
     const validateDimensions = async () => {
-      if (dimensions.some((item) => !item.name)) {
-        return Promise.reject(new Error(t('common.valueValidate')));
+      if (!instList.length) {
+        return Promise.reject(new Error(t('monitor.assetValidate')));
       }
       return Promise.resolve();
     };
@@ -174,7 +188,19 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
                     name="grouping_rules"
                     rules={[{ required: true, validator: validateDimensions }]}
                   >
-                    <div>select 2 assets</div>
+                    <div className="flex">
+                      {t('common.select')}
+                      <span className="text-[var(--color-primary)] px-[4px]">
+                        {instList.length}
+                      </span>
+                      {t('monitor.asset')}(s)
+                      <Button
+                        className="ml-[10px]"
+                        icon={<PlusOutlined />}
+                        size="small"
+                        onClick={openInstModal}
+                      ></Button>
+                    </div>
                   </Form.Item>
                 ) : (
                   <Form.Item<RuleInfo>
@@ -195,6 +221,13 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
               <Cascader multiple showSearch options={groupList} />
             </Form.Item>
           </Form>
+          <SelectInstance
+            ref={instRef}
+            monitorObject={monitorObject}
+            organizationList={groupList}
+            list={instList}
+            onSuccess={operateSelect}
+          />
         </OperateModal>
       </div>
     );

@@ -1,12 +1,11 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Spin, Input, Button, Tree, Cascader, Modal, message } from 'antd';
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import { ColumnItem, TreeItem, ModalRef, Organization } from '@/types';
 import { ObectItem, RuleInfo, ObjectInstItem } from '@/types/monitor';
-import { deepClone } from '@/utils/common';
 import CustomTable from '@/components/custom-table';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import Icon from '@/components/icon';
@@ -35,6 +34,11 @@ const Asset = () => {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [ruleList, setRuleList] = useState<RuleInfo[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
+    []
+  );
 
   const columns: ColumnItem[] = [
     {
@@ -77,9 +81,50 @@ const Asset = () => {
   ];
 
   useEffect(() => {
-    if (isLoading) return;
-    getObjects();
+    if (!isLoading) {
+      getObjects();
+    }
   }, [isLoading]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [
+    tableData,
+    searchText,
+    selectedOrganizations,
+    pagination.current,
+    pagination.pageSize,
+  ]);
+
+  const applyFilters = useCallback(() => {
+    let filtered = tableData;
+    // Filter by instance_id
+    if (searchText) {
+      filtered = filtered.filter((item) =>
+        item.instance_id.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+    // Filter by selected organizations
+    if (selectedOrganizations.length > 0) {
+      filtered = filtered.filter((item) =>
+        selectedOrganizations.some((org) => item.organization.includes(org))
+      );
+    }
+    // Pagination
+    const start = (pagination.current - 1) * pagination.pageSize;
+    const end = start + pagination.pageSize;
+    setFilteredData(filtered.slice(start, end));
+    setPagination((prev: any) => ({
+      ...prev,
+      total: filtered.length,
+    }));
+  }, [
+    searchText,
+    selectedOrganizations,
+    pagination.current,
+    pagination.pageSize,
+    tableData,
+  ]);
 
   const openRuleModal = (type: string, row = {}) => {
     const title = t(type === 'add' ? 'monitor.addRule' : 'monitor.editRule');
@@ -173,7 +218,7 @@ const Asset = () => {
 
   const onSelect = (selectedKeys: React.Key[], info: any) => {
     const isFirstLevel = !!info.node?.children?.length;
-    if (!isFirstLevel) {
+    if (!isFirstLevel && selectedKeys?.length) {
       setSelectedKeys(selectedKeys);
       getAssetInsts(selectedKeys[0]);
       getRuleList(selectedKeys[0]);
@@ -233,16 +278,20 @@ const Asset = () => {
                 className="mr-[8px]"
                 showSearch
                 options={organizationList}
+                onChange={(value) => setSelectedOrganizations(value as any)}
+                multiple
+                allowClear
               />
               <Input
                 className="w-[320px]"
                 placeholder={t('common.searchPlaceHolder')}
+                onChange={(e) => setSearchText(e.target.value)}
               ></Input>
             </div>
             <CustomTable
               scroll={{ y: 'calc(100vh - 320px)', x: 'calc(100vw - 500px)' }}
               columns={columns}
-              dataSource={tableData}
+              dataSource={filteredData}
               pagination={pagination}
               loading={tableLoading}
               rowKey="instance_id"

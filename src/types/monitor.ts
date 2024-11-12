@@ -21,13 +21,15 @@ export interface MetricInfo {
 export interface RuleInfo {
   type?: string;
   name?: string;
-  grouping_rules?: {
-    query?: string;
-    instances?: number[];
-  };
+  grouping_rules?: GroupingRules;
   organizations?: string[];
   monitor_object?: number;
   id?: number;
+}
+
+export interface GroupingRules {
+  query?: string;
+  instances?: string[];
 }
 
 export interface ObjectInstItem {

@@ -133,6 +133,7 @@
     "enum": "Enum",
     "addRule": "Add Rule",
     "editRule": "Edit Rule",
-    "condition": "Condition"
+    "condition": "Condition",
+    "assetValidate": "The Asset cannot be empty"
   }
 }
