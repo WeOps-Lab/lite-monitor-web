@@ -23,7 +23,7 @@ export default function RootLayout({
         <Script src="/iconfont.js" strategy="afterInteractive" />
       </head>
       <body className={inter.className}>
-        <SessionProvider>
+        <SessionProvider refetchInterval={ 30 * 60 }>
           <LocaleProvider>
             <ThemeProvider>
               <AuthProvider>

@@ -47,7 +47,6 @@ async function introspectToken(token: string) {
 async function fetchUserRolesAndLocale(accessToken: string) {
   try {
     const introspectData = await introspectToken(accessToken);
-    console.log("Introspect data", introspectData);
     return {
       locale: introspectData.locale || 'en',
       roles: introspectData.realm_access.roles || [],
@@ -79,7 +78,7 @@ export const authOptions: AuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 60 * 30,
+    maxAge: 60 * 60 * 24,
   },
   callbacks: {
     async jwt({ token, account }) {
