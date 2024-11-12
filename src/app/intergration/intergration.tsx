@@ -106,7 +106,7 @@ const Intergration = () => {
       />
       <Spin spinning={pageLoading}>
         <Segmented
-          className="mb-[20px]"
+          className="mb-[20px] custom-tabs"
           value={activeTab}
           options={items}
           onChange={onTabChange}

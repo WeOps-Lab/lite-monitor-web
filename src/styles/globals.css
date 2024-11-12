@@ -280,6 +280,16 @@ html:not(.dark) body {
 .ant-modal-confirm-btns button:nth-child(1) {
   margin-left: 8px;
 }
+.custom-tabs {
+  background: transparent;
+  color: var(--color-text-1);
+}
+.custom-tabs .ant-segmented-item {
+  margin-right: 8px;
+}
+.custom-tabs .ant-segmented-item-selected {
+  color: var(--color-primary);
+}
 
 @keyframes rt {
   100% {
