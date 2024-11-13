@@ -162,7 +162,7 @@ const Asset = () => {
     try {
       setTableLoading(true);
       const data = await get(
-        `/api/monitor_instance_group_rule/monitor_object_instances/${objectId}/`,
+        `/api/monitor_instance/${objectId}/list/`,
         {
           params: {
             name: '',

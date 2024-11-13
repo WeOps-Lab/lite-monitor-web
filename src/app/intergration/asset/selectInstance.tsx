@@ -130,7 +130,7 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
       try {
         setTableLoading(true);
         const data = await get(
-          `/api/monitor_instance_group_rule/monitor_object_instances/${monitorObject}/`,
+          `/api/monitor_instance/${monitorObject}/list/`,
           {
             params: {
               name: '',

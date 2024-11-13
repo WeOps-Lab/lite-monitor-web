@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import ThreeStep from './threeStep';
-import { Spin, Form, Input, Select } from 'antd';
+import { Spin, Form, Input, Select, Button, message } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { MetricItem, CollectionTargetField } from '@/types/monitor';
@@ -10,47 +10,123 @@ import configureStyle from './index.module.less';
 const { Option } = Select;
 
 const Configure: React.FC = () => {
-  const { get, isLoading } = useApiClient();
+  const { get, post, isLoading } = useApiClient();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const name = searchParams.get('name') || '';
+  const objId = searchParams.get('id') || '';
   const [form] = Form.useForm();
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const [step3Content, setStep3Content] = useState<JSX.Element>(<></>);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [step3Content, setStep3Content] = useState<JSX.Element | string>('');
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
-  const [originMetrics, setoriginMetrics] = useState<MetricItem[]>([]);
+  const [originMetrics, setoriginMetrics] = useState<MetricItem[]>([
+    {
+      id: 0,
+      metric_group: 0,
+      metric_object: 0,
+      name: 'All',
+      type: 'none',
+      dimensions: [],
+    },
+  ]);
   const [intervalUnit, setIntervalUnit] = useState<string>('s');
 
   useEffect(() => {
     if (isLoading) return;
-    getMetrics();
+    // getMetrics();
   }, [isLoading]);
 
   useEffect(() => {
-    changeStep3Content();
-  }, [name, intervalUnit, metrics]);
+    form.resetFields();
+    form.setFieldsValue({
+      interval: 10,
+    });
+  }, [name]);
+
+  const createContent = () => {
+    form?.validateFields().then((values) => {
+      if (intervalUnit === 'm') {
+        values.interval = values.interval * 60;
+      } else {
+        values.interval = +values.interval;
+      }
+      getStep3Content(values);
+    });
+  };
+
+  const getStep3Content = async (params = { interval: '' }) => {
+    try {
+      setLoading(true);
+      const instnaceId = await post(
+        `/api/monitor_instance/${objId}/generate_instance_id/`,
+        params
+      );
+      let content: string | JSX.Element = '';
+      switch (name) {
+        case 'Website':
+          break;
+        case 'K8S':
+          break;
+        default:
+          content = (
+            <div>
+              <ul>
+                <li>{'[global_tags]'}</li>
+                <li>{'agent_id="${node.name}"'}</li>
+              </ul>
+              <ul>
+                <li>{'[agent]'}</li>
+                <li>{`interval = "${params.interval}s"`}</li>
+                <li>{'round_interval = true'}</li>
+                <li>{'metric_batch_size = 1000'}</li>
+                <li>{'metric_buffer_limit = 10000'}</li>
+                <li>{'collection_jitter = "0s"'}</li>
+                <li>{'flush_jitter = "30s"'}</li>
+                <li>{'precision = "0s"'}</li>
+                <li>{'hostname = "${node.name}"'}</li>
+                <li>{'omit_hostname = false'}</li>
+              </ul>
+              <ul>
+                <li>{'[[outputs.kafka]]'}</li>
+                <li>{'brokers = ["${KAFKA_ADDR}:${KAFKA_PORT}"]'}</li>
+                <li>{'topic = "telegraf"'}</li>
+                <li>{'sasl_username = "${KAFKA_USERNAME}"'}</li>
+                <li>{'sasl_password = "${KAFKA_PASSWORD}"'}</li>
+                <li>{'sasl_mechanism = "PLAIN"'}</li>
+                <li>{'max_message_bytes = 10000000'}</li>
+                <li>{'compression_codec=1'}</li>
+              </ul>
+              <ul>
+                <li>{'[[inputs.internal]]'}</li>
+                <li>{`tags = { "instance_id"="${instnaceId}"}`}</li>
+              </ul>
+              <ul>
+                <li>{'[[inputs.prometheus]]'}</li>
+                <li>{'urls = ["http://127.0.0.1:41000/metrics"]'}</li>
+                <li>{`tags = { "instance_id"="${instnaceId}"}`}</li>
+              </ul>
+              <ul>
+                <li>{'[[inputs.prometheus]]'}</li>
+                <li>
+                  {
+                    'urls = ["http://127.0.0.1:41001/probe?target=https://wedoc.canway.net/&module=http_2xx"]'
+                  }
+                </li>
+                <li>{`tags = { "instance_id"="${instnaceId}"}`}</li>
+              </ul>
+            </div>
+          );
+      }
+      message.success(t('common.successfullyAdded'));
+      setStep3Content(content);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const changeStep3Content = () => {
-    const formData = form.getFieldsValue();
-    const html = (
-      <>
-        <ul>
-          {metrics.map((item) => (
-            <li className="mb-[10px]" key={item.id}>{`[[${item.name}]]`}</li>
-          ))}
-        </ul>
-        <ul>
-          {Object.entries(formData).map(([key, value]) =>
-            key === 'interval' ? (
-              <li key={key}>{`${key}='${value}${intervalUnit}'`}</li>
-            ) : (
-              <li className="mb-[10px]" key={key}>{`${key}='${value}'`}</li>
-            )
-          )}
-        </ul>
-      </>
-    );
-    setStep3Content(html);
+    setStep3Content(<></>);
   };
 
   const handleStep2Change = (selected: number[]) => {
@@ -77,6 +153,7 @@ const Configure: React.FC = () => {
   };
 
   const handleValuesChange = (changedValues: any, allValues: any) => {
+    if (changedValues) return;
     changeStep3Content();
   };
 
@@ -89,9 +166,14 @@ const Configure: React.FC = () => {
       <Spin spinning={pageLoading}>
         <p className="mb-[20px]">{t('monitor.configureStepIntro')}</p>
         <ThreeStep
-          metricsDisabled={name === 'K8S'}
+          metricsDisabled={true}
           step2Options={originMetrics}
           step3Content={step3Content}
+          step3Config={
+            <Button type="primary" loading={loading} onClick={createContent}>
+              {t('monitor.generateConfiguration')}
+            </Button>
+          }
           onStep2Change={handleStep2Change}
         >
           <Form form={form} name="basic" onValuesChange={handleValuesChange}>
@@ -99,29 +181,11 @@ const Configure: React.FC = () => {
               label={
                 <span className="w-[100px]">{t('monitor.instanceName')}</span>
               }
-              name="instance_name"
+              name="monitor_instance_name"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Input className="w-[300px]" />
             </Form.Item>
-            <Form.Item<CollectionTargetField>
-              label={
-                <span className="w-[100px]">{t('monitor.collectionNode')}</span>
-              }
-              name="node"
-              rules={[{ required: true, message: t('common.required') }]}
-            >
-              <Input className="w-[300px]" />
-            </Form.Item>
-            {name === 'Website' && (
-              <Form.Item<CollectionTargetField>
-                label={<span className="w-[100px]">{t('monitor.url')}</span>}
-                name="url"
-                rules={[{ required: true, message: t('common.required') }]}
-              >
-                <Input className="w-[300px]" />
-              </Form.Item>
-            )}
             <Form.Item<CollectionTargetField>
               label={<span className="w-[100px]">{t('monitor.interval')}</span>}
               className={configureStyle.interval}

@@ -187,7 +187,7 @@ const Intergration = () => {
     try {
       setTableLoading(type !== 'timer');
       const data = await get(
-        `/api/monitor_instance_group_rule/monitor_object_instances/${objectId}/`
+        `/api/monitor_instance/${objectId}/list/`
       );
       setTableData(data);
     } finally {

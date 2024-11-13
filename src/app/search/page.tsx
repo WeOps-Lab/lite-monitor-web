@@ -127,7 +127,7 @@ const Search = () => {
     try {
       setInstanceLoading(true);
       const data = await get(
-        `/api/monitor_instance_group_rule/monitor_object_instances/${id}/`,
+        `/api/monitor_instance/${id}/list/`,
         {
           params: {
             name: '',

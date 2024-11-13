@@ -19,12 +19,14 @@ interface Step2Props {
 }
 
 interface Step3Props {
-  content: JSX.Element;
+  content: JSX.Element | string;
+  config: JSX.Element;
 }
 
 interface ThreeStepComponentProps {
   step2Options: MetricItem[];
-  step3Content: JSX.Element;
+  step3Content: JSX.Element | string;
+  step3Config: JSX.Element;
   metricsDisabled: boolean;
   onStep2Change: (selected: number[]) => void;
   children: ReactNode;
@@ -79,11 +81,11 @@ const Step2: React.FC<Step2Props> = ({
   );
 };
 
-const Step3: React.FC<Step3Props> = ({ content }) => {
+const Step3: React.FC<Step3Props> = ({ content, config }) => {
   const { t } = useTranslation();
 
   // 复制jsx里面的内容，不要标签
-  const onCopy = (value: JSX.Element) => {
+  const onCopy = (value: JSX.Element | string) => {
     const elementString = ReactDOMServer.renderToString(value);
     const parser = new DOMParser();
     const doc = parser.parseFromString(elementString, 'text/html');
@@ -98,16 +100,21 @@ const Step3: React.FC<Step3Props> = ({ content }) => {
         <span>{t('monitor.step3')}：</span>
         {t('monitor.configureStep3')}
       </b>
-      <div className={`${threeStepStyle.content} ${threeStepStyle.copyBoard}`}>
-        {content}
-        <Button
-          className={threeStepStyle.copy}
-          type="link"
-          size="small"
-          icon={<CopyOutlined />}
-          onClick={() => onCopy(content)}
-        />
-      </div>
+      <div className="mb-[15px] ml-[100px]">{config}</div>
+      {!!content && (
+        <div
+          className={`${threeStepStyle.content} ${threeStepStyle.copyBoard}`}
+        >
+          {content}
+          <Button
+            className={threeStepStyle.copy}
+            type="link"
+            size="small"
+            icon={<CopyOutlined />}
+            onClick={() => onCopy(content)}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -116,6 +123,7 @@ const ThreeStepComponent: React.FC<ThreeStepComponentProps> = ({
   step2Options,
   step3Content,
   metricsDisabled,
+  step3Config,
   onStep2Change,
   children,
 }) => {
@@ -139,7 +147,7 @@ const ThreeStepComponent: React.FC<ThreeStepComponentProps> = ({
         selectedOptions={selectedOptions}
         onChange={handleStep2Change}
       />
-      <Step3 content={step3Content} />
+      <Step3 content={step3Content} config={step3Config} />
     </div>
   );
 };

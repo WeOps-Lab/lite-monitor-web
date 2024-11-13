@@ -65,11 +65,10 @@ export interface MetricItem {
 }
 
 export interface CollectionTargetField {
-  node: string;
-  instance_name: string;
+  monitor_instance_name: string;
+  monitor_object_id?: number;
   interval: number;
-  unit: string;
-  url?: string;
+  unit?: string;
 }
 
 export interface DimensionItem {
