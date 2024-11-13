@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { useTranslation } from '@/utils/i18n';
 import useApiClient from '@/utils/request';
 
-
 interface PermissionsContextProps {
   permissions: Record<string, any> | null;
   loadPermissions: () => Promise<void>;
@@ -23,23 +22,21 @@ export const PermissionsProvider: React.FC<PermissionsProviderProps> = ({ childr
   const loadPermissions = useCallback(async () => {
     if (isLoaded) return;
 
-    const useLocalPermissions = process.env.NEXT_PUBLIC_USE_LOCAL_PERMISSIONS === 'true';
     let fetchedPermissions: Record<string, any> = {};
 
-    if (useLocalPermissions) {
+    try {
+      const response = await get('/user/permission/');
+      if (!response.ok) {
+        throw new Error('Failed to fetch permissions from server');
+      }
+      fetchedPermissions = await response.json();
+    } catch (error) {
+      console.error(t('common.errorFetch'), error);
       try {
         fetchedPermissions = await import('@/constants/permissions.json');
-        console.log('fetchedPermissions:', fetchedPermissions);
         fetchedPermissions = fetchedPermissions.default || fetchedPermissions;
-      } catch (error) {
-        console.error(t('common.errorFetch'), error);
-      }
-    } else {
-      try {
-        const response = await get('/user/permission/');
-        fetchedPermissions = await response.json();
-      } catch (error) {
-        console.error(t('common.errorFetch'), error);
+      } catch (localError) {
+        console.error(t('common.errorFetchLocal'), localError);
       }
     }
 

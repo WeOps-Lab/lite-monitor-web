@@ -51,6 +51,7 @@ async function fetchUserRolesAndLocale(accessToken: string) {
       locale: introspectData.locale || 'en',
       roles: introspectData.realm_access.roles || [],
       username: introspectData.username || '',
+      zoneinfo: introspectData.zoneinfo || 'utc',
     };
   } catch (error) {
     console.error("Error introspecting token", error);
@@ -58,6 +59,7 @@ async function fetchUserRolesAndLocale(accessToken: string) {
       locale: 'en',
       roles: [],
       username: '',
+      zoneinfo: 'utc'
     };
   }
 }
@@ -76,7 +78,7 @@ export const authOptions: AuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 60 * 30,
+    maxAge: 60 * 60 * 24,
   },
   callbacks: {
     async jwt({ token, account }) {
@@ -92,6 +94,7 @@ export const authOptions: AuthOptions = {
             token.locale = userInfo.locale || 'en';
             token.roles = userInfo.roles || [];
             token.username = userInfo.username || '';
+            token.zoneinfo = userInfo.zoneinfo || 'utc';
           } catch (error) {
             console.error("Error fetching user info", error);
           }
@@ -118,6 +121,7 @@ export const authOptions: AuthOptions = {
             updatedToken.locale = userInfo.locale || 'en';
             updatedToken.username = userInfo.username || '';
             updatedToken.roles = userInfo.roles || [];
+            updatedToken.zoneinfo = userInfo.zoneinfo || 'utc';
           } catch (error) {
             console.error("Error fetching user info", error);
           }
@@ -145,7 +149,10 @@ export const authOptions: AuthOptions = {
       if (token.roles) {
         session.roles = token.roles;
       }
+      if (token.zoneinfo) {
+        session.zoneinfo = token.zoneinfo;
+      }
       return session;
     },
   },
-}
+};
