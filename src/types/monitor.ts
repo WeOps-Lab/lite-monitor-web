@@ -75,3 +75,11 @@ export interface DimensionItem {
   name: string;
   [key: string]: unknown;
 }
+
+export interface IndexViewItem {
+  name?: string;
+  id?: string | number;
+  isExpanded?: boolean;
+  isLoading?: boolean;
+  child?: any[];
+}

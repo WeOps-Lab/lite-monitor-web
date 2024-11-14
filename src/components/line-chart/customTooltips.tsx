@@ -1,5 +1,6 @@
 import React from 'react';
 import { TooltipProps } from 'recharts';
+import customTooltipStyle from './index.module.less';
 
 const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
   active,
@@ -8,19 +9,7 @@ const CustomTooltip: React.FC<TooltipProps<any, string>> = ({
 }) => {
   if (active && payload?.length) {
     return (
-      <div
-        className="custom-tooltip"
-        style={{
-          pointerEvents: 'auto',
-          maxHeight: '300px',
-          overflowY: 'auto',
-          fontSize: '14px',
-          backgroundColor: 'var(--color-bg-1)',
-          border: '1px solid var(--color-border-1)',
-          padding: '10px',
-          borderRadius: '5px',
-        }}
-      >
+      <div className={customTooltipStyle.customTooltip}>
         <p className="label font-[600]">{`${label}`}</p>
         {payload.map((item: any, index: number) => (
           <div key={index} className="intro flex items-center mt-[4px]">

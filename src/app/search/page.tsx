@@ -8,22 +8,13 @@ import Collapse from '@/components/collapse';
 import searchStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
-const { Option } = Select;
+import LineChart from '@/components/line-chart';
 import { ListItem, ColumnItem } from '@/types';
 import { ObectItem, MetricItem } from '@/types/monitor';
-import { deepClone, generateUniqueRandomColor } from '@/utils/common';
+import { deepClone } from '@/utils/common';
 import { CONDITION_LIST } from '@/constants/monitor';
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-} from 'recharts';
-import CustomTooltip from './customTooltips';
 import CustomTable from '@/components/custom-table';
+const { Option } = Select;
 
 interface ConditionItem {
   label: string | null;
@@ -38,26 +29,6 @@ interface SearchParams {
   step?: number;
   query: string;
 }
-
-const processData = (data: any) => {
-  const result: any[] = [];
-  data.forEach((item: any, index: number) => {
-    item.values.forEach(([timestamp, value]: [number, string]) => {
-      const time = new Date(timestamp * 1000).toLocaleString();
-      const existing = result.find((entry) => entry.time === time);
-      if (existing) {
-        existing[`value${index + 1}`] = parseFloat(value);
-      } else {
-        result.push({
-          time,
-          title: `${item.metric['__name__']}`,
-          [`value${index + 1}`]: parseFloat(value),
-        });
-      }
-    });
-  });
-  return result;
-};
 
 const Search = () => {
   const { get, isLoading } = useApiClient();
@@ -104,7 +75,7 @@ const Search = () => {
   const getObjects = async () => {
     try {
       setObjLoading(true);
-      const data = await get(`/api/monitor_object/`);
+      const data = await get('/api/monitor_object/');
       setObjects(data);
     } finally {
       setObjLoading(false);
@@ -114,7 +85,7 @@ const Search = () => {
   const getMetrics = async (params = {}) => {
     try {
       setMetricsLoading(true);
-      const data = await get(`/api/metrics/`, {
+      const data = await get('/api/metrics/', {
         params,
       });
       setMetrics(data);
@@ -126,14 +97,7 @@ const Search = () => {
   const getInstList = async (id: number) => {
     try {
       setInstanceLoading(true);
-      const data = await get(
-        `/api/monitor_instance/${id}/list/`,
-        {
-          params: {
-            name: '',
-          },
-        }
-      );
+      const data = await get(`/api/monitor_instance/${id}/list/`);
       setInstances(data);
     } finally {
       setInstanceLoading(false);
@@ -276,6 +240,26 @@ const Search = () => {
     handleSearch('refresh', val);
   };
 
+  const processData = (data: any) => {
+    const result: any[] = [];
+    data.forEach((item: any, index: number) => {
+      item.values.forEach(([timestamp, value]: [number, string]) => {
+        const time = new Date(timestamp * 1000).toLocaleString();
+        const existing = result.find((entry) => entry.time === time);
+        if (existing) {
+          existing[`value${index + 1}`] = parseFloat(value);
+        } else {
+          result.push({
+            time,
+            title: item.metric['__name__'],
+            [`value${index + 1}`]: parseFloat(value),
+          });
+        }
+      });
+    });
+    return result;
+  };
+
   const handleSearch = async (type: string, tab: string) => {
     if (type !== 'timer') {
       setChartData([]);
@@ -302,7 +286,7 @@ const Search = () => {
       });
       const data = responseData.data?.result || [];
       if (areaCurrent) {
-        setChartData(processData(data));
+        setChartData(data);
       } else {
         const _tableData = data.map((item: any, index: number) => ({
           ...item.metric,
@@ -328,18 +312,6 @@ const Search = () => {
     } finally {
       setPageLoading(false);
     }
-  };
-
-  const getChartAreaKeys = (arr: any[]) => {
-    const keys = new Set();
-    arr.forEach((obj) => {
-      Object.keys(obj).forEach((key) => {
-        if (key.includes('value')) {
-          keys.add(key);
-        }
-      });
-    });
-    return Array.from(keys);
   };
 
   return (
@@ -527,40 +499,7 @@ const Search = () => {
           />
           {isArea ? (
             <div className={searchStyle.chartArea}>
-              <ResponsiveContainer>
-                <AreaChart
-                  data={chartData}
-                  margin={{
-                    top: 10,
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                  }}
-                >
-                  <XAxis
-                    dataKey="time"
-                    tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-                    tickFormatter={(value) => `${value}`}
-                  />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <Tooltip content={<CustomTooltip />} offset={-10} />
-                  {getChartAreaKeys(chartData).map((key, index) => (
-                    <Area
-                      key={index}
-                      type="monotone"
-                      dataKey={`value${index + 1}`}
-                      stroke={generateUniqueRandomColor()}
-                      fillOpacity={0.1}
-                      fill={generateUniqueRandomColor()}
-                    />
-                  ))}
-                </AreaChart>
-              </ResponsiveContainer>
+              <LineChart data={processData(chartData)} />
             </div>
           ) : (
             <CustomTable
@@ -576,4 +515,5 @@ const Search = () => {
     </div>
   );
 };
+
 export default Search;

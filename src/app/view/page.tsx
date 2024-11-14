@@ -6,7 +6,8 @@ import { useTranslation } from '@/utils/i18n';
 import { deepClone } from '@/utils/common';
 import { useRouter } from 'next/navigation';
 import { IntergrationItem, ObectItem } from '@/types/monitor';
-import { TabItem, Organization, ColumnItem } from '@/types';
+import ViewModal from './viewModal';
+import { TabItem, Organization, ColumnItem, ModalRef } from '@/types';
 import CustomTable from '@/components/custom-table';
 import TimeSelector from '@/components/time-selector';
 import { useCommon } from '@/context/common';
@@ -18,6 +19,7 @@ const Intergration = () => {
   const router = useRouter();
   const commonContext = useCommon();
   const authList = useRef(commonContext?.authOrganizations || []);
+  const viewRef = useRef<ModalRef>(null);
   const organizationList: Organization[] = authList.current;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
@@ -71,7 +73,11 @@ const Intergration = () => {
       render: (_, record) => (
         <>
           <Button type="link">{t('common.detail')}</Button>
-          <Button className="ml-[10px]" type="link">
+          <Button
+            className="ml-[10px]"
+            type="link"
+            onClick={() => openViewModal(record)}
+          >
             {t('menu.view')}
           </Button>
         </>
@@ -186,9 +192,7 @@ const Intergration = () => {
   const getAssetInsts = async (objectId: React.Key, type?: string) => {
     try {
       setTableLoading(type !== 'timer');
-      const data = await get(
-        `/api/monitor_instance/${objectId}/list/`
-      );
+      const data = await get(`/api/monitor_instance/${objectId}/list/`);
       setTableData(data);
     } finally {
       setTableLoading(false);
@@ -232,6 +236,14 @@ const Intergration = () => {
     getAssetInsts(objectId);
   };
 
+  const openViewModal = (row: any) => {
+    viewRef.current?.showModal({
+      title: t('monitor.indexView'),
+      type: 'add',
+      form: row,
+    });
+  };
+
   return (
     <div className="w-full">
       <Spin spinning={pageLoading}>
@@ -250,9 +262,9 @@ const Intergration = () => {
                   className="mr-[8px]"
                   showSearch
                   options={organizationList}
-                  onChange={(value) => setSelectedOrganizations(value as any)}
                   multiple
                   allowClear
+                  onChange={(value) => setSelectedOrganizations(value as any)}
                 />
                 <Input
                   className="w-[320px]"
@@ -278,6 +290,7 @@ const Intergration = () => {
           </div>
         </div>
       </Spin>
+      <ViewModal ref={viewRef} monitorObject={objectId} />
     </div>
   );
 };

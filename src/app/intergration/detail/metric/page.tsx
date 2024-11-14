@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Input, Button, Switch, Modal, message, Spin } from 'antd';
+import { Input, Button, Modal, message, Spin } from 'antd';
 import useApiClient from '@/utils/request';
 import metricStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
