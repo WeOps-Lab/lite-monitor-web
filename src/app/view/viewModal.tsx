@@ -136,9 +136,30 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
         const time = new Date(timestamp * 1000).toLocaleString();
         const existing = result.find((entry) => entry.time === time);
+        const detailValue = Object.entries(item.metric)
+          .map(([key, dimenValue]) => ({
+            name: key,
+            label:
+              key === 'instance_name'
+                ? 'Instance Name'
+                : target.find((sec) => sec.name === key)?.description || key,
+            value: dimenValue,
+          }))
+          .filter(
+            (item) =>
+              item.name === 'instance_name' ||
+              target.find((tex) => tex.name === item.name)
+          );
         if (existing) {
           existing[`value${index + 1}`] = parseFloat(value);
+          if (!existing.details[`value${index + 1}`]) {
+            existing.details[`value${index + 1}`] = [];
+          }
+          existing.details[`value${index + 1}`].push(...detailValue);
         } else {
+          const details = {
+            [`value${index + 1}`]: detailValue,
+          };
           result.push({
             time,
             title: metricItem.name,
@@ -158,6 +179,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
                   target.find((tex) => tex.name === item.name)
               ),
             [`value${index + 1}`]: parseFloat(value),
+            details,
           });
         }
       });

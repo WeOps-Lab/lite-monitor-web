@@ -63,7 +63,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, unit = '' }) => {
             type="monotone"
             dataKey={`value${index + 1}`}
             stroke={generateUniqueRandomColor()}
-            fillOpacity={0.1}
+            fillOpacity={0.01}
             fill={generateUniqueRandomColor()}
           />
         ))}

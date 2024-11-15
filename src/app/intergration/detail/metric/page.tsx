@@ -72,6 +72,7 @@ const Configure = () => {
       title: t('common.descripition'),
       dataIndex: 'description',
       key: 'description',
+      render: (_, record) => <>{record.description || '--'}</>,
     },
     // {
     //   title: t('monitor.keyMetric'),

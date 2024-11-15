@@ -56,7 +56,9 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
           formData.type = 'metric';
           setDimensions([{ name: '' }]);
         } else {
-          setDimensions(formData.dimensions || []);
+          setDimensions(
+            formData.dimensions?.length ? formData.dimensions : [{ name: '' }]
+          );
           formData.unit = findCascaderPath(unitList.current, formData.unit);
         }
         setGroupForm(formData);
@@ -98,6 +100,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
           ...values,
           dimensions: dimensions.some((item) => !item.name) ? [] : dimensions,
           monitor_object: monitorObject,
+          type: 'metric',
           unit: values.unit.at(-1),
         });
       });
@@ -163,7 +166,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 18 }}
           >
-            <Form.Item<MetricInfo>
+            {/* <Form.Item<MetricInfo>
               label={t('common.type')}
               name="type"
               rules={[{ required: true, message: t('common.required') }]}
@@ -174,8 +177,8 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
                   {t('monitor.calculatedMetric')}
                 </Radio>
               </Radio.Group>
-            </Form.Item>
-            <Form.Item
+            </Form.Item> */}
+            {/* <Form.Item
               noStyle
               shouldUpdate={(prevValues, currentValues) =>
                 prevValues.type !== currentValues.type
@@ -188,6 +191,13 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               >
                 <Input disabled={type === 'edit'} />
               </Form.Item>
+            </Form.Item> */}
+            <Form.Item<MetricInfo>
+              label={t('common.id')}
+              name="name"
+              rules={[{ required: true, message: t('common.required') }]}
+            >
+              <Input disabled={type === 'edit'} />
             </Form.Item>
             <Form.Item<MetricInfo>
               label={t('common.name')}
@@ -209,62 +219,49 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item
-              noStyle
-              shouldUpdate={(prevValues, currentValues) =>
-                prevValues.type !== currentValues.type
-              }
+            <Form.Item<MetricInfo>
+              label={t('monitor.dimension')}
+              name="dimensions"
             >
-              {({ getFieldValue }) =>
-                getFieldValue('type') === 'metric' ? (
-                  <Form.Item<MetricInfo>
-                    label={t('monitor.dimension')}
-                    name="dimensions"
-                    rules={[{ required: true, validator: validateDimensions }]}
+              <ul>
+                {dimensions.map((item, index) => (
+                  <li
+                    className={`flex ${
+                      index + 1 !== dimensions?.length && 'mb-[10px]'
+                    }`}
+                    key={index}
                   >
-                    <ul>
-                      {dimensions.map((item, index) => (
-                        <li
-                          className={`flex ${
-                            index + 1 !== dimensions?.length && 'mb-[10px]'
-                          }`}
-                          key={index}
-                        >
-                          <Input
-                            className="w-[80%]"
-                            value={item.name}
-                            onChange={(e) => {
-                              onDimensionValChange(e, index);
-                            }}
-                          />
-                          <Button
-                            icon={<PlusOutlined />}
-                            className="ml-[10px]"
-                            onClick={addDimension}
-                          ></Button>
-                          {!!index && (
-                            <Button
-                              icon={<MinusOutlined />}
-                              className="ml-[10px]"
-                              onClick={() => deleteDimensiontem(index)}
-                            ></Button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </Form.Item>
-                ) : (
-                  <Form.Item<MetricInfo>
-                    label={t('monitor.formula')}
-                    name="query"
-                    rules={[{ required: true, message: t('common.required') }]}
-                  >
-                    <Input.TextArea rows={4} />
-                  </Form.Item>
-                )
-              }
+                    <Input
+                      className="w-[80%]"
+                      value={item.name}
+                      onChange={(e) => {
+                        onDimensionValChange(e, index);
+                      }}
+                    />
+                    <Button
+                      icon={<PlusOutlined />}
+                      className="ml-[10px]"
+                      onClick={addDimension}
+                    ></Button>
+                    {!!index && (
+                      <Button
+                        icon={<MinusOutlined />}
+                        className="ml-[10px]"
+                        onClick={() => deleteDimensiontem(index)}
+                      ></Button>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </Form.Item>
-            <Form.Item
+            <Form.Item<MetricInfo>
+              label={t('monitor.formula')}
+              name="query"
+              rules={[{ required: true, message: t('common.required') }]}
+            >
+              <Input.TextArea rows={4} />
+            </Form.Item>
+            {/* <Form.Item
               noStyle
               shouldUpdate={(prevValues, currentValues) =>
                 prevValues.type !== currentValues.type
@@ -284,6 +281,16 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
                   </Form.Item>
                 ) : null
               }
+            </Form.Item> */}
+            <Form.Item<MetricInfo>
+              label={t('monitor.dataType')}
+              name="data_type"
+              rules={[{ required: true, message: t('common.required') }]}
+            >
+              <Select>
+                <Option value="number">{t('monitor.number')}</Option>
+                <Option value="enum">{t('monitor.enum')}</Option>
+              </Select>
             </Form.Item>
             <Form.Item<MetricInfo>
               label={t('common.unit')}
@@ -295,7 +302,6 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
             <Form.Item<MetricInfo>
               label={t('common.description')}
               name="description"
-              rules={[{ required: true, message: t('common.required') }]}
             >
               <Input.TextArea rows={4} />
             </Form.Item>

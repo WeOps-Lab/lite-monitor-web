@@ -117,7 +117,7 @@ const Intergration = () => {
               key={app.id}
               className={`w-full sm:w-1/4 p-2 min-w-[200px] ${intergrationStyle.appItem}`}
             >
-              <div className="border shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-4 relative cursor-pointer group">
+              <div className="bg-[var(--color-bg-1)] border shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-4 relative cursor-pointer group">
                 <div className="flex items-center space-x-4 my-2">
                   <Icon type={app.name} className="text-6xl" />
                   <div>
