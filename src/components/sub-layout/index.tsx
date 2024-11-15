@@ -34,7 +34,7 @@ const WithSideMenuLayout: React.FC<WithSideMenuLayoutProps> = ({
             {topSection}
           </div>
         )} 
-        <div className={`p-4 flex-1 rounded-md overflow-auto ${sideMenuStyle.sectionContainer}`}>
+        <div className={`flex-1 rounded-md overflow-auto ${sideMenuStyle.sectionContainer}`}>
           {children}
         </div>
       </section>

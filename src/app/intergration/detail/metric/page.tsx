@@ -34,9 +34,14 @@ const Configure = () => {
 
   const columns: ColumnItem[] = [
     {
-      title: t('common.name'),
+      title: t('common.id'),
       dataIndex: 'name',
       key: 'name',
+    },
+    {
+      title: t('common.name'),
+      dataIndex: 'display_name',
+      key: 'display_name',
     },
     {
       title: t('monitor.dimension'),
@@ -53,12 +58,10 @@ const Configure = () => {
       ),
     },
     {
-      title: t('common.type'),
-      dataIndex: 'type',
-      key: 'type',
-      render: (_, record) => (
-        <>{record.type === 'metric' ? 'Metric' : 'Calculated Metric'}</>
-      ),
+      title: t('monitor.dataType'),
+      dataIndex: 'data_type',
+      key: 'data_type',
+      render: (_, record) => <>{record.data_type || '--'}</>,
     },
     {
       title: t('common.unit'),

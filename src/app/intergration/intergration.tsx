@@ -121,8 +121,8 @@ const Intergration = () => {
                 <div className="flex items-center space-x-4 my-2">
                   <Icon type={app.name} className="text-6xl" />
                   <div>
-                    <h2 className="text-xl font-bold m-0">{app.type}</h2>
-                    <Tag className="mt-[4px]">{app.name}</Tag>
+                    <h2 className="text-xl font-bold m-0">{app.name}</h2>
+                    <Tag className="mt-[4px]">{app.type}</Tag>
                   </div>
                 </div>
                 <p
