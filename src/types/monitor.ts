@@ -80,8 +80,7 @@ export interface DimensionItem {
 
 export interface IndexViewItem {
   name?: string;
-  id?: string | number;
-  isExpanded?: boolean;
+  id: number;
   isLoading?: boolean;
   child?: any[];
 }

@@ -7,9 +7,9 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import { Input, Button, Spin } from 'antd';
+import { Button, Spin, Select } from 'antd';
 import { BellOutlined, SearchOutlined } from '@ant-design/icons';
-import OperateModal from '@/components/operate-modal';
+import OperateDrawer from '@/components/operate-drawer';
 import TimeSelector from '@/components/time-selector';
 import LineChart from '@/components/line-chart';
 import Collapse from '@/components/collapse';
@@ -37,11 +37,13 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   const [groupVisible, setGroupVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [title, setTitle] = useState<string>('');
-  const [searhText, setSearhText] = useState<string>('');
+  const [metricId, setMetricId] = useState<number>();
   const [timeRange, setTimeRange] = useState<string[]>([]);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<IndexViewItem[]>([]);
+  const [originMetricData, setOriginMetricData] = useState<IndexViewItem[]>([]);
   const [instId, setInstId] = useState<string>('');
+  const [expandId, setExpandId] = useState<number>(0);
 
   useImperativeHandle(ref, () => ({
     showModal: ({ title, form }) => {
@@ -54,13 +56,22 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   }));
 
   useEffect(() => {
-    if (groupVisible) {
-      console.log(123);
+    clearTimer();
+    if (frequence > 0) {
+      timerRef.current = setInterval(() => {
+        handleSearch('timer');
+      }, frequence);
     }
-  }, [groupVisible]);
+    return () => clearTimer();
+  }, [frequence, timeRange, metricId]);
+
+  useEffect(() => {
+    handleSearch('refresh');
+  }, [timeRange]);
 
   const handleCancel = () => {
     setGroupVisible(false);
+    clearTimer();
   };
 
   const getInitData = async (id: string) => {
@@ -76,7 +87,6 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
         .then((res) => {
           const groupData = res[0].map((item: GroupInfo, index: number) => ({
             ...item,
-            isExpanded: !index,
             isLoading: !index,
             child: [],
           }));
@@ -92,8 +102,10 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
               });
             }
           });
+          setExpandId(groupData[0]?.id || 0);
           setMetricData(groupData);
-          fetchViewData(groupData, 0, id);
+          setOriginMetricData(groupData);
+          fetchViewData(groupData, groupData[0]?.id || 0, id);
         })
         .finally(() => {
           setLoading(false);
@@ -117,8 +129,9 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     return params;
   };
 
-  const processData = (data: any) => {
+  const processData = (data: any, metricItem: MetricItem) => {
     const result: any[] = [];
+    const target = metricItem?.dimensions || [];
     data.forEach((item: any, index: number) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
         const time = new Date(timestamp * 1000).toLocaleString();
@@ -128,7 +141,22 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
         } else {
           result.push({
             time,
-            title: item.metric['__name__'],
+            title: metricItem.name,
+            dimensions: Object.entries(item.metric)
+              .map(([key, value]) => ({
+                name: key,
+                label:
+                  key === 'instance_name'
+                    ? 'Instance Name'
+                    : target.find((sec) => sec.name === key)?.description ||
+                      key,
+                value: value,
+              }))
+              .filter(
+                (item) =>
+                  item.name === 'instance_name' ||
+                  target.find((tex) => tex.name === item.name)
+              ),
             [`value${index + 1}`]: parseFloat(value),
           });
         }
@@ -139,10 +167,10 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
 
   const fetchViewData = async (
     data: IndexViewItem[],
-    index: number,
+    groupId: number,
     id: string
   ) => {
-    const metricList = data[index]?.child || [];
+    const metricList = data.find((item) => item.id === groupId)?.child || [];
     const requestQueue = metricList.map((item) =>
       get(`/api/metrics_instance/query_range/`, {
         params: getParams(item.query, id),
@@ -153,7 +181,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
       results.forEach((result) => {
         const metricItem = metricList.find((item) => item.id === result.id);
         if (metricItem) {
-          metricItem.viewData = processData(result.data || []);
+          metricItem.viewData = processData(result.data || [], metricItem);
         }
       });
     } catch (error) {
@@ -185,34 +213,67 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   };
 
   const handleSearch = (type?: string) => {
-    console.log(123);
+    const _metricData = deepClone(metricData);
+    const target = _metricData.find(
+      (item: IndexViewItem) => item.id === expandId
+    );
+    if (type === 'refresh' && target) {
+      target.isLoading = true;
+    }
+    setMetricData(_metricData);
+    fetchViewData(_metricData, expandId, instId);
   };
 
-  const handleSearhTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearhText(e.target.value);
+  const handleMetricIdChange = (val: number) => {
+    setMetricId(val);
+    if (val) {
+      const filteredData = originMetricData
+        .map((group) => ({
+          ...group,
+          isLoading: false,
+          child: (group?.child || []).filter((item) => item.id === val),
+        }))
+        .filter((item) => item.child?.find((tex) => tex.id === val));
+      const target = filteredData.find((item) =>
+        item.child?.find((tex) => tex.id === val)
+      );
+      if (target) {
+        target.isLoading = true;
+        const _groupId = target?.id || 0;
+        setExpandId(_groupId);
+        setMetricData(filteredData);
+        fetchViewData(filteredData, _groupId, instId);
+      }
+    } else {
+      getInitData(instId);
+    }
   };
 
-  const toggleGroup = (expanded: boolean, index: number) => {
+  const toggleGroup = (expanded: boolean, groupId: number) => {
     if (expanded) {
       const _metricData = deepClone(metricData);
       _metricData.forEach((item: IndexViewItem) => {
-        item.isExpanded = false;
         item.isLoading = false;
       });
-      _metricData[index].isExpanded = true;
-      _metricData[index].isLoading = true;
+      const targetIndex = _metricData.findIndex(
+        (item: IndexViewItem) => item.id === groupId
+      );
+      if (targetIndex !== -1) {
+        _metricData[targetIndex].isLoading = true;
+      }
+      setExpandId(groupId);
       setMetricData(_metricData);
-      fetchViewData(_metricData, index, instId);
+      fetchViewData(_metricData, groupId, instId);
     }
   };
 
   return (
     <div>
-      <OperateModal
+      <OperateDrawer
         width={900}
         title={title}
         visible={groupVisible}
-        onCancel={handleCancel}
+        onClose={handleCancel}
         footer={
           <div>
             <Button onClick={handleCancel}>{t('common.cancel')}</Button>
@@ -220,12 +281,22 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
         }
       >
         <div className="flex justify-between mb-[15px]">
-          <Input
+          <Select
             className="w-[250px]"
             placeholder={t('common.searchPlaceHolder')}
-            value={searhText}
-            onChange={handleSearhTextChange}
-          ></Input>
+            value={metricId}
+            allowClear
+            showSearch
+            options={originMetricData.map((item) => ({
+              label: item.name,
+              title: item.name,
+              options: (item.child || []).map((tex) => ({
+                label: tex.name,
+                value: tex.id,
+              })),
+            }))}
+            onChange={handleMetricIdChange}
+          ></Select>
           <TimeSelector
             onChange={(value, dateString) => {
               onTimeChange(dateString);
@@ -236,7 +307,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
         </div>
         <div className="groupList">
           <Spin spinning={loading}>
-            {metricData.map((metricItem, index) => (
+            {metricData.map((metricItem) => (
               <Spin
                 className="w-full"
                 key={metricItem.id}
@@ -245,8 +316,8 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
                 <Collapse
                   className="mb-[10px]"
                   title={metricItem.name || ''}
-                  isOpen={!!metricItem.isExpanded}
-                  onToggle={(expanded) => toggleGroup(expanded, index)}
+                  isOpen={metricItem.id === expandId}
+                  onToggle={(expanded) => toggleGroup(expanded, metricItem.id)}
                 >
                   <div className="flex flex-wrap justify-between">
                     {(metricItem.child || []).map((item) => (
@@ -264,7 +335,10 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
                           </div>
                         </div>
                         <div className="h-[100px] mt-[10px]">
-                          <LineChart data={item.viewData || []} />
+                          <LineChart
+                            data={item.viewData || []}
+                            unit={item.unit}
+                          />
                         </div>
                       </div>
                     ))}
@@ -274,7 +348,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
             ))}
           </Spin>
         </div>
-      </OperateModal>
+      </OperateDrawer>
     </div>
   );
 });
