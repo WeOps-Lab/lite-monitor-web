@@ -10,10 +10,11 @@ import {
 } from 'recharts';
 import CustomTooltip from './customTooltips';
 import { generateUniqueRandomColor } from '@/utils/common';
-import chartLineStyle from './index.module.less'
+import chartLineStyle from './index.module.less';
 
 interface LineChartProps {
   data: any[];
+  unit?: string;
 }
 
 const getChartAreaKeys = (arr: any[]) => {
@@ -28,7 +29,7 @@ const getChartAreaKeys = (arr: any[]) => {
   return Array.from(keys);
 };
 
-const LineChart: React.FC<LineChartProps> = ({ data }) => {
+const LineChart: React.FC<LineChartProps> = ({ data, unit = '' }) => {
   return (
     <ResponsiveContainer className={chartLineStyle.chartLine}>
       <AreaChart
@@ -48,10 +49,14 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
           axisLine={false}
           tickLine={false}
           tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-          tickFormatter={(value) => `${value}`}
+          tickFormatter={(value) => `${value}${unit}`}
         />
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <Tooltip wrapperClassName='custom-TIPS' content={<CustomTooltip />} offset={-10} />
+        <Tooltip
+          wrapperClassName="custom-TIPS"
+          content={<CustomTooltip unit={unit} />}
+          offset={-10}
+        />
         {getChartAreaKeys(data).map((key, index) => (
           <Area
             key={index}

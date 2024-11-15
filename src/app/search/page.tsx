@@ -51,6 +51,7 @@ const Search = () => {
   const [tableData, setTableData] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [frequence, setFrequence] = useState<number>(0);
+  const [unit, setUnit] = useState<string>('');
   const isArea: boolean = activeTab === 'area';
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -170,10 +171,10 @@ const Search = () => {
 
   const handleMetricChange = (val: string) => {
     setMetric(val);
-    const _labels = (
-      metrics.find((item) => item.name === val)?.dimensions || []
-    ).map((item) => item.name);
+    const target = metrics.find((item) => item.name === val);
+    const _labels = (target?.dimensions || []).map((item) => item.name);
     setLabels(_labels);
+    setUnit(target?.unit || '');
   };
 
   const handleObjectChange = (val: string) => {
@@ -243,6 +244,8 @@ const Search = () => {
 
   const processData = (data: any) => {
     const result: any[] = [];
+    const target =
+      metrics.find((item) => item.name === metric)?.dimensions || [];
     data.forEach((item: any, index: number) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
         const time = new Date(timestamp * 1000).toLocaleString();
@@ -252,7 +255,22 @@ const Search = () => {
         } else {
           result.push({
             time,
-            title: item.metric['__name__'],
+            title: metric,
+            dimensions: Object.entries(item.metric)
+              .map(([key, value]) => ({
+                name: key,
+                label:
+                  key === 'instance_name'
+                    ? 'Instance Name'
+                    : target.find((sec) => sec.name === key)?.description ||
+                      key,
+                value: value,
+              }))
+              .filter(
+                (item) =>
+                  item.name === 'instance_name' ||
+                  target.find((tex) => tex.name === item.name)
+              ),
             [`value${index + 1}`]: parseFloat(value),
           });
         }
@@ -500,7 +518,7 @@ const Search = () => {
           />
           {isArea ? (
             <div className={searchStyle.chartArea}>
-              <LineChart data={processData(chartData)} />
+              <LineChart data={processData(chartData)} unit={unit} />
             </div>
           ) : (
             <CustomTable
