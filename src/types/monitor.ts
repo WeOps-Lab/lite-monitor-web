@@ -61,6 +61,7 @@ export interface MetricItem {
   name: string;
   type: string;
   dimensions: any[];
+  query?: string;
   [key: string]: unknown;
 }
 

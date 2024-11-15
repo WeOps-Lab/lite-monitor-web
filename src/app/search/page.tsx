@@ -105,10 +105,12 @@ const Search = () => {
   };
 
   const canSearch = () => {
-    return timeRange.length && timeRange.every((item) => !!item) && !!metric;
+    return !!metric && instanceId?.length;
   };
 
   const getParams = () => {
+    const _query: string =
+      metrics.find((item) => item.name === metric)?.query || '';
     const params: SearchParams = { query: '' };
     const startTime = timeRange.at(0);
     const endTime = timeRange.at(1);
@@ -116,29 +118,28 @@ const Search = () => {
       params.start = new Date(startTime).getTime();
       params.end = new Date(endTime).getTime();
       params.step = Math.ceil((params.end / 1000 - params.start / 1000) / 360);
-      // 生成Prometheus查询语法
-      let query = '';
-      if (instanceId?.length) {
-        query += `instance_id=~"${instanceId.join('|')}"`;
-      }
-      if (conditions?.length) {
-        const conditionQueries = conditions
-          .map((condition) => {
-            if (condition.label && condition.condition && condition.value) {
-              return `${condition.label}${condition.condition}"${condition.value}"`;
-            }
-            return '';
-          })
-          .filter(Boolean);
-        if (conditionQueries.length) {
-          if (query) {
-            query += ',';
-          }
-          query += conditionQueries.join(',');
-        }
-      }
-      params.query = query ? `${metric}{${query}}` : metric || '';
     }
+    let query = '';
+    if (instanceId?.length) {
+      query += `instance_id=~"${instanceId.join('|')}"`;
+    }
+    if (conditions?.length) {
+      const conditionQueries = conditions
+        .map((condition) => {
+          if (condition.label && condition.condition && condition.value) {
+            return `${condition.label}${condition.condition}"${condition.value}"`;
+          }
+          return '';
+        })
+        .filter(Boolean);
+      if (conditionQueries.length) {
+        if (query) {
+          query += ',';
+        }
+        query += conditionQueries.join(',');
+      }
+    }
+    params.query = _query.replace(/__\$labels__/g, query);
     return params;
   };
 
