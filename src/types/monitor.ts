@@ -60,6 +60,7 @@ export interface MetricItem {
   metric_object: number;
   name: string;
   type: string;
+  display_name?: string;
   dimensions: any[];
   query?: string;
   unit?: string;

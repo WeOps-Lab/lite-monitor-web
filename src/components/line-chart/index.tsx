@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import CustomTooltip from './customTooltips';
-import { generateUniqueRandomColor } from '@/utils/common';
+import { generateUniqueRandomColor, formatTime } from '@/utils/common';
 import chartLineStyle from './index.module.less';
 
 interface LineChartProps {
@@ -30,6 +30,10 @@ const getChartAreaKeys = (arr: any[]) => {
 };
 
 const LineChart: React.FC<LineChartProps> = ({ data, unit = '' }) => {
+  // 获取数据中的最小和最大时间
+  const times = data.map((d) => d.time);
+  const minTime = +new Date(Math.min(...times));
+  const maxTime = +new Date(Math.max(...times));
   return (
     <ResponsiveContainer className={chartLineStyle.chartLine}>
       <AreaChart
@@ -44,18 +48,17 @@ const LineChart: React.FC<LineChartProps> = ({ data, unit = '' }) => {
         <XAxis
           dataKey="time"
           tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
+          tickFormatter={(tick) => formatTime(tick, minTime, maxTime)}
         />
         <YAxis
           axisLine={false}
           tickLine={false}
           tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-          tickFormatter={(value) => `${value}${unit}`}
         />
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <Tooltip
           wrapperClassName="custom-TIPS"
           content={<CustomTooltip unit={unit} />}
-          offset={-10}
         />
         {getChartAreaKeys(data).map((key, index) => (
           <Area

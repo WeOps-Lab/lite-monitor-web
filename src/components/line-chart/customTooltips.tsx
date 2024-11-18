@@ -1,6 +1,7 @@
 import React from 'react';
 import { TooltipProps } from 'recharts';
 import customTooltipStyle from './index.module.less';
+import dayjs from 'dayjs';
 interface CustomToolTipProps extends Omit<TooltipProps<any, string>, 'unit'> {
   unit?: string;
 }
@@ -14,7 +15,9 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
   if (active && payload?.length) {
     return (
       <div className={customTooltipStyle.customTooltip}>
-        <p className="label font-[600]">{`${label}`}</p>
+        <p className="label font-[600]">{`${dayjs
+          .unix(label)
+          .format('YYYY-MM-DD HH:mm:ss')}`}</p>
         {payload.map((item: any, index: number) => (
           <div key={index}>
             <div className="flex items-center mt-[4px]">
@@ -30,8 +33,9 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
               ></span>
               {item.payload.title}
               <span className="font-[600] ml-[10px]">
-                {item.value}
-                {unit}
+                {typeof item.value === 'number'
+                  ? item.value.toFixed(2)
+                  : item.value}
               </span>
             </div>
             <ul className="text-[12px] ml-[15px] text-[var(--color-text-3)]">

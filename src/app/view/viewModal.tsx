@@ -17,7 +17,7 @@ import useApiClient from '@/utils/request';
 import { ModalRef } from '@/types';
 import { MetricItem, GroupInfo, IndexViewItem } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
-import { deepClone } from '@/utils/common';
+import { deepClone, findUnitNameById } from '@/utils/common';
 
 interface ModalProps {
   monitorObject: React.Key;
@@ -121,10 +121,17 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     };
     const startTime = timeRange.at(0);
     const endTime = timeRange.at(1);
+    const MAX_POINTS = 100; // 最大数据点数
+    const DEFAULT_STEP = 360; // 默认步长
     if (startTime && endTime) {
       params.start = new Date(startTime).getTime();
       params.end = new Date(endTime).getTime();
-      params.step = Math.ceil((params.end / 1000 - params.start / 1000) / 360);
+      params.step = Math.max(
+        Math.ceil(
+          (params.end / MAX_POINTS - params.start / MAX_POINTS) / DEFAULT_STEP
+        ),
+        1
+      );
     }
     return params;
   };
@@ -134,8 +141,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     const target = metricItem?.dimensions || [];
     data.forEach((item: any, index: number) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
-        const time = new Date(timestamp * 1000).toLocaleString();
-        const existing = result.find((entry) => entry.time === time);
+        const existing = result.find((entry) => entry.time === timestamp);
         const detailValue = Object.entries(item.metric)
           .map(([key, dimenValue]) => ({
             name: key,
@@ -161,8 +167,8 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
             [`value${index + 1}`]: detailValue,
           };
           result.push({
-            time,
-            title: metricItem.name,
+            time: timestamp,
+            title: metricItem.display_name,
             dimensions: Object.entries(item.metric)
               .map(([key, value]) => ({
                 name: key,
@@ -292,7 +298,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   return (
     <div>
       <OperateDrawer
-        width={900}
+        width={950}
         title={title}
         visible={groupVisible}
         onClose={handleCancel}
@@ -348,15 +354,24 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
                         className="w-[49%] border border-[var(--color-border-1)] p-[10px] mb-[10px]"
                       >
                         <div className="flex justify-between items-center">
-                          <span className="font-[600] text-[14px]">
-                            {item.name}
+                          <span className="text-[14px]">
+                            <span className="font-[600]">
+                              {item.display_name}
+                            </span>
+                            <span className="text-[var(--color-text-3)] text-[12px]">
+                              {`${
+                                findUnitNameById(item.unit)
+                                  ? '（' + findUnitNameById(item.unit) + '）'
+                                  : ''
+                              }`}
+                            </span>
                           </span>
                           <div className="text-[var(--color-text-3)]">
                             <SearchOutlined className="cursor-pointer" />
                             <BellOutlined className="ml-[6px] cursor-pointer" />
                           </div>
                         </div>
-                        <div className="h-[100px] mt-[10px]">
+                        <div className="h-[200px] mt-[10px]">
                           <LineChart
                             data={item.viewData || []}
                             unit={item.unit}

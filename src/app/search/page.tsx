@@ -11,7 +11,7 @@ import Icon from '@/components/icon';
 import LineChart from '@/components/line-chart';
 import { ListItem, ColumnItem } from '@/types';
 import { ObectItem, MetricItem } from '@/types/monitor';
-import { deepClone } from '@/utils/common';
+import { deepClone, findUnitNameById } from '@/utils/common';
 import { CONDITION_LIST } from '@/constants/monitor';
 import CustomTable from '@/components/custom-table';
 const { Option } = Select;
@@ -116,9 +116,16 @@ const Search = () => {
     const startTime = timeRange.at(0);
     const endTime = timeRange.at(1);
     if (startTime && endTime) {
+      const MAX_POINTS = 100; // 最大数据点数
+      const DEFAULT_STEP = 360; // 默认步长
       params.start = new Date(startTime).getTime();
       params.end = new Date(endTime).getTime();
-      params.step = Math.ceil((params.end / 1000 - params.start / 1000) / 360);
+      params.step = Math.max(
+        Math.ceil(
+          (params.end / MAX_POINTS - params.start / MAX_POINTS) / DEFAULT_STEP
+        ),
+        1
+      );
     }
     let query = '';
     if (instanceId?.length) {
@@ -248,8 +255,7 @@ const Search = () => {
       metrics.find((item) => item.name === metric)?.dimensions || [];
     data.forEach((item: any, index: number) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
-        const time = new Date(timestamp * 1000).toLocaleString();
-        const existing = result.find((entry) => entry.time === time);
+        const existing = result.find((entry) => entry.time === timestamp);
         const detailValue = Object.entries(item.metric)
           .map(([key, dimenValue]) => ({
             name: key,
@@ -275,8 +281,9 @@ const Search = () => {
             [`value${index + 1}`]: detailValue,
           };
           result.push({
-            time,
-            title: metric,
+            time: timestamp,
+            title:
+              metrics.find((sec) => sec.name === metric)?.display_name || '--',
             [`value${index + 1}`]: parseFloat(value),
             details,
           });
@@ -419,7 +426,7 @@ const Search = () => {
                   {metrics.map((item, index) => {
                     return (
                       <Option value={item.name} key={index}>
-                        {item.name}
+                        {item.display_name}
                       </Option>
                     );
                   })}
@@ -525,6 +532,27 @@ const Search = () => {
           />
           {isArea ? (
             <div className={searchStyle.chartArea}>
+              {!!metric && (
+                <div className="text-[14px] mb-[10px]">
+                  <span className="font-[600]">
+                    {metrics.find((item) => item.name === metric)
+                      ?.display_name || '--'}
+                  </span>
+                  <span className="text-[var(--color-text-3)] text-[12px]">
+                    {`${
+                      findUnitNameById(
+                        metrics.find((item) => item.name === metric)?.unit
+                      )
+                        ? '（' +
+                          findUnitNameById(
+                            metrics.find((item) => item.name === metric)?.unit
+                          ) +
+                          '）'
+                        : ''
+                    }`}
+                  </span>
+                </div>
+              )}
               <LineChart data={processData(chartData)} unit={unit} />
             </div>
           ) : (
