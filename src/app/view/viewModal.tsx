@@ -39,6 +39,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   const [title, setTitle] = useState<string>('');
   const [metricId, setMetricId] = useState<number>();
   const [timeRange, setTimeRange] = useState<string[]>([]);
+  const [times, setTimes] = useState<any>([]);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<IndexViewItem[]>([]);
   const [originMetricData, setOriginMetricData] = useState<IndexViewItem[]>([]);
@@ -295,6 +296,11 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     }
   };
 
+  const onXRangeChange = (arr: any) => {
+    setTimes(arr);
+    setTimeRange(arr.map((item: any) => new Date(item).getTime()));
+  };
+
   return (
     <div>
       <OperateDrawer
@@ -327,8 +333,10 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
           ></Select>
           <TimeSelector
             onChange={(value, dateString) => {
+              setTimes(value);
               onTimeChange(dateString);
             }}
+            value={times}
             onFrequenceChange={onFrequenceChange}
             onRefresh={onRefresh}
           />
@@ -375,6 +383,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
                           <LineChart
                             data={item.viewData || []}
                             unit={item.unit}
+                            onXRangeChange={onXRangeChange}
                           />
                         </div>
                       </div>

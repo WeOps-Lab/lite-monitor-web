@@ -4,6 +4,7 @@ import customTooltipStyle from './index.module.less';
 import dayjs from 'dayjs';
 interface CustomToolTipProps extends Omit<TooltipProps<any, string>, 'unit'> {
   unit?: string;
+  visible?: boolean;
 }
 
 const CustomTooltip: React.FC<CustomToolTipProps> = ({
@@ -11,8 +12,9 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
   payload,
   label,
   unit = '',
+  visible = true,
 }) => {
-  if (active && payload?.length) {
+  if (active && payload?.length && visible) {
     return (
       <div className={customTooltipStyle.customTooltip}>
         <p className="label font-[600]">{`${dayjs

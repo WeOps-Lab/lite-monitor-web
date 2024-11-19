@@ -54,6 +54,7 @@ const Search = () => {
   const [unit, setUnit] = useState<string>('');
   const isArea: boolean = activeTab === 'area';
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [times, setTimes] = useState<any>([]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -347,11 +348,18 @@ const Search = () => {
     }
   };
 
+  const onXRangeChange = (arr: any) => {
+    setTimes(arr);
+    setTimeRange(arr.map((item: any) => new Date(item).getTime()));
+  };
+
   return (
     <div className={searchStyle.search}>
       <div className={searchStyle.time}>
         <TimeSelector
+          value={times}
           onChange={(value, dateString) => {
+            setTimes(value);
             onTimeChange(dateString);
           }}
           onFrequenceChange={onFrequenceChange}
@@ -553,7 +561,11 @@ const Search = () => {
                   </span>
                 </div>
               )}
-              <LineChart data={processData(chartData)} unit={unit} />
+              <LineChart
+                data={processData(chartData)}
+                unit={unit}
+                onXRangeChange={onXRangeChange}
+              />
             </div>
           ) : (
             <CustomTable
