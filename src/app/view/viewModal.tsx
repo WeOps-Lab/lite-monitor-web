@@ -11,13 +11,14 @@ import { Button, Spin, Select } from 'antd';
 import { BellOutlined, SearchOutlined } from '@ant-design/icons';
 import OperateDrawer from '@/components/operate-drawer';
 import TimeSelector from '@/components/time-selector';
-import LineChart from '@/components/line-chart';
+import LineChart from '@/components/charts/lineChart';
 import Collapse from '@/components/collapse';
 import useApiClient from '@/utils/request';
 import { ModalRef } from '@/types';
 import { MetricItem, GroupInfo, IndexViewItem } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById } from '@/utils/common';
+import dayjs from 'dayjs';
 
 interface ModalProps {
   monitorObject: React.Key;
@@ -38,8 +39,19 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [title, setTitle] = useState<string>('');
   const [metricId, setMetricId] = useState<number>();
-  const [timeRange, setTimeRange] = useState<string[]>([]);
-  const [times, setTimes] = useState<any>([]);
+  const currentTimestamp: number = dayjs().valueOf();
+  const oneHourAgoTimestamp: number = dayjs().subtract(1, 'hour').valueOf();
+  const beginTime: string = dayjs(oneHourAgoTimestamp).format(
+    'YYYY-MM-DD HH:mm:ss'
+  );
+  const lastTime: string = dayjs(currentTimestamp).format(
+    'YYYY-MM-DD HH:mm:ss'
+  );
+  const [timeRange, setTimeRange] = useState<string[]>([beginTime, lastTime]);
+  const [times, setTimes] = useState<any>([
+    dayjs(oneHourAgoTimestamp),
+    dayjs(currentTimestamp),
+  ]);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<IndexViewItem[]>([]);
   const [originMetricData, setOriginMetricData] = useState<IndexViewItem[]>([]);
@@ -170,21 +182,6 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
           result.push({
             time: timestamp,
             title: metricItem.display_name,
-            dimensions: Object.entries(item.metric)
-              .map(([key, value]) => ({
-                name: key,
-                label:
-                  key === 'instance_name'
-                    ? 'Instance Name'
-                    : target.find((sec) => sec.name === key)?.description ||
-                      key,
-                value: value,
-              }))
-              .filter(
-                (item) =>
-                  item.name === 'instance_name' ||
-                  target.find((tex) => tex.name === item.name)
-              ),
             [`value${index + 1}`]: parseFloat(value),
             details,
           });

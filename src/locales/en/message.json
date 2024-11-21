@@ -139,6 +139,7 @@
     "ruleTips": "The rules used to set the asset ownership organization for access are unique to each asset model",
     "assetValidate": "The Asset cannot be empty",
     "generateConfiguration": "Generate Configuration",
-    "indexView": "Index View"
+    "indexView": "Index View",
+    "overview": "Overview"
   }
 }

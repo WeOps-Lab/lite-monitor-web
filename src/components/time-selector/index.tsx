@@ -10,6 +10,7 @@ const { RangePicker } = DatePicker;
 import dayjs from 'dayjs';
 
 const rangePresets: TimeRangePickerProps['presets'] = [
+  { label: 'Last 1 Hours', value: [dayjs().add(-1, 'h'), dayjs()] },
   { label: 'Last 5 Hours', value: [dayjs().add(-5, 'h'), dayjs()] },
   { label: 'Last 12 Hours', value: [dayjs().add(-12, 'h'), dayjs()] },
   { label: 'Last 1 Day', value: [dayjs().add(-1, 'd'), dayjs()] },

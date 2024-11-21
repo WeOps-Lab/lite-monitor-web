@@ -72,7 +72,9 @@ const Intergration = () => {
       fixed: 'right',
       render: (_, record) => (
         <>
-          <Button type="link">{t('common.detail')}</Button>
+          <Button type="link" onClick={() => linkToDetial(record)}>
+            {t('common.detail')}
+          </Button>
           <Button
             className="ml-[10px]"
             type="link"
@@ -209,7 +211,7 @@ const Intergration = () => {
         };
       }
       acc[item.type].list.push({
-        label: item.type,
+        label: item.name,
         key: item.id,
       });
       return acc;
@@ -223,8 +225,11 @@ const Intergration = () => {
 
   const linkToDetial = (app: ObectItem) => {
     const row = deepClone(app);
+    console.log(apps)
+    row.name = apps.find(item=>item.key === objectId)?.label
+    row.monitorObjId = apps.find(item=>item.key === objectId)?.key || ''
     const params = new URLSearchParams(row);
-    const targetUrl = `/intergration/detail?${params.toString()}`;
+    const targetUrl = `/view/detail/overview?${params.toString()}`;
     router.push(targetUrl);
   };
 

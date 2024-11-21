@@ -8,12 +8,13 @@ import Collapse from '@/components/collapse';
 import searchStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
-import LineChart from '@/components/line-chart';
+import LineChart from '@/components/charts/lineChart';
 import { ListItem, ColumnItem } from '@/types';
 import { ObectItem, MetricItem } from '@/types/monitor';
 import { deepClone, findUnitNameById } from '@/utils/common';
 import { CONDITION_LIST } from '@/constants/monitor';
 import CustomTable from '@/components/custom-table';
+import dayjs from 'dayjs';
 const { Option } = Select;
 
 interface ConditionItem {
@@ -46,7 +47,19 @@ const Search = () => {
   const [objects, setObjects] = useState<ObectItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('area');
   const [conditions, setConditions] = useState<ConditionItem[]>([]);
-  const [timeRange, setTimeRange] = useState<string[]>([]);
+  const currentTimestamp: number = dayjs().valueOf();
+  const oneHourAgoTimestamp: number = dayjs().subtract(1, 'hour').valueOf();
+  const beginTime: string = dayjs(oneHourAgoTimestamp).format(
+    'YYYY-MM-DD HH:mm:ss'
+  );
+  const lastTime: string = dayjs(currentTimestamp).format(
+    'YYYY-MM-DD HH:mm:ss'
+  );
+  const [timeRange, setTimeRange] = useState<string[]>([beginTime, lastTime]);
+  const [times, setTimes] = useState<any>([
+    dayjs(oneHourAgoTimestamp),
+    dayjs(currentTimestamp),
+  ]);
   const [columns, setColumns] = useState<ColumnItem[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -54,7 +67,6 @@ const Search = () => {
   const [unit, setUnit] = useState<string>('');
   const isArea: boolean = activeTab === 'area';
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [times, setTimes] = useState<any>([]);
 
   useEffect(() => {
     if (isLoading) return;

@@ -107,4 +107,96 @@ const UNIT_LIST = [
   },
 ];
 
-export { FREQUENCY_LIST, CONDITION_LIST, UNIT_LIST };
+const INDEX_CONFIG = [
+  {
+    name: 'Host',
+    id: 1,
+    dashboardDisplay: [
+      {
+        indexId: 'env.procs',
+        displayType: 'single',
+        displayDimension: [],
+      },
+      {
+        indexId: 'load1',
+        displayType: 'dashboard',
+        displayDimension: [],
+      },
+      {
+        indexId: 'load5',
+        displayType: 'dashboard',
+        displayDimension: [],
+      },
+      {
+        indexId: 'disk.used',
+        displayType: 'table',
+        displayDimension: ['device'],
+      },
+      {
+        indexId: 'cpu_summary.usage',
+        displayType: 'lineChart',
+        displayDimension: ['cpu'],
+      },
+      {
+        indexId: 'disk.is_use',
+        displayType: 'lineChart',
+        displayDimension: ['device '],
+      },
+      {
+        indexId: 'mem.pct_usable',
+        displayType: 'lineChart',
+        displayDimension: ['device '],
+      },
+      {
+        indexId: 'io.util',
+        displayType: 'lineChart',
+        displayDimension: ['device '],
+      },
+      {
+        indexId: 'net.speed_sent',
+        displayType: 'lineChart',
+        displayDimension: ['device '],
+      },
+      {
+        indexId: 'net.speed_recv',
+        displayType: 'lineChart',
+        displayDimension: ['device '],
+      },
+    ],
+    tableDiaplay: ['cpu_summary.usage', 'mem.pct_usable', 'load5'],
+  },
+  {
+    name: 'HTTP',
+    id: 2,
+    dashboardDisplay: [
+      {
+        indexId: 'http_success.rate',
+        displayType: 'single',
+        displayDimension: [],
+      },
+      {
+        indexId: 'http_total.duration',
+        displayType: 'single',
+        displayDimension: [],
+      },
+      {
+        indexId: 'http_ssl',
+        displayType: 'single',
+        displayDimension: [],
+      },
+      {
+        indexId: 'http_status_code',
+        displayType: 'lineChart',
+        displayDimension: [],
+      },
+      {
+        indexId: 'http_dns.lookup.time',
+        displayType: 'lineChart',
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: ['http_success.rate', 'http_total.duration'],
+  },
+];
+
+export { FREQUENCY_LIST, CONDITION_LIST, UNIT_LIST, INDEX_CONFIG };
