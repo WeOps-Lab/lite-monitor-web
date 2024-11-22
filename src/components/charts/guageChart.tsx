@@ -108,7 +108,10 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
         </div>
       </div>
       {label && (
-        <div className="text-center font-[800] h-[40px] w-full leading-[40px] bg-[var(--color-bg-1)]">
+        <div
+          style={{ fontSize: '14px' }}
+          className="text-center h-[40px] w-full leading-[40px] bg-[var(--color-bg-1)] text-[var(--color-text-3)]"
+        >
           {label}
         </div>
       )}

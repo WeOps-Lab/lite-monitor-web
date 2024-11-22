@@ -22,11 +22,10 @@ const getChartAreaKeys = (arr: any[]) => {
 };
 
 const dimensionLael = (detail: any) => {
-  const arr = detail?.[0];
-  if (arr) {
-    return `${arr.label}${arr.value}`;
-  }
-  return '--';
+  const arr = (detail || [])
+    .filter((item: any) => item.name !== 'instance_name')
+    .map((item: any) => `${item.label}${item.value}`);
+  return arr.join('-') || '--';
 };
 
 const DimensionFilter: React.FC<DimensionFilterProps> = ({

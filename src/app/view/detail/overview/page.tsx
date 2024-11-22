@@ -11,7 +11,7 @@ import SingleValue from '@/components/charts/singleValue';
 import useApiClient from '@/utils/request';
 import { MetricItem, IndexViewItem } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
-import { deepClone, findUnitNameById } from '@/utils/common';
+import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import { INDEX_CONFIG } from '@/constants/monitor';
@@ -23,7 +23,7 @@ interface SearchParams {
   query: string;
 }
 
-const ViewModal = () => {
+const Overview = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -94,7 +94,6 @@ const ViewModal = () => {
               }
               return item;
             });
-          console.log(responseData);
           const metricData = responseData.map((metric: MetricItem) => ({
             ...metric,
             viewData: [],
@@ -223,19 +222,42 @@ const ViewModal = () => {
     setTimeRange(arr.map((item: any) => new Date(item).getTime()));
   };
 
+  const getGuageLabel = (arr: any) => {
+    return (
+      (arr[0]?.details?.value1 || [])
+        .map((item: any) => item.value)
+        .join('-') || '--'
+    );
+  };
+
+  const getTableData = (data: any) => {
+    if (data.length === 0) return [];
+    const latestData = data[data.length - 1];
+    const { details } = latestData;
+    const createName = (details: any[]) => {
+      return details
+        .filter((item) => item.name !== 'instance_name')
+        .map((detail) => `${detail.label}${detail.value}`)
+        .join('-');
+    };
+    const tableData = [];
+    for (const key in latestData) {
+      if (key.startsWith('value')) {
+        const detailKey = key;
+        if (details[detailKey]) {
+          tableData.push({
+            Device: createName(details[detailKey]),
+            Value: latestData[detailKey].toFixed(2),
+            id: detailKey,
+          });
+        }
+      }
+    }
+    return tableData;
+  };
+
   const renderChart = (metricItem: any) => {
     switch (metricItem.displayType) {
-      case 'lineChart':
-        return (
-          <div className="w-[500px] h-full">
-            <LineChart
-              data={metricItem.viewData || []}
-              unit={metricItem.unit}
-              showDimensionFilter
-              onXRangeChange={onXRangeChange}
-            />
-          </div>
-        );
       case 'barChart':
         return (
           <div className="w-[500px] h-full">
@@ -251,40 +273,53 @@ const ViewModal = () => {
         return (
           <div className="w-[200px] h-full">
             <GuageChart
-              value={55}
-              max={100}
-              segments={[
-                { value: 20, color: '#52C41A' }, // 绿色区域
-                { value: 50, color: '#FFEC3D' }, // 黄色区域
-                { value: 100, color: '#FF4D4F' }, // 红色区域
-              ]}
-              label="kafka-172.16.32.24"
+              value={
+                calculateMetrics(metricItem.viewData || []).latestValue || 0
+              }
+              max={20}
+              segments={metricItem.segments}
+              label={getGuageLabel(metricItem.viewData || [])}
             />
           </div>
         );
       case 'single':
         return (
           <div className="w-[100px]">
-            <SingleValue value="单值" unit="%" label="wome1" />
+            <SingleValue
+              value={
+                calculateMetrics(metricItem.viewData || []).latestValue || '--'
+              }
+              label={getGuageLabel(metricItem.viewData || [])}
+            />
           </div>
         );
       case 'table':
         return (
           <div className="w-[300px]">
             <CustomTable
-              dataSource={[]}
+              pagination={false}
+              dataSource={getTableData(metricItem.viewData || [])}
               columns={metricItem.displayDimension.map((item: any) => ({
                 title: item,
                 dataIndex: item,
                 key: item,
               }))}
-              scroll={{ y: 300 }}
+              scroll={{ y: 130 }}
               rowKey="id"
             />
           </div>
         );
       default:
-        return <div>unkown</div>;
+        return (
+          <div className="w-[500px] h-full">
+            <LineChart
+              data={metricItem.viewData || []}
+              unit={metricItem.unit}
+              showDimensionFilter
+              onXRangeChange={onXRangeChange}
+            />
+          </div>
+        );
     }
   };
 
@@ -305,7 +340,10 @@ const ViewModal = () => {
         <Spin spinning={loading}>
           <div className="flex flex-wrap">
             {metricData.map((metricItem: any) => (
-              <div key={metricItem.id} className="mb-[20px] mr-[20px] p-[10px] shadow">
+              <div
+                key={metricItem.id}
+                className="mb-[20px] mr-[20px] p-[10px] shadow"
+              >
                 <div className="flex justify-between items-center mb-[10px]">
                   <span className="text-[14px]">
                     <span className="font-[600]">
@@ -318,7 +356,7 @@ const ViewModal = () => {
                     </span>
                   </span>
                 </div>
-                <div className="h-[200px]">{renderChart(metricItem)}</div>
+                <div className="h-[180px]">{renderChart(metricItem)}</div>
               </div>
             ))}
           </div>
@@ -328,4 +366,4 @@ const ViewModal = () => {
   );
 };
 
-export default ViewModal;
+export default Overview;

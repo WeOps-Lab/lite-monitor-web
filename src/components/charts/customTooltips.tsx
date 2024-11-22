@@ -41,13 +41,13 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
               </span>
             </div>
             <ul className="text-[12px] ml-[15px] text-[var(--color-text-3)]">
-              {(item.payload.details?.[item.dataKey] || []).map(
-                (detail: any) => (
+              {(item.payload.details?.[item.dataKey] || [])
+                .filter((item: any) => item.name !== 'instance_name')
+                .map((detail: any) => (
                   <li className="mt-[5px]" key={detail.name}>
                     <span>{`${detail.label}: ${detail.value}`}</span>
                   </li>
-                )
-              )}
+                ))}
             </ul>
           </div>
         ))}

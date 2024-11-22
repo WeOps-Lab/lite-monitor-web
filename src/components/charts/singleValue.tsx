@@ -14,14 +14,17 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
   value,
   unit,
   label,
-  color = '#1890FF',
+  color = 'var(--color-text-1)',
   fontSize = 24, // 默认字体大小
   unitFontSize = 16, // 默认单位字体大小
   labelFontSize = 14, // 默认标签字体大小
 }) => {
   return (
-    <div className='bg-[var(--color-bg-1)]'>
-      <div className="flex items-center justify-center font-bold" style={{ color, fontSize }}>
+    <div className="bg-[var(--color-bg-1)]">
+      <div
+        className="flex items-center justify-center font-bold"
+        style={{ color, fontSize }}
+      >
         {value}
         {unit && (
           <span className="ml-[4px]" style={{ fontSize: unitFontSize }}>
@@ -30,7 +33,10 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
         )}
       </div>
       {label && (
-        <div className="flex items-center justify-center text-gray-500 mt-[10px]" style={{ fontSize: labelFontSize }}>
+        <div
+          className="flex items-center justify-center text-[var(--color-text-3)] mt-[10px]"
+          style={{ fontSize: labelFontSize }}
+        >
           {label}
         </div>
       )}

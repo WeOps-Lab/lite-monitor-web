@@ -121,16 +121,28 @@ const INDEX_CONFIG = [
         indexId: 'load1',
         displayType: 'dashboard',
         displayDimension: [],
+        segments: [
+          { value: 1, color: '#27C274' }, // 绿色区域
+          { value: 2, color: '#FF9214' }, // 黄色区域
+          { value: 4, color: '#D97007' }, // 黄色区域
+          { value: 20, color: '#F43B2C' }, // 红色区域
+        ],
       },
       {
         indexId: 'load5',
         displayType: 'dashboard',
         displayDimension: [],
+        segments: [
+          { value: 1.5, color: '#27C274' }, // 绿色区域
+          { value: 3, color: '#FF9214' }, // 黄色区域
+          { value: 5, color: '#D97007' }, // 黄色区域
+          { value: 20, color: '#F43B2C' }, // 红色区域
+        ],
       },
       {
         indexId: 'disk.used',
         displayType: 'table',
-        displayDimension: ['device'],
+        displayDimension: ['Device', 'Value'],
       },
       {
         indexId: 'cpu_summary.usage',

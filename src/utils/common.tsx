@@ -231,3 +231,20 @@ export const findUnitNameById = (
   }
   return '';
 };
+
+// 柱形图或者折线图单条线时，获取其最大值、最小值、平均值和最新值
+export const calculateMetrics = (data: any[], key = 'value1') => {
+  if (!data || data.length === 0) return {};
+  const values = data.map((item) => item[key]);
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  const avgValue =
+    values.reduce((sum, value) => sum + value, 0) / values.length;
+  const latestValue = values[values.length - 1];
+  return {
+    maxValue,
+    minValue,
+    avgValue,
+    latestValue,
+  };
+};
