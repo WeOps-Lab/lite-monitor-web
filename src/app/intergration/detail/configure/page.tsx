@@ -7,6 +7,7 @@ import { useTranslation } from '@/utils/i18n';
 import { MetricItem, CollectionTargetField } from '@/types/monitor';
 import { useSearchParams } from 'next/navigation';
 import configureStyle from './index.module.less';
+import threeStepStyle from './threeStep.module.less';
 const { Option } = Select;
 
 const Configure: React.FC = () => {
@@ -55,7 +56,9 @@ const Configure: React.FC = () => {
     });
   };
 
-  const getStep3Content = async (params = { interval: '' }) => {
+  const getStep3Content = async (
+    params = { interval: '', monitor_url: '' }
+  ) => {
     try {
       setLoading(true);
       const instnaceId = await post(
@@ -65,12 +68,59 @@ const Configure: React.FC = () => {
       let content: string | JSX.Element = '';
       switch (name) {
         case 'Website':
+          content = (
+            <div>
+              <ul>
+                <li>{'scrape_configs:'}</li>
+                <li className="ml-[10px]">{"- job_name: 'blackbox'"}</li>
+                <li className="ml-[20px]">{'metrics_path: /probe'}</li>
+                <li className="ml-[20px]">{'params:'}</li>
+                <li className="ml-[30px]">{'module: [http_2xx]'}</li>
+                <li className="ml-[20px]">{'static_configs:'}</li>
+                <li className="ml-[30px]">{'- targets:'}</li>
+                <li className="ml-[40px]">{`- ${params.monitor_url}`}</li>
+                <li className="ml-[20px]">{'relabel_configs:'}</li>
+                <li className="ml-[30px]">
+                  {'- source_labels: [__address__]'}
+                </li>
+                <li className="ml-[40px]">{'target_label: __param_target'}</li>
+                <li className="ml-[30px]">
+                  {'- source_labels: [__param_target]'}
+                </li>
+                <li className="ml-[40px]">{'target_label: instance'}</li>
+                <li className="ml-[30px]">{'- target_label: __address__'}</li>
+                <li className="ml-[40px]">{'replacement: 127.0.0.1:9115'}</li>
+              </ul>
+            </div>
+          );
           break;
         case 'K8S':
+          content = (
+            <div>
+              <ul>
+                <li>
+                  {'VERSION=v0.49.1 # use the latest release version from'}
+                </li>
+                <li>{'https://github.com/google/cadvisor/releases'}</li>
+                <li>{`sudo docker run \\`}</li>
+                <li className="ml-[10px]">{`--volume=/:/rootfs:ro \\`}</li>
+                <li className="ml-[10px]">{`--volume=/var/run:/var/run:ro \\`}</li>
+                <li className="ml-[10px]">{`--volume=/sys:/sys:ro \\`}</li>
+                <li className="ml-[10px]">{`--volume=/var/lib/docker/:/var/lib/docker:ro \\`}</li>
+                <li className="ml-[10px]">{`--volume=/dev/disk/:/dev/disk:ro \\`}</li>
+                <li className="ml-[10px]">{`--publish=8080:8080 \\`}</li>
+                <li className="ml-[10px]">{`--detach=true \\`}</li>
+                <li className="ml-[10px]">{`--name=cadvisor \\`}</li>
+                <li className="ml-[10px]">{`--privileged \\`}</li>
+                <li className="ml-[10px]">{`--device=/dev/kmsg \\`}</li>
+                <li className="ml-[10px]">{`gcr.io/cadvisor/cadvisor:$VERSION`}</li>
+              </ul>
+            </div>
+          );
           break;
         default:
           content = (
-            <div>
+            <div className={threeStepStyle.hostContent}>
               <ul>
                 <li>{'[global_tags]'}</li>
                 <li>{'agent_id="${node.name}"'}</li>
@@ -186,6 +236,15 @@ const Configure: React.FC = () => {
             >
               <Input className="w-[300px]" />
             </Form.Item>
+            {name === 'Website' && (
+              <Form.Item<CollectionTargetField>
+                label={<span className="w-[100px]">{t('monitor.url')}</span>}
+                name="monitor_url"
+                rules={[{ required: true, message: t('common.required') }]}
+              >
+                <Input className="w-[300px]" />
+              </Form.Item>
+            )}
             <Form.Item<CollectionTargetField>
               label={<span className="w-[100px]">{t('monitor.interval')}</span>}
               className={configureStyle.interval}

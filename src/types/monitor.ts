@@ -71,6 +71,7 @@ export interface CollectionTargetField {
   monitor_instance_name: string;
   monitor_object_id?: number;
   interval: number;
+  monitor_url?: string;
   unit?: string;
 }
 
