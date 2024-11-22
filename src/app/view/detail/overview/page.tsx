@@ -79,31 +79,27 @@ const Overview = () => {
       [];
     setLoading(true);
     try {
-      getMetrics
-        .then((res) => {
-          const responseData = res
-            .filter((item: any) =>
-              indexList.find((indexItem) => indexItem.indexId === item.name)
-            )
-            .map((item: any) => {
-              const target = indexList.find(
-                (indexItem) => indexItem.indexId === item.name
-              );
-              if (target) {
-                Object.assign(item, target);
-              }
-              return item;
-            });
-          const metricData = responseData.map((metric: MetricItem) => ({
-            ...metric,
-            viewData: [],
-          }));
-          setMetricData(metricData);
-          fetchViewData(metricData, id);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      getMetrics.then((res) => {
+        const responseData = res
+          .filter((item: any) =>
+            indexList.find((indexItem) => indexItem.indexId === item.name)
+          )
+          .map((item: any) => {
+            const target = indexList.find(
+              (indexItem) => indexItem.indexId === item.name
+            );
+            if (target) {
+              Object.assign(item, target);
+            }
+            return item;
+          });
+        const metricData = responseData.map((metric: MetricItem) => ({
+          ...metric,
+          viewData: [],
+        }));
+        setMetricData(metricData);
+        fetchViewData(metricData, id);
+      });
     } catch (error) {
       setLoading(false);
     }
@@ -173,6 +169,7 @@ const Overview = () => {
   };
 
   const fetchViewData = async (data: MetricItem[], id: string) => {
+    setLoading(true);
     const requestQueue = data.map((item: any) =>
       get(`/api/metrics_instance/query_range/`, {
         params: getParams(item.query, id),
@@ -191,6 +188,7 @@ const Overview = () => {
     } finally {
       const _data = deepClone(data);
       setMetricData(_data);
+      setLoading(false);
     }
   };
 
@@ -339,26 +337,28 @@ const Overview = () => {
       <div className="h-[calc(100vh-180px)] overflow-y-auto">
         <Spin spinning={loading}>
           <div className="flex flex-wrap">
-            {metricData.map((metricItem: any) => (
-              <div
-                key={metricItem.id}
-                className="mb-[20px] mr-[20px] p-[10px] shadow"
-              >
-                <div className="flex justify-between items-center mb-[10px]">
-                  <span className="text-[14px]">
-                    <span className="font-[600]">
-                      {metricItem.display_name}
+            {metricData
+              .sort((a: any, b: any) => a.sortIndex - b.sortIndex)
+              .map((metricItem: any) => (
+                <div
+                  key={metricItem.id}
+                  className="mb-[20px] mr-[20px] p-[10px] shadow"
+                >
+                  <div className="flex justify-between items-center mb-[10px]">
+                    <span className="text-[14px]">
+                      <span className="font-[600]">
+                        {metricItem.display_name}
+                      </span>
+                      <span className="text-[var(--color-text-3)] text-[12px]">
+                        {findUnitNameById(metricItem.unit)
+                          ? `（${findUnitNameById(metricItem.unit)}）`
+                          : ''}
+                      </span>
                     </span>
-                    <span className="text-[var(--color-text-3)] text-[12px]">
-                      {findUnitNameById(metricItem.unit)
-                        ? `（${findUnitNameById(metricItem.unit)}）`
-                        : ''}
-                    </span>
-                  </span>
+                  </div>
+                  <div className="h-[180px]">{renderChart(metricItem)}</div>
                 </div>
-                <div className="h-[180px]">{renderChart(metricItem)}</div>
-              </div>
-            ))}
+              ))}
           </div>
         </Spin>
       </div>

@@ -115,11 +115,13 @@ const INDEX_CONFIG = [
       {
         indexId: 'env.procs',
         displayType: 'single',
+        sortIndex: 0,
         displayDimension: [],
       },
       {
         indexId: 'load1',
         displayType: 'dashboard',
+        sortIndex: 1,
         displayDimension: [],
         segments: [
           { value: 1, color: '#27C274' }, // 绿色区域
@@ -131,6 +133,7 @@ const INDEX_CONFIG = [
       {
         indexId: 'load5',
         displayType: 'dashboard',
+        sortIndex: 2,
         displayDimension: [],
         segments: [
           { value: 1.5, color: '#27C274' }, // 绿色区域
@@ -142,36 +145,43 @@ const INDEX_CONFIG = [
       {
         indexId: 'disk.used',
         displayType: 'table',
+        sortIndex: 3,
         displayDimension: ['Device', 'Value'],
       },
       {
         indexId: 'cpu_summary.usage',
         displayType: 'lineChart',
+        sortIndex: 4,
         displayDimension: ['cpu'],
       },
       {
         indexId: 'disk.is_use',
         displayType: 'lineChart',
+        sortIndex: 5,
         displayDimension: ['device '],
       },
       {
         indexId: 'mem.pct_usable',
         displayType: 'lineChart',
+        sortIndex: 6,
         displayDimension: ['device '],
       },
       {
         indexId: 'io.util',
         displayType: 'lineChart',
+        sortIndex: 7,
         displayDimension: ['device '],
       },
       {
         indexId: 'net.speed_sent',
         displayType: 'lineChart',
+        sortIndex: 8,
         displayDimension: ['device '],
       },
       {
         indexId: 'net.speed_recv',
         displayType: 'lineChart',
+        sortIndex: 9,
         displayDimension: ['device '],
       },
     ],
@@ -184,26 +194,31 @@ const INDEX_CONFIG = [
       {
         indexId: 'http_success.rate',
         displayType: 'single',
+        sortIndex: 11,
         displayDimension: [],
       },
       {
         indexId: 'http_total.duration',
         displayType: 'single',
+        sortIndex: 12,
         displayDimension: [],
       },
       {
         indexId: 'http_ssl',
         displayType: 'single',
+        sortIndex: 13,
         displayDimension: [],
       },
       {
         indexId: 'http_status_code',
         displayType: 'lineChart',
+        sortIndex: 14,
         displayDimension: [],
       },
       {
         indexId: 'http_dns.lookup.time',
         displayType: 'lineChart',
+        sortIndex: 15,
         displayDimension: [],
       },
     ],
