@@ -224,6 +224,118 @@ const INDEX_CONFIG = [
     ],
     tableDiaplay: ['http_success.rate', 'http_total.duration'],
   },
+  {
+    name: 'Pod',
+    id: 3,
+    dashboardDisplay: [
+      {
+        indexId: 'pod_status',
+        displayType: 'single',
+        sortIndex: 16,
+        displayDimension: [],
+      },
+      {
+        indexId: 'pod_cpu_utilization',
+        displayType: 'lineChart',
+        sortIndex: 17,
+        displayDimension: [],
+      },
+      {
+        indexId: 'pod_memory_utilization',
+        displayType: 'lineChart',
+        sortIndex: 18,
+        displayDimension: [],
+      },
+      {
+        indexId: 'pod_io_writes',
+        displayType: 'lineChart',
+        sortIndex: 19,
+        displayDimension: [],
+      },
+      {
+        indexId: 'pod_io_read',
+        displayType: 'lineChart',
+        sortIndex: 20,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: [
+      'pod_status',
+      'pod_cpu_utilization',
+      'pod_memory_utilization',
+    ],
+  },
+  {
+    name: 'Node',
+    id: 4,
+    dashboardDisplay: [
+      {
+        indexId: 'node_status_condition',
+        displayType: 'single',
+        sortIndex: 21,
+        displayDimension: [],
+      },
+      {
+        indexId: 'node_cpu_load1',
+        displayType: 'dashboard',
+        sortIndex: 22,
+        displayDimension: [],
+        segments: [
+          { value: 1, color: '#27C274' }, // 绿色区域
+          { value: 2, color: '#FF9214' }, // 黄色区域
+          { value: 4, color: '#D97007' }, // 黄色区域
+          { value: 20, color: '#F43B2C' }, // 红色区域
+        ],
+      },
+      {
+        indexId: 'node_cpu_load5',
+        displayType: 'dashboard',
+        sortIndex: 23,
+        displayDimension: [],
+        segments: [
+          { value: 1.5, color: '#27C274' }, // 绿色区域
+          { value: 3, color: '#FF9214' }, // 黄色区域
+          { value: 5, color: '#D97007' }, // 黄色区域
+          { value: 20, color: '#F43B2C' }, // 红色区域
+        ],
+      },
+      {
+        indexId: 'node_cpu_utilization',
+        displayType: 'lineChart',
+        sortIndex: 24,
+        displayDimension: [],
+      },
+      {
+        indexId: 'node_app_memory_utilization',
+        displayType: 'lineChart',
+        sortIndex: 25,
+        displayDimension: [],
+      },
+      {
+        indexId: 'node_io_current',
+        displayType: 'lineChart',
+        sortIndex: 26,
+        displayDimension: [],
+      },
+      {
+        indexId: 'node_network_receive',
+        displayType: 'lineChart',
+        sortIndex: 27,
+        displayDimension: [],
+      },
+      {
+        indexId: 'node_network_transmit',
+        displayType: 'lineChart',
+        sortIndex: 28,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: [
+      'node_status_condition',
+      'node_cpu_utilization',
+      'node_app_memory_usage',
+    ],
+  },
 ];
 
 export { FREQUENCY_LIST, CONDITION_LIST, UNIT_LIST, INDEX_CONFIG };
