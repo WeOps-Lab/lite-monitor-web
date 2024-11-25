@@ -223,8 +223,9 @@ const Overview = () => {
   const getGuageLabel = (arr: any) => {
     return (
       (arr[0]?.details?.value1 || [])
+        .filter((item: any) => item.name !== 'instance_name')
         .map((item: any) => item.value)
-        .join('-') || '--'
+        .join('-') || ''
     );
   };
 
@@ -269,7 +270,7 @@ const Overview = () => {
         );
       case 'dashboard':
         return (
-          <div className="w-[200px] h-full">
+          <div className="w-[200px]">
             <GuageChart
               value={
                 calculateMetrics(metricItem.viewData || []).latestValue || 0
@@ -284,6 +285,7 @@ const Overview = () => {
         return (
           <div className="w-[100px]">
             <SingleValue
+              fontSize={30}
               value={
                 calculateMetrics(metricItem.viewData || []).latestValue || '--'
               }
@@ -356,7 +358,9 @@ const Overview = () => {
                       </span>
                     </span>
                   </div>
-                  <div className="h-[180px]">{renderChart(metricItem)}</div>
+                  <div className="h-[180px] flex justify-center items-center">
+                    {renderChart(metricItem)}
+                  </div>
                 </div>
               ))}
           </div>
