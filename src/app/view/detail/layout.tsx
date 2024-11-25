@@ -19,7 +19,7 @@ const IntergrationDetailLayout = ({
   const icon = searchParams.get('name') || '';
 
   const handleBackButtonClick = () => {
-    router.push(`/intergration`);
+    router.push(`/view`);
   };
 
   const menuItems = [

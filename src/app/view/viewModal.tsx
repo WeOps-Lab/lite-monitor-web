@@ -115,10 +115,13 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
               });
             }
           });
-          setExpandId(groupData[0]?.id || 0);
-          setMetricData(groupData);
-          setOriginMetricData(groupData);
-          fetchViewData(groupData, groupData[0]?.id || 0, id);
+          const _groupData = groupData.filter(
+            (item: any) => !!item.child?.length
+          );
+          setExpandId(_groupData[0]?.id || 0);
+          setMetricData(_groupData);
+          setOriginMetricData(_groupData);
+          fetchViewData(_groupData, _groupData[0]?.id || 0, id);
         })
         .finally(() => {
           setLoading(false);
