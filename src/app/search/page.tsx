@@ -9,60 +9,46 @@ import searchStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
 import LineChart from '@/components/charts/lineChart';
-import { ListItem, ColumnItem } from '@/types';
-import { ObectItem, MetricItem } from '@/types/monitor';
+import CustomTable from '@/components/custom-table';
+import { ListItem, ColumnItem, ChartData } from '@/types';
+import { Dayjs } from 'dayjs';
+import {
+  ObectItem,
+  MetricItem,
+  ChartDataItem,
+  TableDataItem,
+  ConditionItem,
+  SearchParams,
+} from '@/types/monitor';
 import { deepClone, findUnitNameById } from '@/utils/common';
 import { CONDITION_LIST } from '@/constants/monitor';
-import CustomTable from '@/components/custom-table';
 import dayjs from 'dayjs';
 const { Option } = Select;
 
-interface ConditionItem {
-  label: string | null;
-  condition: string | null;
-  value: string;
-}
-
-interface SearchParams {
-  time?: number;
-  end?: number;
-  start?: number;
-  step?: number;
-  query: string;
-}
-
-const Search = () => {
+const Search: React.FC = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [objLoading, setObjLoading] = useState<boolean>(false);
-  const [metric, setMetric] = useState<string | null>();
+  const [metric, setMetric] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
   const [instanceLoading, setInstanceLoading] = useState<boolean>(false);
-  const [instanceId, setInstanceId] = useState<string[]>();
-  const [instances, setInstances] = useState<any[]>([]);
+  const [instanceId, setInstanceId] = useState<string[]>([]);
+  const [instances, setInstances] = useState<{ instance_id: string }[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
-  const [object, setObject] = useState<string>();
+  const [object, setObject] = useState<string | undefined>();
   const [objects, setObjects] = useState<ObectItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('area');
   const [conditions, setConditions] = useState<ConditionItem[]>([]);
-  const currentTimestamp: number = dayjs().valueOf();
-  const oneHourAgoTimestamp: number = dayjs().subtract(1, 'hour').valueOf();
-  const beginTime: string = dayjs(oneHourAgoTimestamp).format(
-    'YYYY-MM-DD HH:mm:ss'
-  );
-  const lastTime: string = dayjs(currentTimestamp).format(
-    'YYYY-MM-DD HH:mm:ss'
-  );
-  const [timeRange, setTimeRange] = useState<string[]>([beginTime, lastTime]);
-  const [times, setTimes] = useState<any>([
-    dayjs(oneHourAgoTimestamp),
-    dayjs(currentTimestamp),
-  ]);
+  const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
+  const lastTime: number = dayjs().valueOf();
+  const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
+  const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
+  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
   const [columns, setColumns] = useState<ColumnItem[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [tableData, setTableData] = useState<TableDataItem[]>([]);
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
   const [frequence, setFrequence] = useState<number>(0);
   const [unit, setUnit] = useState<string>('');
   const isArea: boolean = activeTab === 'area';
@@ -89,7 +75,7 @@ const Search = () => {
   const getObjects = async () => {
     try {
       setObjLoading(true);
-      const data = await get('/api/monitor_object/');
+      const data: ObectItem[] = await get('/api/monitor_object/');
       setObjects(data);
     } finally {
       setObjLoading(false);
@@ -99,7 +85,7 @@ const Search = () => {
   const getMetrics = async (params = {}) => {
     try {
       setMetricsLoading(true);
-      const data = await get('/api/metrics/', {
+      const data: MetricItem[] = await get('/api/metrics/', {
         params,
       });
       setMetrics(data);
@@ -111,7 +97,9 @@ const Search = () => {
   const getInstList = async (id: number) => {
     try {
       setInstanceLoading(true);
-      const data = await get(`/api/monitor_instance/${id}/list/`);
+      const data: { instance_id: string }[] = await get(
+        `/api/monitor_instance/${id}/list/`
+      );
       setInstances(data);
     } finally {
       setInstanceLoading(false);
@@ -122,17 +110,17 @@ const Search = () => {
     return !!metric && instanceId?.length;
   };
 
-  const getParams = () => {
+  const getParams = (_timeRange: number[]): SearchParams => {
     const _query: string =
       metrics.find((item) => item.name === metric)?.query || '';
     const params: SearchParams = { query: '' };
-    const startTime = timeRange.at(0);
-    const endTime = timeRange.at(1);
+    const startTime = _timeRange.at(0);
+    const endTime = _timeRange.at(1);
     if (startTime && endTime) {
       const MAX_POINTS = 100; // 最大数据点数
       const DEFAULT_STEP = 360; // 默认步长
-      params.start = new Date(startTime).getTime();
-      params.end = new Date(endTime).getTime();
+      params.start = startTime;
+      params.end = endTime;
       params.step = Math.max(
         Math.ceil(
           (params.end / MAX_POINTS - params.start / MAX_POINTS) / DEFAULT_STEP
@@ -164,8 +152,9 @@ const Search = () => {
     return params;
   };
 
-  const onTimeChange = (val: string[]) => {
+  const onTimeChange = (val: number[]) => {
     setTimeRange(val);
+    handleSearch('refresh', activeTab, val);
   };
 
   const clearTimer = () => {
@@ -242,7 +231,7 @@ const Search = () => {
     _conditions.push({
       label: null,
       condition: null,
-      value: null,
+      value: '',
     });
     setConditions(_conditions);
   };
@@ -262,12 +251,12 @@ const Search = () => {
     handleSearch('refresh', val);
   };
 
-  const processData = (data: any) => {
+  const processData = (data: ChartDataItem[]): ChartData[] => {
     const result: any[] = [];
     const target =
       metrics.find((item) => item.name === metric)?.dimensions || [];
-    data.forEach((item: any, index: number) => {
-      item.values.forEach(([timestamp, value]: [number, string]) => {
+    data.forEach((item, index) => {
+      item.values.forEach(([timestamp, value]) => {
         const existing = result.find((entry) => entry.time === timestamp);
         const detailValue = Object.entries(item.metric)
           .map(([key, dimenValue]) => ({
@@ -306,7 +295,11 @@ const Search = () => {
     return result;
   };
 
-  const handleSearch = async (type: string, tab: string) => {
+  const handleSearch = async (
+    type: string,
+    tab: string,
+    _timeRange = timeRange
+  ) => {
     if (type !== 'timer') {
       setChartData([]);
       setTableData([]);
@@ -320,7 +313,7 @@ const Search = () => {
       const url = areaCurrent
         ? '/api/metrics_instance/query_range/'
         : '/api/metrics_instance/query/';
-      let params = getParams();
+      let params = getParams(_timeRange);
       if (!areaCurrent) {
         params = {
           time: params.end,
@@ -339,7 +332,7 @@ const Search = () => {
           value: item.value[1] ?? '--',
           index,
         }));
-        const tableColumns = Object.keys(_tableData[0])
+        const tableColumns = Object.keys(_tableData[0] || {})
           .map((item) => ({
             title: item,
             dataIndex: item,
@@ -351,7 +344,7 @@ const Search = () => {
           }))
           .filter((item) => item.key !== 'index');
         const _columns = deepClone(tableColumns);
-        _columns[0].fixed = 'left';
+        if (_columns[0]) _columns[0].fixed = 'left';
         setColumns(_columns);
         setTableData(_tableData);
       }
@@ -360,20 +353,23 @@ const Search = () => {
     }
   };
 
-  const onXRangeChange = (arr: any) => {
+  const onXRangeChange = (arr: [Dayjs, Dayjs]) => {
     setTimes(arr);
-    setTimeRange(arr.map((item: any) => new Date(item).getTime()));
+    setTimeRangeValue(0);
+    const _times = arr.map((item) => dayjs(item).valueOf());
+    setTimeRange(_times);
+    handleSearch('refresh', activeTab, _times);
   };
 
   return (
     <div className={searchStyle.search}>
       <div className={searchStyle.time}>
         <TimeSelector
-          value={times}
-          onChange={(value, dateString) => {
-            setTimes(value);
-            onTimeChange(dateString);
+          value={{
+            timesValue: times,
+            timeRangeValue,
           }}
+          onChange={(value) => onTimeChange(value)}
           onFrequenceChange={onFrequenceChange}
           onRefresh={onRefresh}
         />
@@ -405,13 +401,11 @@ const Search = () => {
                   value={object}
                   onChange={handleObjectChange}
                 >
-                  {objects.map((item, index) => {
-                    return (
-                      <Option value={item.name} key={index}>
-                        {item.name}
-                      </Option>
-                    );
-                  })}
+                  {objects.map((item) => (
+                    <Option value={item.name} key={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
                 </Select>
                 <Select
                   mode="multiple"
@@ -422,13 +416,11 @@ const Search = () => {
                   value={instanceId}
                   onChange={handleInstanceChange}
                 >
-                  {instances.map((item, index) => {
-                    return (
-                      <Option value={item.instance_id} key={index}>
-                        {item.instance_id}
-                      </Option>
-                    );
-                  })}
+                  {instances.map((item) => (
+                    <Option value={item.instance_id} key={item.instance_id}>
+                      {item.instance_id}
+                    </Option>
+                  ))}
                 </Select>
               </div>
             </div>
@@ -443,13 +435,11 @@ const Search = () => {
                   loading={metricsLoading}
                   onChange={handleMetricChange}
                 >
-                  {metrics.map((item, index) => {
-                    return (
-                      <Option value={item.name} key={index}>
-                        {item.display_name}
-                      </Option>
-                    );
-                  })}
+                  {metrics.map((item) => (
+                    <Option value={item.name} key={item.name}>
+                      {item.display_name}
+                    </Option>
+                  ))}
                 </Select>
               </div>
             </div>
@@ -470,13 +460,11 @@ const Search = () => {
                           value={conditionItem.label}
                           onChange={(val) => handleLabelChange(val, index)}
                         >
-                          {labels.map((item, index) => {
-                            return (
-                              <Option value={item} key={index}>
-                                {item}
-                              </Option>
-                            );
-                          })}
+                          {labels.map((item) => (
+                            <Option value={item} key={item}>
+                              {item}
+                            </Option>
+                          ))}
                         </Select>
                         <Select
                           className="w-[100px]"
@@ -484,21 +472,17 @@ const Search = () => {
                           value={conditionItem.condition}
                           onChange={(val) => handleConditionChange(val, index)}
                         >
-                          {CONDITION_LIST.map(
-                            (item: ListItem, index: number) => {
-                              return (
-                                <Option value={item.id} key={index}>
-                                  {item.name}
-                                </Option>
-                              );
-                            }
-                          )}
+                          {CONDITION_LIST.map((item: ListItem) => (
+                            <Option value={item.id} key={item.id}>
+                              {item.name}
+                            </Option>
+                          ))}
                         </Select>
                         <Input
                           className="w-[250px]"
                           placeholder={t('monitor.value')}
                           value={conditionItem.value}
-                          onChange={(val) => handleValueChange(val, index)}
+                          onChange={(e) => handleValueChange(e, index)}
                         ></Input>
                         <Button
                           icon={<CloseOutlined />}
@@ -586,7 +570,7 @@ const Search = () => {
               dataSource={tableData}
               pagination={false}
               rowKey="index"
-            ></CustomTable>
+            />
           )}
         </div>
       </Spin>

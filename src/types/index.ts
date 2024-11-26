@@ -77,3 +77,11 @@ export interface TabItem {
   label: string;
   children?: JSX.Element | string;
 }
+
+export interface ChartData {
+  time: number;
+  value1?: number;
+  value2?: number;
+  details?: Record<string, any>;
+  [key: string]: unknown;
+}

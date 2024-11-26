@@ -1,5 +1,27 @@
 .timeSelector {
     display: flex;
+    .customSlect {
+        position: relative;
+        .calenIcon {
+            position: absolute;
+            top: 9px;
+            right: 10px;
+            cursor: pointer;
+            color: var(--color-text-4);
+            font-size: 14px;
+        }
+        :global {
+            .ant-select-arrow {
+                visibility: hidden;
+            }
+        }
+        .rangePicker {
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            right: 0;
+        }
+    }
 
     .refreshBox {
         .refreshBtn {

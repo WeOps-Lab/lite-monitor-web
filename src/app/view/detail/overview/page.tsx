@@ -9,19 +9,13 @@ import CustomTable from '@/components/custom-table';
 import GuageChart from '@/components/charts/guageChart';
 import SingleValue from '@/components/charts/singleValue';
 import useApiClient from '@/utils/request';
-import { MetricItem, IndexViewItem } from '@/types/monitor';
+import { MetricItem, ChartDataItem, SearchParams } from '@/types/monitor';
+import { ChartData } from '@/types';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { INDEX_CONFIG } from '@/constants/monitor';
-
-interface SearchParams {
-  end?: number;
-  start?: number;
-  step?: number;
-  query: string;
-}
 
 const Overview = () => {
   const { get, isLoading } = useApiClient();
@@ -33,21 +27,13 @@ const Overview = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [metricId, setMetricId] = useState<number>();
-  const currentTimestamp: number = dayjs().valueOf();
-  const oneHourAgoTimestamp: number = dayjs().subtract(1, 'hour').valueOf();
-  const beginTime: string = dayjs(oneHourAgoTimestamp).format(
-    'YYYY-MM-DD HH:mm:ss'
-  );
-  const lastTime: string = dayjs(currentTimestamp).format(
-    'YYYY-MM-DD HH:mm:ss'
-  );
-  const [timeRange, setTimeRange] = useState<string[]>([beginTime, lastTime]);
-  const [times, setTimes] = useState<any>([
-    dayjs(oneHourAgoTimestamp),
-    dayjs(currentTimestamp),
-  ]);
+  const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
+  const lastTime: number = dayjs().valueOf();
+  const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
+  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<MetricItem[]>([]);
+  const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
 
   useEffect(() => {
     clearTimer();
@@ -81,10 +67,10 @@ const Overview = () => {
     try {
       getMetrics.then((res) => {
         const responseData = res
-          .filter((item: any) =>
+          .filter((item: MetricItem) =>
             indexList.find((indexItem) => indexItem.indexId === item.name)
           )
-          .map((item: any) => {
+          .map((item: MetricItem) => {
             const target = indexList.find(
               (indexItem) => indexItem.indexId === item.name
             );
@@ -114,8 +100,8 @@ const Overview = () => {
     const MAX_POINTS = 100; // 最大数据点数
     const DEFAULT_STEP = 360; // 默认步长
     if (startTime && endTime) {
-      params.start = new Date(startTime).getTime();
-      params.end = new Date(endTime).getTime();
+      params.start = startTime;
+      params.end = endTime;
       params.step = Math.max(
         Math.ceil(
           (params.end / MAX_POINTS - params.start / MAX_POINTS) / DEFAULT_STEP
@@ -126,10 +112,13 @@ const Overview = () => {
     return params;
   };
 
-  const processData = (data: any, metricItem: MetricItem) => {
+  const processData = (
+    data: ChartDataItem[],
+    metricItem: MetricItem
+  ): ChartData[] => {
     const result: any[] = [];
     const target = metricItem?.dimensions || [];
-    data.forEach((item: any, index: number) => {
+    data.forEach((item, index: number) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
         const existing = result.find((entry) => entry.time === timestamp);
         const detailValue = Object.entries(item.metric)
@@ -170,9 +159,9 @@ const Overview = () => {
 
   const fetchViewData = async (data: MetricItem[], id: string) => {
     setLoading(true);
-    const requestQueue = data.map((item: any) =>
+    const requestQueue = data.map((item: MetricItem) =>
       get(`/api/metrics_instance/query_range/`, {
-        params: getParams(item.query, id),
+        params: getParams(item?.query || '', id),
       }).then((response) => ({ id: item.id, data: response.data.result || [] }))
     );
     try {
@@ -192,7 +181,7 @@ const Overview = () => {
     }
   };
 
-  const onTimeChange = (val: string[]) => {
+  const onTimeChange = (val: number[]) => {
     setTimeRange(val);
   };
 
@@ -215,21 +204,23 @@ const Overview = () => {
     fetchViewData(_metricData, instId);
   };
 
-  const onXRangeChange = (arr: any) => {
+  const onXRangeChange = (arr: [Dayjs, Dayjs]) => {
     setTimes(arr);
-    setTimeRange(arr.map((item: any) => new Date(item).getTime()));
+    setTimeRangeValue(0);
+    const _times = arr.map((item) => dayjs(item).valueOf());
+    setTimeRange(_times);
   };
 
-  const getGuageLabel = (arr: any) => {
+  const getGuageLabel = (arr: ChartDataItem[]) => {
     return (
       (arr[0]?.details?.value1 || [])
-        .filter((item: any) => item.name !== 'instance_name')
-        .map((item: any) => item.value)
+        .filter((item: ChartDataItem) => item.name !== 'instance_name')
+        .map((item: ChartDataItem) => item.value)
         .join('-') || ''
     );
   };
 
-  const getTableData = (data: any) => {
+  const getTableData = (data: ChartDataItem[]) => {
     if (data.length === 0) return [];
     const latestData = data[data.length - 1];
     const { details } = latestData;
@@ -327,11 +318,11 @@ const Overview = () => {
     <div className="bg-[var(--color-bg-1)] p-[20px]">
       <div className="flex justify-end mb-[15px]">
         <TimeSelector
-          onChange={(value, dateString) => {
-            setTimes(value);
-            onTimeChange(dateString);
+          value={{
+            timesValue: times,
+            timeRangeValue,
           }}
-          value={times}
+          onChange={(value) => onTimeChange(value)}
           onFrequenceChange={onFrequenceChange}
           onRefresh={onRefresh}
         />
@@ -341,7 +332,7 @@ const Overview = () => {
           <div className="flex flex-wrap">
             {metricData
               .sort((a: any, b: any) => a.sortIndex - b.sortIndex)
-              .map((metricItem: any) => (
+              .map((metricItem: MetricItem) => (
                 <div
                   key={metricItem.id}
                   className="mb-[20px] mr-[20px] p-[10px] shadow"

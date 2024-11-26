@@ -86,3 +86,30 @@ export interface IndexViewItem {
   isLoading?: boolean;
   child?: any[];
 }
+
+export interface TableDataItem {
+  metric: Record<string, string>;
+  value: string;
+  index: number;
+  [key: string]: any;
+}
+
+export interface ChartDataItem {
+  metric: Record<string, string>;
+  values: [number, string][];
+  [key: string]: any;
+}
+
+export interface ConditionItem {
+  label: string | null;
+  condition: string | null;
+  value: string;
+}
+
+export interface SearchParams {
+  time?: number;
+  end?: number;
+  start?: number;
+  step?: number;
+  query: string;
+}

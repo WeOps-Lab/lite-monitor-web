@@ -1,17 +1,18 @@
 'use client';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Spin, Input, Button, Segmented, Tabs, Cascader } from 'antd';
+import { Spin, Input, Button, Segmented, Tabs, Cascader, Progress } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone } from '@/utils/common';
 import { useRouter } from 'next/navigation';
-import { IntergrationItem, ObectItem } from '@/types/monitor';
+import { IntergrationItem, ObectItem, MetricItem } from '@/types/monitor';
 import ViewModal from './viewModal';
 import { TabItem, Organization, ColumnItem, ModalRef } from '@/types';
 import CustomTable from '@/components/custom-table';
 import TimeSelector from '@/components/time-selector';
 import { useCommon } from '@/context/common';
 import { showGroupName } from '@/utils/common';
+import { INDEX_CONFIG } from '@/constants/monitor';
 
 const Intergration = () => {
   const { get, isLoading } = useApiClient();
@@ -86,6 +87,7 @@ const Intergration = () => {
       ),
     },
   ];
+  const [tableColumn, setTableColumn] = useState<ColumnItem[]>(columns);
 
   useEffect(() => {
     if (activeTab) {
@@ -105,7 +107,7 @@ const Intergration = () => {
 
   useEffect(() => {
     if (objectId) {
-      getAssetInsts(objectId);
+      getColoumnAndData();
     }
   }, [objectId]);
 
@@ -131,6 +133,57 @@ const Intergration = () => {
     pagination.current,
     pagination.pageSize,
   ]);
+
+  const getColoumnAndData = () => {
+    const getInstList = get(`/api/monitor_instance/${objectId}/list/`);
+    const getMetrics = get('/api/metrics/', {
+      params: {
+        monitor_object_id: objectId,
+      },
+    });
+    setTableLoading(true);
+    try {
+      Promise.all([getInstList, getMetrics])
+        .then((res) => {
+          setTableData(res[0]);
+          const _objectName = apps.find((item) => item.key === objectId)?.label;
+          if (_objectName) {
+            const filterMetrics =
+              INDEX_CONFIG.find((item) => item.name === _objectName)
+                ?.tableDiaplay || [];
+            const data = (res[1] || []).filter((item: MetricItem) =>
+              filterMetrics.includes(item.name)
+            );
+            const _columns = data.map((item: MetricItem) => {
+              return {
+                title: item.display_name,
+                dataIndex: item.name,
+                key: item.name,
+                width: 200,
+                render: (_: any, record: any) => (
+                  <Progress
+                    strokeLinecap="butt"
+                    showInfo={!!record[item.name]}
+                    percent={record[item.name] || 0}
+                    percentPosition={{ align: 'center', type: 'inner' }}
+                    size={[100, 20]}
+                  />
+                ),
+              };
+            });
+            const originColumns = deepClone(columns);
+            const indexToInsert = originColumns.length - 2;
+            originColumns.splice(indexToInsert, 0, ..._columns);
+            setTableColumn(originColumns);
+          }
+        })
+        .finally(() => {
+          setTableLoading(false);
+        });
+    } catch (error) {
+      setTableLoading(false);
+    }
+  };
 
   const clearTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -225,9 +278,9 @@ const Intergration = () => {
 
   const linkToDetial = (app: ObectItem) => {
     const row = deepClone(app);
-    console.log(apps)
-    row.name = apps.find(item=>item.key === objectId)?.label
-    row.monitorObjId = apps.find(item=>item.key === objectId)?.key || ''
+    console.log(apps);
+    row.name = apps.find((item) => item.key === objectId)?.label;
+    row.monitorObjId = apps.find((item) => item.key === objectId)?.key || '';
     const params = new URLSearchParams(row);
     const targetUrl = `/view/detail/overview?${params.toString()}`;
     router.push(targetUrl);
@@ -285,7 +338,7 @@ const Intergration = () => {
             </div>
             <CustomTable
               scroll={{ y: 'calc(100vh - 320px)', x: 'calc(100vw - 500px)' }}
-              columns={columns}
+              columns={tableColumn}
               dataSource={filteredData}
               pagination={pagination}
               loading={tableLoading}

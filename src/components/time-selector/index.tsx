@@ -1,47 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Icon from '@/components/icon';
-import { Select, Button, TimeRangePickerProps, DatePicker } from 'antd';
-import type { SelectProps } from 'antd';
-type LabelRender = SelectProps['labelRender'];
-import { FREQUENCY_LIST } from '@/constants/monitor';
-import { ReloadOutlined } from '@ant-design/icons';
+import { Select, Button, DatePicker } from 'antd';
+import { CalendarOutlined, ReloadOutlined } from '@ant-design/icons';
+import type { SelectProps, TimeRangePickerProps } from 'antd';
+import { FREQUENCY_LIST, TIME_RANGE_LIST } from '@/constants/monitor';
 import timeSelectorStyle from './index.module.less';
+import dayjs, { Dayjs } from 'dayjs';
+type LabelRender = SelectProps['labelRender'];
 const { RangePicker } = DatePicker;
-import dayjs from 'dayjs';
 
-const rangePresets: TimeRangePickerProps['presets'] = [
-  { label: 'Last 1 Hours', value: [dayjs().add(-1, 'h'), dayjs()] },
-  { label: 'Last 5 Hours', value: [dayjs().add(-5, 'h'), dayjs()] },
-  { label: 'Last 12 Hours', value: [dayjs().add(-12, 'h'), dayjs()] },
-  { label: 'Last 1 Day', value: [dayjs().add(-1, 'd'), dayjs()] },
-  { label: 'Last 5 Days', value: [dayjs().add(-5, 'd'), dayjs()] },
-  { label: 'Last 7 Days', value: [dayjs().add(-7, 'd'), dayjs()] },
-  { label: 'Last 14 Days', value: [dayjs().add(-14, 'd'), dayjs()] },
-  { label: 'Last 30 Days', value: [dayjs().add(-30, 'd'), dayjs()] },
-  { label: 'Last 90 Days', value: [dayjs().add(-90, 'd'), dayjs()] },
-];
-
-interface TimeSelectorProps
-  extends Omit<
-    TimeRangePickerProps,
-    'showTime' | 'format' | 'onFrequenceChange' | 'onRefresh'
-  > {
+interface TimeSelectorProps {
   showTime?: boolean;
   format?: string;
   onlyRefresh?: boolean;
+  value?: {
+    timeRangeValue: number;
+    timesValue: [Dayjs, Dayjs] | null;
+  };
   onFrequenceChange: (frequence: number) => void;
   onRefresh: () => void;
+  onChange?: (range: number[]) => void;
 }
 
 const TimeSelector: React.FC<TimeSelectorProps> = ({
   showTime = true,
   format = 'YYYY-MM-DD HH:mm:ss',
   onlyRefresh = false,
+  value = {
+    timeRangeValue: 15,
+    timesValue: null,
+  },
   onFrequenceChange,
   onRefresh,
-  ...TimeRangePickerProps
+  onChange,
 }) => {
   const [frequency, setFrequency] = useState<number>(0);
+  const [timeRange, setTimeRange] = useState<number>(15);
+  const [rangePickerOpen, setRangePickerOpen] = useState<boolean>(false);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const selectRef = useRef<HTMLDivElement>(null);
+  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(value.timesValue);
+
+  useEffect(() => {
+    if (value.timeRangeValue !== timeRange) {
+      setTimeRange(value.timeRangeValue);
+    }
+  }, [value.timeRangeValue]);
+
+  useEffect(() => {
+    if (JSON.stringify(value.timesValue) !== JSON.stringify(times)) {
+      setTimes(value.timesValue);
+    }
+  }, [value.timesValue]);
 
   const labelRender: LabelRender = (props) => {
     const { label } = props;
@@ -58,29 +68,106 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
     onFrequenceChange(val);
   };
 
+  const handleRangePickerOpenChange = (open: boolean) => {
+    setRangePickerOpen(open);
+  };
+
+  const handleDropdownVisibleChange = (open: boolean) => {
+    setDropdownOpen(open);
+  };
+
+  const handleIconClick = () => {
+    if (selectRef.current) {
+      const selectDom = selectRef.current.querySelector('.ant-select-selector');
+      if (selectDom) {
+        (selectDom as HTMLElement).click();
+        const flag =
+          !!document.querySelector('.ant-select-dropdown-hidden') ||
+          !document.querySelector('.ant-select-dropdown');
+        setDropdownOpen(flag);
+      }
+    }
+  };
+
+  const handleRangePickerChange: TimeRangePickerProps['onChange'] = (value) => {
+    if (value) {
+      const rangeTime = value.map((item) => dayjs(item).valueOf());
+      onChange && onChange(rangeTime);
+      setTimes(value as [Dayjs, Dayjs]);
+      return;
+    }
+    const rangeTime = [
+      dayjs().subtract(15, 'minute').valueOf(),
+      dayjs().valueOf(),
+    ];
+    onChange && onChange(rangeTime);
+    setTimeRange(15);
+  };
+
+  const handleRangePickerOk: TimeRangePickerProps['onOk'] = (value) => {
+    if (value && value.every((item) => !!item)) {
+      setTimeRange(0);
+    }
+  };
+
+  const handleTimeRangeChange = (value: number) => {
+    if (!value) {
+      setRangePickerOpen(true);
+      return;
+    }
+    setTimes(null);
+    setTimeRange(value);
+    const rangeTime = [
+      dayjs().subtract(value, 'minute').valueOf(),
+      dayjs().valueOf(),
+    ];
+    onChange && onChange(rangeTime);
+  };
+
   return (
     <div className={timeSelectorStyle.timeSelector}>
       {!onlyRefresh && (
-        <RangePicker
-          presets={rangePresets}
-          showTime={showTime}
-          format={format}
-          {...TimeRangePickerProps}
-        />
+        <div className={timeSelectorStyle.customSlect} ref={selectRef}>
+          <Select
+            className={`w-[350px] ${timeSelectorStyle.frequence}`}
+            value={timeRange}
+            options={TIME_RANGE_LIST}
+            open={dropdownOpen}
+            onChange={handleTimeRangeChange}
+            onDropdownVisibleChange={handleDropdownVisibleChange}
+          />
+          <RangePicker
+            style={{
+              zIndex: rangePickerOpen || !timeRange ? 1 : -1,
+            }}
+            className={`w-[350px] ${timeSelectorStyle.rangePicker}`}
+            open={rangePickerOpen}
+            showTime={showTime}
+            format={format}
+            value={times}
+            onOpenChange={handleRangePickerOpenChange}
+            onChange={handleRangePickerChange}
+            onOk={handleRangePickerOk}
+          />
+          <CalendarOutlined
+            className={timeSelectorStyle.calenIcon}
+            onClick={handleIconClick}
+          />
+        </div>
       )}
       <div className={`${timeSelectorStyle.refreshBox} flex ml-[8px]`}>
         <Button
           className={timeSelectorStyle.refreshBtn}
           icon={<ReloadOutlined />}
           onClick={onRefresh}
-        ></Button>
+        />
         <Select
           className={`w-[100px] ${timeSelectorStyle.frequence}`}
           value={frequency}
           options={FREQUENCY_LIST}
           labelRender={labelRender}
           onChange={handleFrequencyChange}
-        ></Select>
+        />
       </div>
     </div>
   );

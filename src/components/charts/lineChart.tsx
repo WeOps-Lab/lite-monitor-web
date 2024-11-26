@@ -12,18 +12,19 @@ import {
 import CustomTooltip from './customTooltips';
 import { generateUniqueRandomColor, formatTime } from '@/utils/common';
 import chartLineStyle from './index.module.less';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import DimensionFilter from './dimensionFilter';
+import { ChartData } from '@/types';
 
 interface LineChartProps {
-  data: any[];
+  data: ChartData[];
   unit?: string;
   showDimensionFilter?: boolean;
-  onXRangeChange?: (arr: any[]) => void;
+  onXRangeChange?: (arr: [Dayjs, Dayjs]) => void;
 }
 
-const getChartAreaKeys = (arr: any[]) => {
-  const keys = new Set();
+const getChartAreaKeys = (arr: ChartData[]): string[] => {
+  const keys = new Set<string>();
   arr.forEach((obj) => {
     Object.keys(obj).forEach((key) => {
       if (key.includes('value')) {
@@ -34,7 +35,7 @@ const getChartAreaKeys = (arr: any[]) => {
   return Array.from(keys);
 };
 
-const getDetials = (arr: any[]) => {
+const getDetails = (arr: ChartData[]): Record<string, any> => {
   return arr.reduce((pre, cur) => {
     return Object.assign(pre, cur.details);
   }, {});
@@ -50,14 +51,13 @@ const LineChart: React.FC<LineChartProps> = ({
   const [endX, setEndX] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  // 生成颜色并存储在状态中
   const [colors, setColors] = useState<string[]>([]);
-  const [visibleAreas, setVisibleAreas] = useState<any[]>([]);
-  const [details, setDetails] = useState<any[]>([]);
+  const [visibleAreas, setVisibleAreas] = useState<string[]>([]);
+  const [details, setDetails] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const chartKeys = getChartAreaKeys(data);
-    const chartDetails = getDetials(data);
+    const chartDetails = getDetails(data);
     setDetails(chartDetails);
     setVisibleAreas(chartKeys); // 默认显示所有area
     if (colors.length) return;
@@ -80,8 +80,8 @@ const LineChart: React.FC<LineChartProps> = ({
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    if (!!startX && !!endX) {
-      const selectedTimeRange = [
+    if (startX !== null && endX !== null) {
+      const selectedTimeRange: [Dayjs, Dayjs] = [
         dayjs(Math.min(startX, endX) * 1000),
         dayjs(Math.max(startX, endX) * 1000),
       ];
@@ -96,7 +96,7 @@ const LineChart: React.FC<LineChartProps> = ({
   const minTime = +new Date(Math.min(...times));
   const maxTime = +new Date(Math.max(...times));
 
-  const handleLegendClick = (key: any) => {
+  const handleLegendClick = (key: string) => {
     setVisibleAreas((prevVisibleAreas) =>
       prevVisibleAreas.includes(key)
         ? prevVisibleAreas.filter((area) => area !== key)
@@ -137,14 +137,14 @@ const LineChart: React.FC<LineChartProps> = ({
             <Area
               key={index}
               type="monotone"
-              dataKey={key as any}
+              dataKey={key}
               stroke={colors[index]}
               fillOpacity={0}
               fill={colors[index]}
               hide={!visibleAreas.includes(key)}
             />
           ))}
-          {isDragging && !!startX && !!endX && (
+          {isDragging && startX !== null && endX !== null && (
             <ReferenceArea
               x1={Math.min(startX, endX)}
               x2={Math.max(startX, endX)}

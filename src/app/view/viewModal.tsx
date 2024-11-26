@@ -14,21 +14,20 @@ import TimeSelector from '@/components/time-selector';
 import LineChart from '@/components/charts/lineChart';
 import Collapse from '@/components/collapse';
 import useApiClient from '@/utils/request';
-import { ModalRef } from '@/types';
-import { MetricItem, GroupInfo, IndexViewItem } from '@/types/monitor';
+import { ModalRef, ChartData } from '@/types';
+import {
+  MetricItem,
+  GroupInfo,
+  IndexViewItem,
+  SearchParams,
+  ChartDataItem,
+} from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById } from '@/utils/common';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface ModalProps {
   monitorObject: React.Key;
-}
-
-interface SearchParams {
-  end?: number;
-  start?: number;
-  step?: number;
-  query: string;
 }
 
 const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
@@ -39,24 +38,16 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [title, setTitle] = useState<string>('');
   const [metricId, setMetricId] = useState<number>();
-  const currentTimestamp: number = dayjs().valueOf();
-  const oneHourAgoTimestamp: number = dayjs().subtract(1, 'hour').valueOf();
-  const beginTime: string = dayjs(oneHourAgoTimestamp).format(
-    'YYYY-MM-DD HH:mm:ss'
-  );
-  const lastTime: string = dayjs(currentTimestamp).format(
-    'YYYY-MM-DD HH:mm:ss'
-  );
-  const [timeRange, setTimeRange] = useState<string[]>([beginTime, lastTime]);
-  const [times, setTimes] = useState<any>([
-    dayjs(oneHourAgoTimestamp),
-    dayjs(currentTimestamp),
-  ]);
+  const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
+  const lastTime: number = dayjs().valueOf();
+  const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
+  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<IndexViewItem[]>([]);
   const [originMetricData, setOriginMetricData] = useState<IndexViewItem[]>([]);
   const [instId, setInstId] = useState<string>('');
   const [expandId, setExpandId] = useState<number>(0);
+  const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
 
   useImperativeHandle(ref, () => ({
     showModal: ({ title, form }) => {
@@ -140,8 +131,8 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     const MAX_POINTS = 100; // 最大数据点数
     const DEFAULT_STEP = 360; // 默认步长
     if (startTime && endTime) {
-      params.start = new Date(startTime).getTime();
-      params.end = new Date(endTime).getTime();
+      params.start = startTime;
+      params.end = endTime;
       params.step = Math.max(
         Math.ceil(
           (params.end / MAX_POINTS - params.start / MAX_POINTS) / DEFAULT_STEP
@@ -152,10 +143,13 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     return params;
   };
 
-  const processData = (data: any, metricItem: MetricItem) => {
+  const processData = (
+    data: ChartDataItem[],
+    metricItem: MetricItem
+  ): ChartData[] => {
     const result: any[] = [];
     const target = metricItem?.dimensions || [];
-    data.forEach((item: any, index: number) => {
+    data.forEach((item, index: number) => {
       item.values.forEach(([timestamp, value]: [number, string]) => {
         const existing = result.find((entry) => entry.time === timestamp);
         const detailValue = Object.entries(item.metric)
@@ -224,7 +218,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     }
   };
 
-  const onTimeChange = (val: string[]) => {
+  const onTimeChange = (val: number[]) => {
     setTimeRange(val);
   };
 
@@ -296,9 +290,11 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
     }
   };
 
-  const onXRangeChange = (arr: any) => {
+  const onXRangeChange = (arr: [Dayjs, Dayjs]) => {
     setTimes(arr);
-    setTimeRange(arr.map((item: any) => new Date(item).getTime()));
+    setTimeRangeValue(0);
+    const _times = arr.map((item) => dayjs(item).valueOf());
+    setTimeRange(_times);
   };
 
   return (
@@ -332,11 +328,11 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
             onChange={handleMetricIdChange}
           ></Select>
           <TimeSelector
-            onChange={(value, dateString) => {
-              setTimes(value);
-              onTimeChange(dateString);
+            value={{
+              timesValue: times,
+              timeRangeValue,
             }}
-            value={times}
+            onChange={(value) => onTimeChange(value)}
             onFrequenceChange={onFrequenceChange}
             onRefresh={onRefresh}
           />
