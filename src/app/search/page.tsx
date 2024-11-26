@@ -22,22 +22,31 @@ import {
 } from '@/types/monitor';
 import { deepClone, findUnitNameById } from '@/utils/common';
 import { CONDITION_LIST } from '@/constants/monitor';
+import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 const { Option } = Select;
 
 const Search: React.FC = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const url_instance_id = searchParams.get('instance_id');
+  const url_obj_name = searchParams.get('monitor_object');
+  const url_metric_id = searchParams.get('metric_id');
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [objLoading, setObjLoading] = useState<boolean>(false);
-  const [metric, setMetric] = useState<string | null>(null);
+  const [metric, setMetric] = useState<string | null>(url_metric_id || null);
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
   const [instanceLoading, setInstanceLoading] = useState<boolean>(false);
-  const [instanceId, setInstanceId] = useState<string[]>([]);
-  const [instances, setInstances] = useState<{ instance_id: string }[]>([]);
+  const [instanceId, setInstanceId] = useState<string[]>(
+    url_instance_id ? [url_instance_id] : []
+  );
+  const [instances, setInstances] = useState<
+    { instance_id: string; instance_name: string }[]
+  >([]);
   const [labels, setLabels] = useState<string[]>([]);
-  const [object, setObject] = useState<string | undefined>();
+  const [object, setObject] = useState<string | undefined>(url_obj_name as any);
   const [objects, setObjects] = useState<ObectItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('area');
   const [conditions, setConditions] = useState<ConditionItem[]>([]);
@@ -72,6 +81,12 @@ const Search: React.FC = () => {
     };
   }, [activeTab, frequence, object, metric, conditions, instances, timeRange]);
 
+  useEffect(() => {
+    if (url_obj_name && objects.length) {
+      handleObjectChange('otherWay');
+    }
+  }, [url_instance_id, url_obj_name, url_metric_id, objects]);
+
   const getObjects = async () => {
     try {
       setObjLoading(true);
@@ -97,9 +112,7 @@ const Search: React.FC = () => {
   const getInstList = async (id: number) => {
     try {
       setInstanceLoading(true);
-      const data: { instance_id: string }[] = await get(
-        `/api/monitor_instance/${id}/list/`
-      );
+      const data = await get(`/api/monitor_instance/${id}/list/`);
       setInstances(data);
     } finally {
       setInstanceLoading(false);
@@ -187,19 +200,22 @@ const Search: React.FC = () => {
   };
 
   const handleObjectChange = (val: string) => {
-    setObject(val);
-    setMetrics([]);
-    setLabels([]);
-    setMetric(null);
-    setInstanceId([]);
-    setInstances([]);
-    setConditions([]);
-    if (val) {
+    if (val !== 'otherWay') {
+      setObject(val);
+      setMetrics([]);
+      setLabels([]);
+      setMetric(null);
+      setInstanceId([]);
+      setInstances([]);
+      setConditions([]);
+    }
+    const value = val === 'otherWay' ? url_obj_name : val;
+    if (value) {
       getMetrics({
-        monitor_object_name: val,
+        monitor_object_name: value,
       });
     }
-    const id = objects.find((item) => item.name === val)?.id || 0;
+    const id = objects.find((item) => item.name === value)?.id || 0;
     if (id) {
       getInstList(id);
     }
@@ -418,7 +434,7 @@ const Search: React.FC = () => {
                 >
                   {instances.map((item) => (
                     <Option value={item.instance_id} key={item.instance_id}>
-                      {item.instance_id}
+                      {item.instance_name}
                     </Option>
                   ))}
                 </Select>

@@ -38,8 +38,8 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     const columns: ColumnItem[] = [
       {
         title: t('common.name'),
-        dataIndex: 'instance_id',
-        key: 'instance_id',
+        dataIndex: 'instance_name',
+        key: 'instance_name',
       },
       {
         title: t('monitor.collectionNode'),
@@ -129,14 +129,11 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     const fetchData = async () => {
       try {
         setTableLoading(true);
-        const data = await get(
-          `/api/monitor_instance/${monitorObject}/list/`,
-          {
-            params: {
-              name: '',
-            },
-          }
-        );
+        const data = await get(`/api/monitor_instance/${monitorObject}/list/`, {
+          params: {
+            name: '',
+          },
+        });
         setTableData(data);
       } finally {
         setTableLoading(false);

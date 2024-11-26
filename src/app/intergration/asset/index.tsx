@@ -26,7 +26,7 @@ import Icon from '@/components/icon';
 import RuleModal from './ruleModal';
 const { Search } = Input;
 import { useCommon } from '@/context/common';
-import { showGroupName } from '@/utils/common';
+import { deepClone, showGroupName } from '@/utils/common';
 const { confirm } = Modal;
 
 const Asset = () => {
@@ -54,12 +54,13 @@ const Asset = () => {
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
     []
   );
+  const [objects, setObjects] = useState<ObectItem[]>([]);
 
   const columns: ColumnItem[] = [
     {
       title: t('common.name'),
-      dataIndex: 'instance_id',
-      key: 'instance_id',
+      dataIndex: 'instance_name',
+      key: 'instance_name',
     },
     {
       title: t('monitor.collectionNode'),
@@ -151,7 +152,13 @@ const Asset = () => {
   };
 
   const checkDetail = (row: ObjectInstItem) => {
-    console.log(row);
+    const _row = deepClone(row);
+    const _objId = selectedKeys[0];
+    _row.monitorObjId = _objId;
+    _row.name = objects.find((item) => item.id === _objId)?.name || '';
+    const queryString = new URLSearchParams(_row).toString();
+    const url = `/view/detail/overview?${queryString}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const handleTableChange = (pagination = {}) => {
@@ -161,14 +168,11 @@ const Asset = () => {
   const getAssetInsts = async (objectId: React.Key) => {
     try {
       setTableLoading(true);
-      const data = await get(
-        `/api/monitor_instance/${objectId}/list/`,
-        {
-          params: {
-            name: '',
-          },
-        }
-      );
+      const data = await get(`/api/monitor_instance/${objectId}/list/`, {
+        params: {
+          name: '',
+        },
+      });
       setTableData(data);
     } finally {
       setTableLoading(false);
@@ -197,7 +201,8 @@ const Asset = () => {
           name: text || '',
         },
       });
-      const _treeData = getTreeData(data);
+      setObjects(data);
+      const _treeData = getTreeData(deepClone(data));
       setTreeData(_treeData);
       setExpandedKeys(_treeData.map((item) => item.key));
       const defaultChildren = _treeData[0]?.children;
@@ -234,6 +239,7 @@ const Asset = () => {
   const onSelect = (selectedKeys: React.Key[], info: any) => {
     const isFirstLevel = !!info.node?.children?.length;
     if (!isFirstLevel && selectedKeys?.length) {
+      setFilteredData([]);
       setSelectedKeys(selectedKeys);
       getAssetInsts(selectedKeys[0]);
       getRuleList(selectedKeys[0]);

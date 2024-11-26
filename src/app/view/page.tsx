@@ -44,8 +44,8 @@ const Intergration = () => {
   const columns: ColumnItem[] = [
     {
       title: t('common.name'),
-      dataIndex: 'instance_id',
-      key: 'instance_id',
+      dataIndex: 'instance_name',
+      key: 'instance_name',
     },
     {
       title: t('monitor.collectionNode'),
@@ -70,6 +70,7 @@ const Intergration = () => {
       title: t('common.action'),
       key: 'action',
       dataIndex: 'action',
+      width: 180,
       fixed: 'right',
       render: (_, record) => (
         <>
@@ -274,6 +275,7 @@ const Intergration = () => {
 
   const onTabChange = (val: string) => {
     setActiveTab(val);
+    setFilteredData([]);
   };
 
   const linkToDetial = (app: ObectItem) => {
@@ -348,7 +350,11 @@ const Intergration = () => {
           </div>
         </div>
       </Spin>
-      <ViewModal ref={viewRef} monitorObject={objectId} />
+      <ViewModal
+        ref={viewRef}
+        monitorObject={objectId}
+        monitorName={apps.find((item) => item.key === objectId)?.label || ''}
+      />
     </div>
   );
 };
