@@ -79,12 +79,11 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(({ monitorObject }, ref) => {
   };
 
   const getInitData = async (id: string) => {
-    const getGroupList = get(`/api/metrics_group/`);
-    const getMetrics = get('/api/metrics/', {
-      params: {
-        monitor_object_id: monitorObject,
-      },
-    });
+    const params = {
+      monitor_object_id: monitorObject,
+    };
+    const getGroupList = get(`/api/metrics_group/`, { params });
+    const getMetrics = get('/api/metrics/', { params });
     setLoading(true);
     try {
       Promise.all([getGroupList, getMetrics])

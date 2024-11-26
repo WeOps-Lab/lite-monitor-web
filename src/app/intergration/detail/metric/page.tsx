@@ -155,16 +155,11 @@ const Configure = () => {
   };
 
   const getInitData = async (type?: string) => {
-    const getGroupList = get(`/api/metrics_group/`, {
-      params: {
-        search: type ? '' : searchText,
-      },
-    });
-    const getMetrics = get('/api/metrics/', {
-      params: {
-        monitor_object_name: name,
-      },
-    });
+    const params = {
+      monitor_object_name: name,
+    };
+    const getGroupList = get(`/api/metrics_group/`, { params });
+    const getMetrics = get('/api/metrics/', { params });
     setLoading(true);
     try {
       Promise.all([getGroupList, getMetrics])
