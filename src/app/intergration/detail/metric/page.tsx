@@ -1,13 +1,19 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Input, Button, Modal, message, Spin } from 'antd';
+import { Input, Button, Modal, message, Spin, Segmented } from 'antd';
 import useApiClient from '@/utils/request';
 import metricStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import CustomTable from '@/components/custom-table';
 import { ColumnItem, ModalRef } from '@/types';
-import { DimensionItem, MetricItem, GroupInfo } from '@/types/monitor';
+import {
+  DimensionItem,
+  MetricItem,
+  GroupInfo,
+  IntergrationItem,
+  ObectItem,
+} from '@/types/monitor';
 import Collapse from '@/components/collapse';
 import GroupModal from './groupModal';
 import MetricModal from './metricModal';
@@ -23,14 +29,14 @@ const Configure = () => {
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const name = searchParams.get('name') || '';
-  const monitorObjectId = searchParams.get('id') || '';
   const groupRef = useRef<ModalRef>(null);
   const metricRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [metricData, setMetricData] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [groupList, setGroupList] = useState<ListItem[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('');
+  const [items, setItems] = useState<IntergrationItem[]>([]);
 
   const columns: ColumnItem[] = [
     {
@@ -74,18 +80,6 @@ const Configure = () => {
       key: 'description',
       render: (_, record) => <>{record.description || '--'}</>,
     },
-    // {
-    //   title: t('monitor.keyMetric'),
-    //   dataIndex: 'keyMetric',
-    //   key: 'keyMetric',
-    //   render: (_, record) => (
-    //     <Switch
-    //       size="small"
-    //       onChange={handleKeyMetricChange}
-    //       value={record.keyMetric}
-    //     />
-    //   ),
-    // },
     {
       title: t('common.action'),
       key: 'action',
@@ -109,11 +103,27 @@ const Configure = () => {
 
   useEffect(() => {
     if (isLoading) return;
-    getInitData();
+    getObjects();
   }, [isLoading]);
 
-  const handleKeyMetricChange = () => {
-    console.log(123);
+  const getObjects = async (text?: string) => {
+    setLoading(true);
+    try {
+      const data = await get(`/api/monitor_object/`);
+      const _items = data
+        .filter((item: ObectItem) => item.type === 'K8S')
+        .sort((a: ObectItem, b: ObectItem) => a.id - b.id)
+        .map((item: ObectItem) => ({
+          label: item.name,
+          value: item.id,
+        }));
+      const objId = _items[0]?.value;
+      setActiveTab(objId);
+      setItems(_items);
+      getInitData(objId);
+    } catch {
+      setLoading(false);
+    }
   };
 
   const showDeleteConfirm = (row: MetricItem) => {
@@ -154,9 +164,9 @@ const Configure = () => {
     });
   };
 
-  const getInitData = async (type?: string) => {
+  const getInitData = async (objId = activeTab) => {
     const params = {
-      monitor_object_name: name,
+      monitor_object_id: objId,
     };
     const getGroupList = get(`/api/metrics_group/`, { params });
     const getMetrics = get('/api/metrics/', { params });
@@ -198,7 +208,7 @@ const Configure = () => {
 
   const onTxtClear = () => {
     setSearchText('');
-    getInitData('clear');
+    getInitData();
   };
 
   const openGroupModal = (type: string, row = {}) => {
@@ -229,8 +239,20 @@ const Configure = () => {
     getInitData();
   };
 
+  const onTabChange = (val: string) => {
+    setMetricData([])
+    setActiveTab(val);
+    getInitData(val);
+  };
+
   return (
     <div className={metricStyle.metric}>
+      <Segmented
+        className="mb-[20px] custom-tabs"
+        value={activeTab}
+        options={items}
+        onChange={onTabChange}
+      />
       <p className="mb-[10px] text-[var(--color-text-2)]">
         {t('monitor.metricTitle')}
       </p>
@@ -294,12 +316,12 @@ const Configure = () => {
       </Spin>
       <GroupModal
         ref={groupRef}
-        monitorObject={+monitorObjectId}
+        monitorObject={+activeTab}
         onSuccess={operateGroup}
       />
       <MetricModal
         ref={metricRef}
-        monitorObject={+monitorObjectId}
+        monitorObject={+activeTab}
         groupList={groupList}
         onSuccess={operateMtric}
       />

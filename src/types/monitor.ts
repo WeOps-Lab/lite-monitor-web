@@ -44,6 +44,7 @@ export interface IntergrationItem {
   label: string;
   value: string;
   list: ObectItem[];
+  [key: string]: unknown;
 }
 
 export interface ObectItem {

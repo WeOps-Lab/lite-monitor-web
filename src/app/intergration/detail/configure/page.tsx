@@ -94,7 +94,7 @@ const Configure: React.FC = () => {
             </div>
           );
           break;
-        case 'K8S':
+        case 'Cluster':
           content = (
             <div>
               <ul>

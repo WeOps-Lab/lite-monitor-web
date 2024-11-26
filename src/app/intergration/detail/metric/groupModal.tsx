@@ -52,7 +52,9 @@ const GroupMoadal = forwardRef<ModalRef, GroupModalProps>(
       try {
         setConfirmLoading(true);
         const msg: string = t(
-          type === 'add' ? 'successfullyAdded' : 'successfullyModified'
+          type === 'add'
+            ? 'common.successfullyAdded'
+            : 'common.successfullyModified'
         );
         const url: string =
           type === 'add'

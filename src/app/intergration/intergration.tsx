@@ -38,7 +38,9 @@ const Intergration = () => {
           name: text || '',
         },
       });
-      const _items = getAppsByType(data);
+      const _items = getAppsByType(
+        data.filter((item: ObectItem) => item.level === 'base')
+      );
       setItems(_items);
       setActiveTab('All');
     } finally {
@@ -119,7 +121,10 @@ const Intergration = () => {
             >
               <div className="bg-[var(--color-bg-1)] border shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-4 relative cursor-pointer group">
                 <div className="flex items-center space-x-4 my-2">
-                  <Icon type={app.name} className="text-6xl" />
+                  <Icon
+                    type={app.name === 'Cluster' ? 'K8S' : app.name}
+                    className="text-6xl"
+                  />
                   <div>
                     <h2 className="text-xl font-bold m-0">{app.name}</h2>
                     <Tag className="mt-[4px]">{app.type}</Tag>

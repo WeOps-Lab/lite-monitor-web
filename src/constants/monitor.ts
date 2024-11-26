@@ -200,7 +200,7 @@ const INDEX_CONFIG = [
     tableDiaplay: ['cpu_summary.usage', 'mem.pct_usable', 'load5'],
   },
   {
-    name: 'HTTP',
+    name: 'Website',
     id: 2,
     dashboardDisplay: [
       {
@@ -347,6 +347,31 @@ const INDEX_CONFIG = [
       'node_cpu_utilization',
       'node_app_memory_usage',
     ],
+  },
+  {
+    name: 'Cluster',
+    id: 5,
+    dashboardDisplay: [
+      {
+        indexId: 'cluster_pod_count',
+        displayType: 'single',
+        sortIndex: 29,
+        displayDimension: [],
+      },
+      {
+        indexId: 'cluster_node_count',
+        displayType: 'single',
+        sortIndex: 30,
+        displayDimension: [],
+      },
+      {
+        indexId: 'k8s_cluster',
+        displayType: 'lineChart',
+        sortIndex: 31,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: ['cluster_pod_count', 'cluster_node_count'],
   },
 ];
 

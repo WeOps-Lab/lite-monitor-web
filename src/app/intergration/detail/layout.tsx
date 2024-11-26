@@ -18,7 +18,10 @@ const IntergrationDetailLayout = ({
   const router = useRouter();
   const groupId = searchParams.get('name');
   const desc = searchParams.get('description');
-  const icon = searchParams.get('name') || '';
+  const icon =
+    searchParams.get('name') === 'Cluster'
+      ? 'K8S'
+      : searchParams.get('name') || '';
 
   const handleBackButtonClick = () => {
     router.push(`/intergration`);
@@ -39,7 +42,7 @@ const IntergrationDetailLayout = ({
 
   const TopSection = () => (
     <div className="p-4 rounded-md w-full h-[95px] flex items-center bg-[var(--color-bg-1)]">
-      <Icon type={icon} className="text-5xl mr-[10px]" />
+      <Icon type={icon} className="text-6xl mr-[10px]" />
       <div>
         <h2 className="text-lg font-semibold mb-2">{groupId}</h2>
         <Tooltip title={desc}>
