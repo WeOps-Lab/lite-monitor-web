@@ -243,6 +243,11 @@ const Asset = () => {
   const onSelect = (selectedKeys: React.Key[], info: any) => {
     const isFirstLevel = !!info.node?.children?.length;
     if (!isFirstLevel && selectedKeys?.length) {
+      setPagination((prev: any) => ({
+        ...prev,
+        current: 1,
+      }));
+      setFilteredData([]);
       setFilteredData([]);
       setSelectedKeys(selectedKeys);
       getAssetInsts(selectedKeys[0]);

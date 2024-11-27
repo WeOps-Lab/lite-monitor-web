@@ -81,6 +81,11 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     useImperativeHandle(ref, () => ({
       showModal: ({ title }) => {
         // 开启弹窗的交互
+        setPagination((prev: any) => ({
+          ...prev,
+          current: 1,
+        }));
+        setFilteredData([]);
         setGroupVisible(true);
         setTitle(title);
         setSelectedRowKeys(list);
