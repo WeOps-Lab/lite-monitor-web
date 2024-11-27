@@ -19,6 +19,7 @@ const TopMenu = () => {
       icon: 'zichan-quanbushebei',
       path: '/intergration',
     },
+    { label: t('menu.event'), icon: 'mulu', path: '/event' },
   ];
 
   return (

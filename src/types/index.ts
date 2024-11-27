@@ -85,3 +85,19 @@ export interface ChartData {
   details?: Record<string, any>;
   [key: string]: unknown;
 }
+
+export interface SegmentedItem {
+  label: string;
+  value: string;
+}
+
+export interface Pagination {
+  current: number;
+  total: number;
+  pageSize: number;
+}
+
+export interface TableDataItem {
+  id?: number | string;
+  [key: string]: any;
+}

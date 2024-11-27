@@ -114,3 +114,9 @@ export interface SearchParams {
   step?: number;
   query: string;
 }
+
+export interface FiltersConfig {
+  level: string[];
+  state: string[];
+  notify: string[];
+}

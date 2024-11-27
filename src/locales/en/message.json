@@ -82,12 +82,15 @@
     "required": "Required",
     "valueValidate": "The value cannot be empty",
     "group": "Group",
-    "time": "Time"
+    "time": "Time",
+    "operator": "Operator",
+    "close": "Close"
   },
   "menu": {
     "search": "Search",
     "intergration": "Intergration",
-    "view": "View"
+    "view": "View",
+    "event": "Event"
   },
   "cutomTable": {
     "fieldSetting": "List field settings"
@@ -140,6 +143,23 @@
     "assetValidate": "The Asset cannot be empty",
     "generateConfiguration": "Generate Configuration",
     "indexView": "Index View",
-    "overview": "Overview"
+    "overview": "Overview",
+    "alert": "Alert",
+    "strategy": "Strategy",
+    "template": "Template",
+    "filterItems": "Filter Items",
+    "level": "Level",
+    "state": "State",
+    "notify": "Notify",
+    "critical": "Critical",
+    "error": "Error",
+    "warning": "Warning",
+    "new": "New",
+    "recovery": "Recovery",
+    "closed": "Closed",
+    "notified": "Notified",
+    "unnotified": "Unnotified",
+    "title": "Title",
+    "index": "Index"
   }
 }
