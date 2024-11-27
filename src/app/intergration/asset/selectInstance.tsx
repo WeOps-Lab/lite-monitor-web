@@ -15,11 +15,13 @@ import CustomTable from '@/components/custom-table';
 import selectInstanceStyle from './selectInstance.module.less';
 import { ColumnItem, ModalRef, ModalConfig } from '@/types';
 import { CloseOutlined } from '@ant-design/icons';
+import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 
 const SelectInstance = forwardRef<ModalRef, ModalConfig>(
   ({ onSuccess, organizationList, monitorObject, list }, ref) => {
     const { t } = useTranslation();
     const { get } = useApiClient();
+    const { convertToLocalizedTime } = useLocalizedTime();
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [pagination, setPagination] = useState<any>({
       current: 1,
@@ -58,7 +60,11 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
         title: t('common.time'),
         dataIndex: 'time',
         key: 'time',
-        render: (_, { time }) => <>{time || '--'}</>,
+        render: (_, { time }) => (
+          <>
+            {time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}
+          </>
+        ),
       },
     ];
 

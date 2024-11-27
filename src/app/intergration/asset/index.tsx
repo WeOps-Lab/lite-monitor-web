@@ -27,12 +27,14 @@ import RuleModal from './ruleModal';
 const { Search } = Input;
 import { useCommon } from '@/context/common';
 import { deepClone, showGroupName } from '@/utils/common';
+import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 const { confirm } = Modal;
 
 const Asset = () => {
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
   const commonContext = useCommon();
+  const { convertToLocalizedTime } = useLocalizedTime();
   const authList = useRef(commonContext?.authOrganizations || []);
   const organizationList: Organization[] = authList.current;
   const ruleRef = useRef<ModalRef>(null);
@@ -79,7 +81,9 @@ const Asset = () => {
       title: t('common.time'),
       dataIndex: 'time',
       key: 'time',
-      render: (_, { time }) => <>{time || '--'}</>,
+      render: (_, { time }) => (
+        <>{time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}</>
+      ),
     },
     {
       title: t('common.action'),

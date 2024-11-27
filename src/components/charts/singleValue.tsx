@@ -25,7 +25,7 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
         className="flex items-center justify-center font-bold"
         style={{ color, fontSize }}
       >
-        {value}
+        {typeof value === 'number' ? value.toFixed(2) : value}
         {unit && (
           <span className="ml-[4px]" style={{ fontSize: unitFontSize }}>
             {unit}

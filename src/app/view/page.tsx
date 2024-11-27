@@ -13,12 +13,14 @@ import TimeSelector from '@/components/time-selector';
 import { useCommon } from '@/context/common';
 import { showGroupName } from '@/utils/common';
 import { INDEX_CONFIG } from '@/constants/monitor';
+import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 
 const Intergration = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
   const router = useRouter();
   const commonContext = useCommon();
+  const { convertToLocalizedTime } = useLocalizedTime();
   const authList = useRef(commonContext?.authOrganizations || []);
   const viewRef = useRef<ModalRef>(null);
   const organizationList: Organization[] = authList.current;
@@ -64,7 +66,9 @@ const Intergration = () => {
       title: t('common.time'),
       dataIndex: 'time',
       key: 'time',
-      render: (_, { time }) => <>{time || '--'}</>,
+      render: (_, { time }) => (
+        <>{time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}</>
+      ),
     },
     {
       title: t('common.action'),
