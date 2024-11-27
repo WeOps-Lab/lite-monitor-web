@@ -112,6 +112,11 @@ const Intergration = () => {
 
   useEffect(() => {
     if (objectId) {
+      setPagination((prev: any) => ({
+        ...prev,
+        current: 1,
+      }));
+      setFilteredData([]);
       getColoumnAndData();
     }
   }, [objectId]);
@@ -139,7 +144,7 @@ const Intergration = () => {
     pagination.pageSize,
   ]);
 
-  const getColoumnAndData = () => {
+  const getColoumnAndData = async () => {
     const getInstList = get(`/api/monitor_instance/${objectId}/list/`);
     const getMetrics = get('/api/metrics/', {
       params: {
@@ -148,44 +153,41 @@ const Intergration = () => {
     });
     setTableLoading(true);
     try {
-      Promise.all([getInstList, getMetrics])
-        .then((res) => {
-          setTableData(res[0]);
-          const _objectName = apps.find((item) => item.key === objectId)?.label;
-          if (_objectName) {
-            const filterMetrics =
-              INDEX_CONFIG.find((item) => item.name === _objectName)
-                ?.tableDiaplay || [];
-            const data = (res[1] || []).filter((item: MetricItem) =>
-              filterMetrics.includes(item.name)
-            );
-            const _columns = data.map((item: MetricItem) => {
-              return {
-                title: item.display_name,
-                dataIndex: item.name,
-                key: item.name,
-                width: 200,
-                render: (_: any, record: any) => (
-                  <Progress
-                    strokeLinecap="butt"
-                    showInfo={!!record[item.name]}
-                    percent={record[item.name] || 0}
-                    percentPosition={{ align: 'center', type: 'inner' }}
-                    size={[100, 20]}
-                  />
-                ),
-              };
-            });
-            const originColumns = deepClone(columns);
-            const indexToInsert = originColumns.length - 2;
-            originColumns.splice(indexToInsert, 0, ..._columns);
-            setTableColumn(originColumns);
-          }
-        })
-        .finally(() => {
-          setTableLoading(false);
+      const res = await Promise.all([getInstList, getMetrics]);
+      setTableData(res[0]);
+      const _objectName = apps.find((item) => item.key === objectId)?.label;
+      if (_objectName) {
+        const filterMetrics =
+          INDEX_CONFIG.find((item) => item.name === _objectName)
+            ?.tableDiaplay || [];
+        const data = (res[1] || []).filter((item: MetricItem) =>
+          filterMetrics.includes(item.name)
+        );
+        const _columns = data.map((item: MetricItem) => {
+          return {
+            title: item.display_name,
+            dataIndex: item.name,
+            key: item.name,
+            width: 200,
+            render: (_: any, record: any) => (
+              <Progress
+                strokeLinecap="butt"
+                showInfo={!!record[item.name]}
+                percent={record[item.name] || 0}
+                percentPosition={{ align: 'center', type: 'inner' }}
+                size={[100, 20]}
+              />
+            ),
+          };
         });
+        const originColumns = deepClone(columns);
+        const indexToInsert = originColumns.length - 2;
+        originColumns.splice(indexToInsert, 0, ..._columns);
+        setTableColumn(originColumns);
+      }
     } catch (error) {
+      // Handle error
+    } finally {
       setTableLoading(false);
     }
   };
@@ -279,12 +281,10 @@ const Intergration = () => {
 
   const onTabChange = (val: string) => {
     setActiveTab(val);
-    setFilteredData([]);
   };
 
   const linkToDetial = (app: ObectItem) => {
     const row = deepClone(app);
-    console.log(apps);
     row.name = apps.find((item) => item.key === objectId)?.label;
     row.monitorObjId = apps.find((item) => item.key === objectId)?.key || '';
     const params = new URLSearchParams(row);
@@ -343,7 +343,7 @@ const Intergration = () => {
               />
             </div>
             <CustomTable
-              scroll={{ y: 'calc(100vh - 320px)', x: 'calc(100vw - 500px)' }}
+              scroll={{ y: 'calc(100vh - 380px)', x: 'calc(100vw - 500px)' }}
               columns={tableColumn}
               dataSource={filteredData}
               pagination={pagination}
