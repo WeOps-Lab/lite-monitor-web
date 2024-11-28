@@ -160,6 +160,17 @@
     "notified": "Notified",
     "unnotified": "Unnotified",
     "title": "Title",
-    "index": "Index"
+    "index": "Index",
+    "alertDetail": "Alert Detail",
+    "information": "Information",
+    "firstAlertTime": "First Alert Time",
+    "duration": "Duration",
+    "assetType": "Asset Type",
+    "assetGroup": "Asset Group",
+    "notifier": "Notifier",
+    "closeTitle": "Do you want to close this item?",
+    "closeContent": "After closing, the data cannot be recovered.",
+    "successfullyClosed": "Close successfully !",
+    "closeAlert": "Close This Alert"
   }
 }

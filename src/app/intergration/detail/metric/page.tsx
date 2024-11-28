@@ -29,6 +29,7 @@ const Configure = () => {
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
+  const groupName = searchParams.get('name');
   const groupRef = useRef<ModalRef>(null);
   const metricRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
@@ -110,13 +111,19 @@ const Configure = () => {
     setLoading(true);
     try {
       const data = await get(`/api/monitor_object/`);
-      const _items = data
-        .filter((item: ObectItem) => item.type === 'K8S')
-        .sort((a: ObectItem, b: ObectItem) => a.id - b.id)
-        .map((item: ObectItem) => ({
-          label: item.name,
-          value: item.id,
-        }));
+      const _items =
+        groupName === 'Cluster'
+          ? data
+            .filter((item: ObectItem) => item.type === 'K8S')
+            .sort((a: ObectItem, b: ObectItem) => a.id - b.id)
+            .map((item: ObectItem) => ({
+              label: item.name,
+              value: item.id,
+            }))
+          : data.map((item: ObectItem) => ({
+            label: item.name,
+            value: item.id,
+          }));
       const objId = _items[0]?.value;
       setActiveTab(objId);
       setItems(_items);
@@ -240,19 +247,21 @@ const Configure = () => {
   };
 
   const onTabChange = (val: string) => {
-    setMetricData([])
+    setMetricData([]);
     setActiveTab(val);
     getInitData(val);
   };
 
   return (
     <div className={metricStyle.metric}>
-      <Segmented
-        className="mb-[20px] custom-tabs"
-        value={activeTab}
-        options={items}
-        onChange={onTabChange}
-      />
+      {groupName === 'Cluster' && (
+        <Segmented
+          className="mb-[20px] custom-tabs"
+          value={activeTab}
+          options={items}
+          onChange={onTabChange}
+        />
+      )}
       <p className="mb-[10px] text-[var(--color-text-2)]">
         {t('monitor.metricTitle')}
       </p>

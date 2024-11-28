@@ -15,7 +15,7 @@ const IntergrationDetailLayout = ({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const desc = searchParams.get('instance_id');
+  const desc = searchParams.get('instance_name');
   const icon = searchParams.get('name') || '';
 
   const handleBackButtonClick = () => {

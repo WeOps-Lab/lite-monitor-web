@@ -120,3 +120,8 @@ export interface FiltersConfig {
   state: string[];
   notify: string[];
 }
+
+export interface AlertProps {
+  objects: ObectItem[];
+  metrics: MetricItem[];
+}
