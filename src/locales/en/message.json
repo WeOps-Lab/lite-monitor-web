@@ -171,6 +171,7 @@
     "closeTitle": "Do you want to close this item?",
     "closeContent": "After closing, the data cannot be recovered.",
     "successfullyClosed": "Close successfully !",
-    "closeAlert": "Close This Alert"
+    "closeAlert": "Close This Alert",
+    "eventName": "Event Name"
   }
 }

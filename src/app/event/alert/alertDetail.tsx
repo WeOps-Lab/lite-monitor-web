@@ -15,12 +15,16 @@ import {
   TableDataItem,
   TabItem,
   ChartData,
+  ColumnItem,
+  Pagination,
 } from '@/types';
 import { ChartDataItem, SearchParams, MetricItem } from '@/types/monitor';
 import { AlertOutlined } from '@ant-design/icons';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import useApiClient from '@/utils/request';
 import Information from './information';
+import CustomTable from '@/components/custom-table';
+import { findUnitNameById } from '@/utils/common';
 
 const AlertDetail = forwardRef<ModalRef, ModalConfig>(
   ({ objects, metrics, onSuccess }, ref) => {
@@ -43,7 +47,62 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     ]);
     const [activeTab, setActiveTab] = useState<string>('information');
     const [loading, setLoading] = useState<boolean>(false);
+    const [tableData, setTableData] = useState<TableDataItem[]>([]);
+    const [pagination, setPagination] = useState<Pagination>({
+      current: 1,
+      total: 0,
+      pageSize: 20,
+    });
+    const [tableLoading, setTableLoading] = useState<boolean>(false);
     const isInformation = activeTab === 'information';
+    const columns: ColumnItem[] = [
+      {
+        title: t('monitor.level'),
+        dataIndex: 'level',
+        key: 'level',
+        render: (_, { level }) => (
+          <Tag
+            icon={<AlertOutlined />}
+            color={
+              level === 'critical'
+                ? '#F43B2C'
+                : level === 'error'
+                  ? '#D97007'
+                  : '#FFAD42'
+            }
+          >
+            {level}
+          </Tag>
+        ),
+      },
+      {
+        title: t('common.time'),
+        dataIndex: 'updated_at',
+        key: 'updated_at',
+        sorter: (a: any, b: any) => a.id - b.id,
+        render: (_, { updated_at }) => (
+          <>{updated_at ? convertToLocalizedTime(updated_at) : '--'}</>
+        ),
+      },
+      {
+        title: t('monitor.eventName'),
+        dataIndex: 'title',
+        key: 'title',
+        render: (_, record) => <>{record.name || '--'}</>,
+      },
+      {
+        title: t('monitor.index'),
+        dataIndex: 'index',
+        key: 'index',
+        render: (_, record) => <>{showMetricName(record)}</>,
+      },
+      {
+        title: t('monitor.value'),
+        dataIndex: 'value',
+        key: 'value',
+        render: (_, record) => <>{record.value + getUnit(record)}</>,
+      },
+    ];
 
     useImperativeHandle(ref, () => ({
       showModal: ({ title, form }) => {
@@ -56,9 +115,23 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
 
     useEffect(() => {
       if (groupVisible) {
-        isInformation && getChartData();
+        isInformation ? getChartData() : getTableData();
       }
     }, [formData, groupVisible, activeTab]);
+
+    const getUnit = (row: TableDataItem) => {
+      return findUnitNameById(
+        metrics.find((item: MetricItem) => item.id === row.policy?.metric)
+          ?.unit || ''
+      );
+    };
+
+    const showMetricName = (row: TableDataItem) => {
+      return (
+        metrics.find((item: MetricItem) => item.id === row.policy?.metric)
+          ?.display_name || '--'
+      );
+    };
 
     const getParams = () => {
       const _query: string = formData.policy.query;
@@ -83,6 +156,16 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         );
       }
       return params;
+    };
+
+    const getTableData = async () => {
+      setTableLoading(true);
+      try {
+        const data = await get(`/api/monitor_event/query/${formData.id}/`);
+        setTableData(data);
+      } finally {
+        setTableLoading(false);
+      }
     };
 
     const getChartData = async () => {
@@ -148,6 +231,9 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
 
     const handleCancel = () => {
       setGroupVisible(false);
+      setActiveTab('information');
+      setChartData([]);
+      setTableData([]);
     };
     const changeTab = (val: string) => {
       setActiveTab(val);
@@ -156,6 +242,10 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     const closeModal = () => {
       handleCancel();
       onSuccess();
+    };
+
+    const handleTableChange = (pagination: any) => {
+      setPagination(pagination);
     };
 
     return (
@@ -220,7 +310,15 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                   chartData={processData(chartData || [])}
                 />
               ) : (
-                <div>456</div>
+                <CustomTable
+                  scroll={{ y: 'calc(100vh - 300px)' }}
+                  columns={columns}
+                  dataSource={tableData}
+                  pagination={false}
+                  loading={tableLoading}
+                  rowKey="id"
+                  onChange={handleTableChange}
+                />
               )}
             </Spin>
           </div>
