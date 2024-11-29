@@ -1,0 +1,33 @@
+.asset {
+    display: flex;
+
+    .tree {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 140px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-right: 10px;
+        padding: 20px 10px;
+        background-color: var(--color-bg-1);
+
+        :global {
+            .ant-tree-list {
+                width: 100%;
+            }
+        }
+    }
+
+    .table {
+        background: var(--color-bg-1);
+        height: calc(100vh - 140px);
+        padding: 20px;
+        width: calc(100vw - 280px);
+
+        .search {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+    }
+}
