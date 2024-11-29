@@ -30,6 +30,7 @@ const Configure = () => {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const groupName = searchParams.get('name');
+  const groupId = searchParams.get('id');
   const groupRef = useRef<ModalRef>(null);
   const metricRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
@@ -109,25 +110,24 @@ const Configure = () => {
 
   const getObjects = async (text?: string) => {
     setLoading(true);
+    let _objId = '';
     try {
-      const data = await get(`/api/monitor_object/`);
-      const _items =
-        groupName === 'Cluster'
-          ? data
-            .filter((item: ObectItem) => item.type === 'K8S')
-            .sort((a: ObectItem, b: ObectItem) => a.id - b.id)
-            .map((item: ObectItem) => ({
-              label: item.name,
-              value: item.id,
-            }))
-          : data.map((item: ObectItem) => ({
+      if (groupName === 'Cluster') {
+        const data = await get(`/api/monitor_object/`);
+        const _items = data
+          .filter((item: ObectItem) => item.type === 'K8S')
+          .sort((a: ObectItem, b: ObectItem) => a.id - b.id)
+          .map((item: ObectItem) => ({
             label: item.name,
             value: item.id,
           }));
-      const objId = _items[0]?.value;
-      setActiveTab(objId);
-      setItems(_items);
-      getInitData(objId);
+        _objId = _items[0]?.value;
+        setItems(_items);
+      } else {
+        _objId = groupId || '';
+      }
+      setActiveTab(_objId);
+      getInitData(_objId);
     } catch {
       setLoading(false);
     }
@@ -173,7 +173,7 @@ const Configure = () => {
 
   const getInitData = async (objId = activeTab) => {
     const params = {
-      monitor_object_id: objId,
+      monitor_object_id: +objId,
     };
     const getGroupList = get(`/api/metrics_group/`, { params });
     const getMetrics = get('/api/metrics/', { params });
