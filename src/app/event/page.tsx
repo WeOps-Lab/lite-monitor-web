@@ -4,6 +4,8 @@ import { Segmented, Spin } from 'antd';
 import { useTranslation } from '@/utils/i18n';
 import { SegmentedItem } from '@/types';
 import Alert from './alert/index';
+import Template from './template';
+import Strategy from './strategy';
 import { ObectItem, MetricItem } from '@/types/monitor';
 import useApiClient from '@/utils/request';
 
@@ -66,8 +68,10 @@ const Event = () => {
         />
         {activeTab === 'alert' ? (
           <Alert objects={objects} metrics={metrics} />
+        ) : activeTab === 'strategy' ? (
+          <Strategy objects={objects} metrics={metrics} />
         ) : (
-          <div>123</div>
+          <Template objects={objects} metrics={metrics} />
         )}
       </Spin>
     </div>

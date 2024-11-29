@@ -84,7 +84,9 @@
     "group": "Group",
     "time": "Time",
     "operator": "Operator",
-    "close": "Close"
+    "close": "Close",
+    "creator": "Creator",
+    "createTime": "Create Time"
   },
   "menu": {
     "search": "Search",
@@ -172,6 +174,8 @@
     "closeContent": "After closing, the data cannot be recovered.",
     "successfullyClosed": "Close successfully !",
     "closeAlert": "Close This Alert",
-    "eventName": "Event Name"
+    "eventName": "Event Name",
+    "executionTime": "Execution Time",
+    "effective": "Effective"
   }
 }
