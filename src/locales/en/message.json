@@ -86,7 +86,8 @@
     "operator": "Operator",
     "close": "Close",
     "creator": "Creator",
-    "createTime": "Create Time"
+    "createTime": "Create Time",
+    "uploadAction": "Click or drag file to this area to upload"
   },
   "menu": {
     "search": "Search",
@@ -176,6 +177,9 @@
     "closeAlert": "Close This Alert",
     "eventName": "Event Name",
     "executionTime": "Execution Time",
-    "effective": "Effective"
+    "effective": "Effective",
+    "importMetric": "Import Metric",
+    "exportMetric": "Export Metric",
+    "GroupImportTips": "Please upload the JSON file."
   }
 }

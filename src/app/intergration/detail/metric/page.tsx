@@ -17,7 +17,10 @@ import {
 import Collapse from '@/components/collapse';
 import GroupModal from './groupModal';
 import MetricModal from './metricModal';
+import ImportModal from './importModal';
 import { useSearchParams } from 'next/navigation';
+import axios from 'axios';
+import { useAuth } from '@/context/auth';
 const { confirm } = Modal;
 interface ListItem {
   id: string;
@@ -28,17 +31,23 @@ interface ListItem {
 const Configure = () => {
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const authContext = useAuth();
+  const token = authContext?.token || null;
+  const tokenRef = useRef(token);
   const searchParams = useSearchParams();
   const groupName = searchParams.get('name');
   const groupId = searchParams.get('id');
+  const groupType = searchParams.get('type');
   const groupRef = useRef<ModalRef>(null);
   const metricRef = useRef<ModalRef>(null);
+  const importRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [metricData, setMetricData] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [groupList, setGroupList] = useState<ListItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
   const [items, setItems] = useState<IntergrationItem[]>([]);
+  const [exportDisabled, setExportDisabled] = useState<boolean>(false);
 
   const columns: ColumnItem[] = [
     {
@@ -238,6 +247,14 @@ const Configure = () => {
     });
   };
 
+  const openImportModal = () => {
+    importRef.current?.showModal({
+      title: t('monitor.importMetric'),
+      type: 'add',
+      form: {},
+    });
+  };
+
   const operateGroup = () => {
     getInitData();
   };
@@ -250,6 +267,38 @@ const Configure = () => {
     setMetricData([]);
     setActiveTab(val);
     getInitData(val);
+  };
+
+  const exportMetric = async () => {
+    try {
+      setExportDisabled(true);
+      const response = await axios({
+        url: `/reqApi/api/monitor_object/export/${groupId}/`, // 替换为你的导出数据的API端点
+        method: 'GET',
+        responseType: 'blob', // 确保响应类型为blob
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`,
+        },
+      });
+      const text = await response.data.text();
+      const json = JSON.parse(text);
+      // 将data对象转换为JSON字符串并创建Blob对象
+      const blob = new Blob([JSON.stringify(json.data, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${groupName}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      message.success('导出成功');
+    } catch (error: any) {
+      message.error(error.message);
+    } finally {
+      setExportDisabled(false);
+    }
   };
 
   return (
@@ -283,7 +332,21 @@ const Configure = () => {
           >
             {t('monitor.addGroup')}
           </Button>
-          <Button type="primary" onClick={() => openMetricModal('add')}>
+          <Button className="mr-[8px]" onClick={openImportModal}>
+            {t('monitor.importMetric')}
+          </Button>
+          <Button
+            className="mr-[8px]"
+            loading={exportDisabled}
+            onClick={exportMetric}
+          >
+            {t('monitor.exportMetric')}
+          </Button>
+          <Button
+            className="mr-[8px]"
+            type="primary"
+            onClick={() => openMetricModal('add')}
+          >
             {t('monitor.addMetric')}
           </Button>
         </div>
@@ -332,6 +395,12 @@ const Configure = () => {
         ref={metricRef}
         monitorObject={+activeTab}
         groupList={groupList}
+        onSuccess={operateMtric}
+      />
+      <ImportModal
+        ref={importRef}
+        groupName={groupName}
+        groupType={groupType}
         onSuccess={operateMtric}
       />
     </div>
