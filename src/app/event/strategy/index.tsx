@@ -32,14 +32,16 @@ import {
 } from '@/utils/common';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import { PlusOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 const { confirm } = Modal;
 
 const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const { t } = useTranslation();
   const { get, del } = useApiClient();
   const commonContext = useCommon();
+  const searchParams = useSearchParams();
   const { convertToLocalizedTime } = useLocalizedTime();
+  const objId = searchParams.get('objId');
   const router = useRouter();
   const authList = useRef(commonContext?.authOrganizations || []);
   const organizationList: Organization[] = authList.current;
@@ -70,7 +72,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       dataIndex: 'organizations',
       key: 'organizations',
       render: (_, { organizations }) => (
-        <>{showGroupName(organizations, organizationList)}</>
+        <>{showGroupName(organizations, organizationList) || '--'}</>
       ),
     },
     {
@@ -145,9 +147,9 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
 
   useEffect(() => {
     if (objects?.length) {
-      getObjects();
+      getObjects('', objId || '');
     }
-  }, [objects]);
+  }, [objects, objId]);
 
   useEffect(() => {
     if (selectedKeys[0]) {
@@ -196,7 +198,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
     }
   };
 
-  const getObjects = async (text?: string) => {
+  const getObjects = async (text: string, id?: string) => {
     try {
       setPageLoading(true);
       let data: ObectItem[] = objects;
@@ -212,8 +214,8 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       setExpandedKeys(_treeData.map((item) => item.key));
       const defaultChildren = _treeData[0]?.children;
       if (defaultChildren?.length) {
-        const key = defaultChildren[0].key;
-        setSelectedKeys([key]);
+        const key = id || defaultChildren[0].key;
+        setSelectedKeys([+key]);
       }
     } finally {
       setPageLoading(false);

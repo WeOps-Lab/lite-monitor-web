@@ -1,5 +1,4 @@
 'use client';
-'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import {
   Spin,
@@ -34,6 +33,7 @@ import {
 } from '@ant-design/icons';
 import SelectAssets from './selectAssets';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Router from 'next/router';
 import {
   CONDITION_LIST,
   METHOD_LIST,
@@ -130,12 +130,14 @@ const StrategyOperation = () => {
       source,
       schedule,
       filter,
-      threshold,
+      threshold: thresholdList,
       no_data_alert,
       no_data_level,
+      recovery_condition,
     } = data;
     form.setFieldsValue({
       ...data,
+      recovery_condition: recovery_condition || null,
       schedule: schedule?.value || null,
     });
     const _metrics = metrics.find((item) => item.id === metric);
@@ -143,7 +145,14 @@ const StrategyOperation = () => {
     setMetric(_metrics?.name || '');
     setLabels(_labels);
     setConditions(filter || []);
-    setThreshold(threshold || []);
+    const _threshold = deepClone(threshold);
+    _threshold.forEach((item: ThresholdField) => {
+      const target = thresholdList.find((tex) => tex.level === item.level);
+      if (target) {
+        item.value = target.value;
+      }
+    });
+    setThreshold(_threshold || []);
     setSource(
       source || {
         type: '',
@@ -190,9 +199,12 @@ const StrategyOperation = () => {
   const validateThreshold = async () => {
     if (
       threshold.length &&
-      threshold.some((item) => {
-        return Object.values(item).some((tex) => !tex);
-      })
+      (threshold.some((item) => {
+        return !item.method;
+      }) ||
+        !threshold.some((item) => {
+          return !!item.value && item.value !== 0;
+        }))
     ) {
       return Promise.reject(new Error(t('monitor.conditionValidate')));
     }
@@ -306,7 +318,14 @@ const StrategyOperation = () => {
   };
 
   const goBack = () => {
-    router.push('/event?active=strategy');
+    router.push(`/event?active=strategy&objId=${monitorObjId}`);
+    // Router.push({
+    //   pathname: '/event',
+    //   query: {
+    //     active: 'strategy',
+    //     objId: monitorObjId,
+    //   },
+    // });
   };
 
   const createStrategy = () => {
@@ -315,7 +334,9 @@ const StrategyOperation = () => {
       _values.filter = conditions;
       _values.source = source;
       _values.metric = metrics.find((item) => item.name === metric)?.id;
-      _values.threshold = threshold;
+      _values.threshold = threshold.filter(
+        (item) => !!item.value || item.value === 0
+      );
       _values.monitor_object = monitorObjId;
       _values.schedule = {
         type: unit,
@@ -327,6 +348,7 @@ const StrategyOperation = () => {
       } else {
         _values.no_data_alert = 0;
       }
+      _values.recovery_condition = _values.recovery_condition || 0;
       operateStrategy(_values);
     });
   };
@@ -738,8 +760,7 @@ const StrategyOperation = () => {
                                   width: '200px',
                                   borderRadius: '0 6px 6px 0',
                                 }}
-                                min={1}
-                                precision={0}
+                                min={0}
                                 value={item.value}
                                 onChange={(e) =>
                                   handleThresholdValueChange(e, index)
@@ -750,7 +771,6 @@ const StrategyOperation = () => {
                         ))}
                       </Form.Item>
                       <Form.Item<StrategyFields>
-                        required
                         label={
                           <span className="w-[100px]">
                             {t('monitor.recovery')}
@@ -762,7 +782,7 @@ const StrategyOperation = () => {
                           name="recovery_condition"
                           noStyle
                           rules={[
-                            { required: true, message: t('common.required') },
+                            { required: false, message: t('common.required') },
                           ]}
                         >
                           <InputNumber
@@ -839,48 +859,69 @@ const StrategyOperation = () => {
                       >
                         <Switch />
                       </Form.Item>
-                      <Form.Item<StrategyFields>
-                        label={
-                          <span className="w-[100px]">
-                            {t('monitor.method')}
-                          </span>
+                      <Form.Item
+                        noStyle
+                        shouldUpdate={(prevValues, currentValues) =>
+                          prevValues.notice !== currentValues.notice
                         }
-                        name="notice_type"
-                        rules={[
-                          { required: true, message: t('common.required') },
-                        ]}
                       >
-                        <Radio.Group>
-                          <Radio value="email">{t('monitor.email')}</Radio>
-                        </Radio.Group>
-                      </Form.Item>
-                      <Form.Item<StrategyFields>
-                        label={
-                          <span className="w-[100px]">
-                            {t('monitor.notifier')}
-                          </span>
+                        {({ getFieldValue }) =>
+                          getFieldValue('notice') ? (
+                            <>
+                              <Form.Item<StrategyFields>
+                                label={
+                                  <span className="w-[100px]">
+                                    {t('monitor.method')}
+                                  </span>
+                                }
+                                name="notice_type"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: t('common.required'),
+                                  },
+                                ]}
+                              >
+                                <Radio.Group>
+                                  <Radio value="email">
+                                    {t('monitor.email')}
+                                  </Radio>
+                                </Radio.Group>
+                              </Form.Item>
+                              <Form.Item<StrategyFields>
+                                label={
+                                  <span className="w-[100px]">
+                                    {t('monitor.notifier')}
+                                  </span>
+                                }
+                                name="notice_users"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: t('common.required'),
+                                  },
+                                ]}
+                              >
+                                <Select
+                                  style={{
+                                    width: '300px',
+                                  }}
+                                  showSearch
+                                  allowClear
+                                  mode="tags"
+                                  maxTagCount="responsive"
+                                  placeholder={t('monitor.notifier')}
+                                >
+                                  {userList.map((item) => (
+                                    <Option value={item.id} key={item.id}>
+                                      {item.username}
+                                    </Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
+                            </>
+                          ) : null
                         }
-                        name="notice_users"
-                        rules={[
-                          { required: true, message: t('common.required') },
-                        ]}
-                      >
-                        <Select
-                          style={{
-                            width: '300px',
-                          }}
-                          showSearch
-                          allowClear
-                          mode="tags"
-                          maxTagCount="responsive"
-                          placeholder={t('monitor.notifier')}
-                        >
-                          {userList.map((item) => (
-                            <Option value={item.id} key={item.id}>
-                              {item.username}
-                            </Option>
-                          ))}
-                        </Select>
                       </Form.Item>
                     </>
                   ),

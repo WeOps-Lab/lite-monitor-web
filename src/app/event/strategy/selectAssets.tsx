@@ -328,7 +328,7 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
                       );
                       return (
                         <li className={selectInstanceStyle.listItem} key={key}>
-                          <span>{item?.instance_id || '--'}</span>
+                          <span>{item?.instance_name || '--'}</span>
                           <CloseOutlined
                             className={`text-[12px] ${selectInstanceStyle.operate}`}
                             onClick={() => handleRemoveItem(key)}
