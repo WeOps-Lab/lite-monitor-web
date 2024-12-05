@@ -18,7 +18,6 @@ import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { ModalRef, Organization, ListItem, UserItem } from '@/types';
 import {
-  AlertProps,
   StrategyFields,
   SourceFeild,
   MetricItem,

@@ -144,10 +144,10 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   ];
 
   useEffect(() => {
-    if (!isLoading) {
+    if (objects?.length) {
       getObjects();
     }
-  }, [isLoading]);
+  }, [objects]);
 
   useEffect(() => {
     if (selectedKeys[0]) {

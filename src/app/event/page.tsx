@@ -8,11 +8,15 @@ import Template from './template';
 import Strategy from './strategy';
 import { ObectItem, MetricItem } from '@/types/monitor';
 import useApiClient from '@/utils/request';
+import { useSearchParams } from 'next/navigation';
 
 const Event = () => {
   const { t } = useTranslation();
   const { get, isLoading } = useApiClient();
-  const [activeTab, setActiveTab] = useState<string>('alert');
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<string>(
+    searchParams.get('active') || 'alert'
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const [objects, setObjects] = useState<ObectItem[]>([]);
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
