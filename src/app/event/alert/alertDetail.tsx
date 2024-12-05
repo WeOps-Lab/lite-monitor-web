@@ -28,7 +28,7 @@ import { findUnitNameById } from '@/utils/common';
 import { LEVEL_MAP, LEVEL_LIST, STATE_MAP } from '@/constants/monitor';
 
 const AlertDetail = forwardRef<ModalRef, ModalConfig>(
-  ({ objects, metrics, onSuccess }, ref) => {
+  ({ objects, metrics, userList, onSuccess }, ref) => {
     const { t } = useTranslation();
     const { get } = useApiClient();
     const { convertToLocalizedTime } = useLocalizedTime();
@@ -126,7 +126,10 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     };
 
     const getParams = () => {
-      const _query: string = formData.policy?.query || '';
+      const target =
+        metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
+          ?.query || '';
+      const _query: string = target;
       const params: SearchParams = {
         query: _query.replace(
           /__\$labels__/g,
@@ -293,6 +296,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                   formData={formData}
                   objects={objects}
                   metrics={metrics}
+                  userList={userList}
                   onClose={closeModal}
                   chartData={processData(chartData || [])}
                 />

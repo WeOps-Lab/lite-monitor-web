@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react';
 import { Descriptions } from 'antd';
-import { TableDataItem, Organization } from '@/types';
+import { TableDataItem, Organization, UserItem } from '@/types';
 import { useTranslation } from '@/utils/i18n';
 import informationStyle from './index.module.less';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
@@ -18,6 +18,7 @@ const Information: React.FC<TableDataItem> = ({
   chartData,
   objects,
   metrics,
+  userList,
   onClose,
 }) => {
   const { t } = useTranslation();
@@ -69,6 +70,16 @@ const Information: React.FC<TableDataItem> = ({
         });
       },
     });
+  };
+
+  const getUsers = (id: string) => {
+    return userList.find((item: UserItem) => item.id === id)?.username || '--';
+  };
+
+  const showNotifiers = (row: TableDataItem) => {
+    return (row.policy?.notice_users || [])
+      .map((item: string) => getUsers(item))
+      .join(',');
   };
 
   return (
@@ -138,7 +149,7 @@ const Information: React.FC<TableDataItem> = ({
           {formData.operator || '--'}
         </Descriptions.Item>
         <Descriptions.Item label={t('monitor.notifier')}>
-          {(formData.policy?.notice_users || []).join(',') || '--'}
+          {showNotifiers(formData)}
         </Descriptions.Item>
       </Descriptions>
       <div className="mt-4">
