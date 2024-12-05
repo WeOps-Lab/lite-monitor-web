@@ -130,15 +130,15 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       fixed: 'right',
       render: (_, record) => (
         <>
-          <Button type="link" onClick={() => showDeleteConfirm(record)}>
-            {t('common.delete')}
-          </Button>
           <Button
-            className="ml-[10px]"
+            className="mr-[10px]"
             type="link"
             onClick={() => linkToStrategyDetail('edit', record)}
           >
             {t('common.edit')}
+          </Button>
+          <Button type="link" onClick={() => showDeleteConfirm(record)}>
+            {t('common.delete')}
           </Button>
         </>
       ),

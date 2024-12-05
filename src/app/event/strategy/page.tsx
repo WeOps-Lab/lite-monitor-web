@@ -203,7 +203,7 @@ const StrategyOperation = () => {
         return !item.method;
       }) ||
         !threshold.some((item) => {
-          return !!item.value && item.value !== 0;
+          return !!item.value || item.value === 0;
         }))
     ) {
       return Promise.reject(new Error(t('monitor.conditionValidate')));
