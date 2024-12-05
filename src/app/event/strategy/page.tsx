@@ -117,6 +117,8 @@ const StrategyOperation = () => {
       form.setFieldsValue({
         notice_type: 'email',
         notice: false,
+        period: 300,
+        schedule: 5,
       });
     } else {
       dealDetail(formData);
@@ -151,7 +153,7 @@ const StrategyOperation = () => {
     );
     setNoDataAlert(no_data_alert || null);
     setNoDataLevel(no_data_level || '');
-    setOpenNoData(!!no_data_level);
+    setOpenNoData(!!no_data_alert);
     setUnit(schedule?.type || '');
   };
 
@@ -324,7 +326,7 @@ const StrategyOperation = () => {
         _values.no_data_alert = noDataAlert;
         _values.no_data_level = noDataLevel;
       } else {
-        _values.no_data_level = '';
+        _values.no_data_alert = 0;
       }
       operateStrategy(_values);
     });
