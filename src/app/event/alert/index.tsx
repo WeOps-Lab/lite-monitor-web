@@ -24,7 +24,7 @@ import AlertDetail from './alertDetail';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import dayjs, { Dayjs } from 'dayjs';
 import alertStyle from './index.module.less';
-import { LEVEL_MAP } from '@/constants/monitor';
+import { LEVEL_MAP, LEVEL_LIST, STATE_MAP } from '@/constants/monitor';
 
 const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const { get, patch, isLoading } = useApiClient();
@@ -61,7 +61,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       key: 'level',
       render: (_, { level }) => (
         <Tag icon={<AlertOutlined />} color={LEVEL_MAP[level] as string}>
-          {level}
+          {LEVEL_LIST.find((item) => item.value === level)?.label || '--'}
         </Tag>
       ),
     },
@@ -90,7 +90,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       title: t('monitor.value'),
       dataIndex: 'value',
       key: 'value',
-      render: (_, record) => <>{record.value + getUnit(record)}</>,
+      render: (_, record) => <>{record.value ?? 0 + getUnit(record)}</>,
     },
     {
       title: t('monitor.state'),
@@ -98,7 +98,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       key: 'status',
       render: (_, { status }) => (
         <Tag color={status === 'new' ? 'blue' : 'var(--color-text-4)'}>
-          {status}
+          {STATE_MAP[status]}
         </Tag>
       ),
     },
@@ -277,83 +277,42 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
         total: data.count,
       }));
     } finally {
-      //   setTableData([
-      //     {
-      //       id: 2,
-      //       policy: {
-      //         id: 5,
-      //         created_by: 'baiyf-git',
-      //         updated_by: 'baiyf-git',
-      //         created_at: '2024-11-28T19:31:13+0800',
-      //         updated_at: '2024-11-28T19:31:18+0800',
-      //         query: 'pod_cpu_utilization',
-      //         name: 'pod策略1',
-      //         organizations: ['076e87e2-a958-4937-8726-49ae000f21dc'],
-      //         source: {
-      //           type: 'instance',
-      //           values: [
-      //             '76f98e2a-f74c-42a6-9879-d5362a3fc060',
-      //             '787b88dd-fce5-47d2-9bba-42361d474e9e',
-      //           ],
-      //         },
-      //         schedule: {
-      //           hour: '*',
-      //           minute: '*',
-      //           day_of_week: '*',
-      //           day_of_month: '*',
-      //           month_of_year: '*',
-      //         },
-      //         period: 100,
-      //         algorithm: 'count',
-      //         threshold: [
-      //           {
-      //             level: 'critical',
-      //             value: 99999,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'error',
-      //             value: 9999,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'warning',
-      //             value: 999,
-      //             method: '>',
-      //           },
-      //         ],
-      //         recovery_condition: 3,
-      //         no_data_alert: 3,
-      //         notice: false,
-      //         notice_type: 'email',
-      //         notice_users: ['baiyf-git'],
-      //         monitor_object: 5,
-      //         metric: 73,
-      //       },
-      //       monitor_instance: {
-      //         id: '626c1bf6-c5fc-4c7a-9f17-069f62a6612f',
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-11-27T19:29:12+0800',
-      //         updated_at: '2024-11-27T19:29:12+0800',
-      //         name: 'kube-service-8668ff6859-n6r2g',
-      //         interval: 10,
-      //         agent_id: 'k3s-node-2',
-      //         auto: true,
-      //         monitor_object: 5,
-      //       },
-      //       created_at: '2024-11-28T19:37:38+0800',
-      //       updated_at: '2024-11-28T19:37:40+0800',
-      //       alert_type: 'alert',
-      //       level: 'critical',
-      //       status: 'new',
-      //       start_event_id: 2,
-      //       start_event_time: '2024-11-28T19:33:52+0800',
-      //       end_event_id: 3,
-      //       end_event_time: '2024-11-28T19:33:52+0800',
-      //       operator: 'baiyf-git',
-      //     },
-      //   ]);
+      setTableData([
+        {
+          id: 2,
+          created_at: '2024-12-05T16:43:02+0800',
+          updated_at: '2024-12-05T16:43:02+0800',
+          policy_id: 10,
+          monitor_instance_id: 'lite',
+          alert_type: 'alert',
+          level: 'critical',
+          value: 8800.0,
+          content: 'OS-Host  cpu_summary.usage > 98',
+          status: 'new',
+          start_event_id: 2,
+          start_event_time: '2024-12-05T16:43:02+0800',
+          end_event_id: null,
+          end_event_time: null,
+          operator: 'system',
+        },
+        {
+          id: 1,
+          created_at: '2024-12-05T16:43:02+0800',
+          updated_at: '2024-12-05T16:43:02+0800',
+          policy_id: 10,
+          monitor_instance_id: '10.10.26.236',
+          alert_type: 'alert',
+          level: 'critical',
+          value: 2200.0,
+          content: 'OS-Host  cpu_summary.usage > 98',
+          status: 'new',
+          start_event_id: 1,
+          start_event_time: '2024-12-05T16:43:02+0800',
+          end_event_id: null,
+          end_event_time: null,
+          operator: 'system',
+        },
+      ]);
       setTableLoading(false);
     }
   };

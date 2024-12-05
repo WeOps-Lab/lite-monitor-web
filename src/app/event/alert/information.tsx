@@ -11,7 +11,7 @@ import { findUnitNameById, showGroupName, deepClone } from '@/utils/common';
 import { useCommon } from '@/context/common';
 import { Modal, message, Button } from 'antd';
 import useApiClient from '@/utils/request';
-import { LEVEL_MAP } from '@/constants/monitor';
+import { LEVEL_MAP, LEVEL_LIST } from '@/constants/monitor';
 
 const Information: React.FC<TableDataItem> = ({
   formData,
@@ -91,7 +91,8 @@ const Information: React.FC<TableDataItem> = ({
                 color: LEVEL_MAP[formData.level] as string,
               }}
             >
-              {formData.level}
+              {LEVEL_LIST.find((item) => item.value === formData.level)
+                ?.label || '--'}
             </span>
           </div>
         </Descriptions.Item>
@@ -99,9 +100,6 @@ const Information: React.FC<TableDataItem> = ({
           {formData.created_at
             ? convertToLocalizedTime(formData.created_at)
             : '--'}
-        </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.duration')}>
-          {formData.policy?.period || '--'}
         </Descriptions.Item>
         <Descriptions.Item label={t('monitor.information')} span={3}>
           {`${formData.content},${t('monitor.value')}:${formData.alertValue}`}

@@ -1,5 +1,5 @@
 import { ListItem } from '@/types';
-import { LevelMap, UnitMap } from '@/types/monitor';
+import { LevelMap, UnitMap, StateMap } from '@/types/monitor';
 const FREQUENCY_LIST: ListItem[] = [
   { label: 'off', value: 0 },
   { label: '1m', value: 60000 },
@@ -431,6 +431,12 @@ const LEVEL_MAP: LevelMap = {
   warning: '#FFAD42',
 };
 
+const STATE_MAP: StateMap = {
+  new: 'New',
+  recovery: 'Recovery',
+  closed: 'Closed',
+};
+
 export {
   FREQUENCY_LIST,
   CONDITION_LIST,
@@ -444,4 +450,5 @@ export {
   LEVEL_MAP,
   LEVEL_LIST,
   SCHEDULE_UNIT_MAP,
+  STATE_MAP,
 };

@@ -25,7 +25,7 @@ import useApiClient from '@/utils/request';
 import Information from './information';
 import CustomTable from '@/components/custom-table';
 import { findUnitNameById } from '@/utils/common';
-import { LEVEL_MAP } from '@/constants/monitor';
+import { LEVEL_MAP, LEVEL_LIST, STATE_MAP } from '@/constants/monitor';
 
 const AlertDetail = forwardRef<ModalRef, ModalConfig>(
   ({ objects, metrics, onSuccess }, ref) => {
@@ -63,17 +63,17 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         key: 'level',
         render: (_, { level }) => (
           <Tag icon={<AlertOutlined />} color={LEVEL_MAP[level] as string}>
-            {level}
+            {LEVEL_LIST.find((item) => item.value === level)?.label || '--'}
           </Tag>
         ),
       },
       {
         title: t('common.time'),
-        dataIndex: 'updated_at',
-        key: 'updated_at',
+        dataIndex: 'created_at',
+        key: 'created_at',
         sorter: (a: any, b: any) => a.id - b.id,
-        render: (_, { updated_at }) => (
-          <>{updated_at ? convertToLocalizedTime(updated_at) : '--'}</>
+        render: (_, { created_at }) => (
+          <>{created_at ? convertToLocalizedTime(created_at) : '--'}</>
         ),
       },
       {
@@ -126,7 +126,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     };
 
     const getParams = () => {
-      const _query: string = formData.policy.query;
+      const _query: string = formData.policy?.query || '';
       const params: SearchParams = {
         query: _query.replace(
           /__\$labels__/g,
@@ -260,7 +260,8 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                   icon={<AlertOutlined />}
                   color={LEVEL_MAP[formData.level] as string}
                 >
-                  {formData.level}
+                  {LEVEL_LIST.find((item) => item.value === formData.level)
+                    ?.label || '--'}
                 </Tag>
                 <b>{formData.content || '--'}</b>
               </div>
@@ -280,7 +281,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                       formData.status === 'new' ? 'blue' : 'var(--color-text-4)'
                     }
                   >
-                    {formData.status}
+                    {STATE_MAP[formData.status]}
                   </Tag>
                 </li>
               </ul>
@@ -297,7 +298,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                 />
               ) : (
                 <CustomTable
-                  scroll={{ y: 'calc(100vh - 300px)' }}
+                  scroll={{ y: 'calc(100vh - 330px)' }}
                   columns={columns}
                   dataSource={tableData}
                   pagination={false}

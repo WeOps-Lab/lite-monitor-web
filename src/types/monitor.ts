@@ -173,6 +173,13 @@ export interface LevelMap {
   [key: string]: unknown;
 }
 
+export interface StateMap {
+  new: string;
+  recovery: string;
+  closed: string;
+  [key: string]: any;
+}
+
 export interface UnitMap {
   [key: string]: number;
 }
