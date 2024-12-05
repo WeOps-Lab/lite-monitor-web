@@ -14,20 +14,25 @@ import {
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
+import { ColumnItem, TreeItem, Organization, Pagination } from '@/types';
 import {
-  ColumnItem,
-  TreeItem,
-  ModalRef,
-  Organization,
-  Pagination,
-} from '@/types';
-import { ObectItem, RuleInfo, AlertProps } from '@/types/monitor';
+  ObectItem,
+  RuleInfo,
+  AlertProps,
+  TableDataItem,
+} from '@/types/monitor';
 import CustomTable from '@/components/custom-table';
 const { Search } = Input;
 import { useCommon } from '@/context/common';
-import { deepClone, showGroupName, getRandomColor } from '@/utils/common';
+import {
+  deepClone,
+  showGroupName,
+  getRandomColor,
+  findLabelById,
+} from '@/utils/common';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import { PlusOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 const { confirm } = Modal;
 
 const Strategy: React.FC<AlertProps> = ({ objects }) => {
@@ -35,9 +40,9 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const { get, del, isLoading } = useApiClient();
   const commonContext = useCommon();
   const { convertToLocalizedTime } = useLocalizedTime();
+  const router = useRouter();
   const authList = useRef(commonContext?.authOrganizations || []);
   const organizationList: Organization[] = authList.current;
-  const ruleRef = useRef<ModalRef>(null);
   const [pagination, setPagination] = useState<Pagination>({
     current: 1,
     total: 0,
@@ -48,7 +53,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const [treeData, setTreeData] = useState<TreeItem[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
+  const [tableData, setTableData] = useState<TableDataItem[]>([]);
   const [searchText, setSearchText] = useState<string>('');
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
     []
@@ -57,31 +62,31 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const columns: ColumnItem[] = [
     {
       title: t('common.name'),
-      dataIndex: 'instance_name',
-      key: 'instance_name',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: t('common.group'),
-      dataIndex: 'organization',
-      key: 'organization',
-      render: (_, { organization }) => (
-        <>{showGroupName(organization, organizationList)}</>
+      dataIndex: 'organizations',
+      key: 'organizations',
+      render: (_, { organizations }) => (
+        <>{showGroupName(organizations, organizationList)}</>
       ),
     },
     {
       title: t('common.creator'),
-      dataIndex: 'operator',
-      key: 'operator',
-      render: (_, { operator }) => {
-        return operator ? (
-          <div className="column-user" title={operator}>
+      dataIndex: 'created_by',
+      key: 'created_by',
+      render: (_, { created_by }) => {
+        return created_by ? (
+          <div className="column-user" title={created_by}>
             <span
               className="user-avatar"
               style={{ background: getRandomColor() }}
             >
-              {operator.slice(0, 1).toLocaleUpperCase()}
+              {created_by.slice(0, 1).toLocaleUpperCase()}
             </span>
-            <span className="user-name">{operator}</span>
+            <span className="user-name">{created_by}</span>
           </div>
         ) : (
           <>--</>
@@ -90,10 +95,10 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
     },
     {
       title: t('common.createTime'),
-      dataIndex: 'time',
-      key: 'time',
-      render: (_, { time }) => (
-        <>{time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}</>
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (_, { created_at }) => (
+        <>{created_at ? convertToLocalizedTime(created_at) : '--'}</>
       ),
     },
     {
@@ -103,11 +108,6 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       render: (_, { time }) => (
         <>{time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}</>
       ),
-    },
-    {
-      title: t('monitor.duration'),
-      dataIndex: 'agent_id',
-      key: 'agent_id',
     },
     {
       title: t('monitor.effective'),
@@ -130,6 +130,13 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
         <>
           <Button type="link" onClick={() => showDeleteConfirm(record)}>
             {t('common.delete')}
+          </Button>
+          <Button
+            className="ml-[10px]"
+            type="link"
+            onClick={() => linkToStrategyDetail('edit', record)}
+          >
+            {t('common.edit')}
           </Button>
         </>
       ),
@@ -165,15 +172,6 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
 
   const handleEffectiveChange = () => {
     console.log(123);
-  };
-
-  const openRuleModal = (type: string, row = {}) => {
-    const title = t(type === 'add' ? 'monitor.addRule' : 'monitor.editRule');
-    ruleRef.current?.showModal({
-      title,
-      type,
-      form: row,
-    });
   };
 
   const handleTableChange = (pagination: any) => {
@@ -252,7 +250,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
     }
   };
 
-  const onSearchTree = (value: any) => {
+  const onSearchTree = (value: string) => {
     getObjects(value);
   };
 
@@ -264,8 +262,9 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       onOk() {
         return new Promise(async (resolve) => {
           try {
-            await del(`/api/monitor_instance_group_rule/${row.id}/`);
+            await del(`/api/monitor_policy/${row.id}/`);
             message.success(t('common.successfullyDeleted'));
+            getAssetInsts(selectedKeys[0]);
           } finally {
             resolve(true);
           }
@@ -281,6 +280,20 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const clearText = () => {
     setSearchText('');
     getAssetInsts(selectedKeys[0], 'clear');
+  };
+
+  const linkToStrategyDetail = (type: string, row = { id: '', name: '' }) => {
+    const monitorObjId = selectedKeys[0] as string;
+    const monitorName = findLabelById(treeData, monitorObjId) as string;
+    const params = new URLSearchParams({
+      monitorObjId,
+      monitorName,
+      type,
+      id: row.id,
+      name: row.name,
+    });
+    const targetUrl = `/event/strategy?${params.toString()}`;
+    router.push(targetUrl);
   };
 
   return (
@@ -322,7 +335,11 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
                 onChange={(e) => setSearchText(e.target.value)}
               ></Input>
             </div>
-            <Button type="primary" icon={<PlusOutlined />}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => linkToStrategyDetail('add')}
+            >
               {t('common.add')}
             </Button>
           </div>
@@ -332,7 +349,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
             dataSource={tableData}
             pagination={pagination}
             loading={tableLoading}
-            rowKey="instance_id"
+            rowKey="id"
             onChange={handleTableChange}
           ></CustomTable>
         </div>

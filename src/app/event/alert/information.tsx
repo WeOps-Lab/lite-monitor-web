@@ -11,6 +11,7 @@ import { findUnitNameById, showGroupName, deepClone } from '@/utils/common';
 import { useCommon } from '@/context/common';
 import { Modal, message, Button } from 'antd';
 import useApiClient from '@/utils/request';
+import { LEVEL_MAP } from '@/constants/monitor';
 
 const Information: React.FC<TableDataItem> = ({
   formData,
@@ -82,22 +83,12 @@ const Information: React.FC<TableDataItem> = ({
           <div
             className={informationStyle.level}
             style={{
-              borderColor:
-                formData.level === 'critical'
-                  ? '#F43B2C'
-                  : formData.level === 'error'
-                    ? '#D97007'
-                    : '#FFAD42',
+              borderLeft: `4px solid ${LEVEL_MAP[formData.level]}`,
             }}
           >
             <span
               style={{
-                color:
-                  formData.level === 'critical'
-                    ? '#F43B2C'
-                    : formData.level === 'error'
-                      ? '#D97007'
-                      : '#FFAD42',
+                color: LEVEL_MAP[formData.level] as string,
               }}
             >
               {formData.level}

@@ -1,4 +1,5 @@
 import { ListItem } from '@/types';
+import { LevelMap, UnitMap } from '@/types/monitor';
 const FREQUENCY_LIST: ListItem[] = [
   { label: 'off', value: 0 },
   { label: '1m', value: 60000 },
@@ -375,10 +376,72 @@ const INDEX_CONFIG = [
   },
 ];
 
+const METHOD_LIST: ListItem[] = [
+  { label: 'SUM', value: 'sum' },
+  { label: 'AVG', value: 'avg' },
+  { label: 'MAX', value: 'max' },
+  { label: 'MIN', value: 'min' },
+  { label: 'NEW', value: 'new' },
+];
+
+const SCHEDULE_LIST: ListItem[] = [
+  { label: 'Minute(s)', value: 'min' },
+  { label: 'Hour(s)', value: 'hour' },
+  { label: 'Day(s)', value: 'day' },
+];
+
+const SCHEDULE_UNIT_MAP: UnitMap = {
+  minMin: 1,
+  minMax: 59,
+  hourMin: 1,
+  hourMax: 23,
+  dayMin: 1,
+  dayMax: 1,
+};
+
+const PERIOD_LIST: ListItem[] = [
+  { label: '1min', value: 60 },
+  { label: '5min', value: 300 },
+  { label: '15min', value: 900 },
+  { label: '30min', value: 1800 },
+  { label: '1hour', value: 3600 },
+  { label: '6hour', value: 21600 },
+  { label: '12hour', value: 43200 },
+  { label: '24hour', value: 86400 },
+];
+
+const COMPARISON_METHOD: ListItem[] = [
+  { label: '>', value: '>' },
+  { label: '<', value: '<' },
+  { label: '=', value: '=' },
+  { label: '≠', value: '!=' },
+  { label: '≥', value: '>=' },
+  { label: '≤', value: '<=' },
+];
+
+const LEVEL_LIST: ListItem[] = [
+  { label: 'Critical', value: 'critical' },
+  { label: 'Error', value: 'error' },
+  { label: 'Warning', value: 'warning' },
+];
+
+const LEVEL_MAP: LevelMap = {
+  critical: '#F43B2C',
+  error: '#D97007',
+  warning: '#FFAD42',
+};
+
 export {
   FREQUENCY_LIST,
   CONDITION_LIST,
   UNIT_LIST,
   INDEX_CONFIG,
   TIME_RANGE_LIST,
+  METHOD_LIST,
+  SCHEDULE_LIST,
+  PERIOD_LIST,
+  COMPARISON_METHOD,
+  LEVEL_MAP,
+  LEVEL_LIST,
+  SCHEDULE_UNIT_MAP,
 };

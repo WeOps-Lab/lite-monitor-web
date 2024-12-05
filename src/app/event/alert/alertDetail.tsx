@@ -25,6 +25,7 @@ import useApiClient from '@/utils/request';
 import Information from './information';
 import CustomTable from '@/components/custom-table';
 import { findUnitNameById } from '@/utils/common';
+import { LEVEL_MAP } from '@/constants/monitor';
 
 const AlertDetail = forwardRef<ModalRef, ModalConfig>(
   ({ objects, metrics, onSuccess }, ref) => {
@@ -61,16 +62,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         dataIndex: 'level',
         key: 'level',
         render: (_, { level }) => (
-          <Tag
-            icon={<AlertOutlined />}
-            color={
-              level === 'critical'
-                ? '#F43B2C'
-                : level === 'error'
-                  ? '#D97007'
-                  : '#FFAD42'
-            }
-          >
+          <Tag icon={<AlertOutlined />} color={LEVEL_MAP[level] as string}>
             {level}
           </Tag>
         ),
@@ -266,13 +258,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
               <div>
                 <Tag
                   icon={<AlertOutlined />}
-                  color={
-                    formData.level === 'critical'
-                      ? '#F43B2C'
-                      : formData.level === 'error'
-                        ? '#D97007'
-                        : '#FFAD42'
-                  }
+                  color={LEVEL_MAP[formData.level] as string}
                 >
                   {formData.level}
                 </Tag>

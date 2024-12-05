@@ -107,6 +107,12 @@ export interface ConditionItem {
   value: string;
 }
 
+export interface FilterItem {
+  name: string | null;
+  method: string | null;
+  value: string;
+}
+
 export interface SearchParams {
   time?: number;
   end?: number;
@@ -120,8 +126,53 @@ export interface FiltersConfig {
   state: string[];
   notify: string[];
 }
+export interface ThresholdField {
+  level: string;
+  method: string;
+  value: number | null;
+}
 
 export interface AlertProps {
   objects: ObectItem[];
   metrics: MetricItem[];
+}
+
+export interface SourceFeild {
+  type: string;
+  values: Array<string | number>;
+}
+
+export interface StrategyFields {
+  name?: string;
+  organizations?: string[];
+  source?: SourceFeild;
+  metric?: number;
+  schedule?: {
+    type: string;
+    value: number;
+  };
+  period?: number;
+  algorithm?: string;
+  threshold: ThresholdField[];
+  recovery_condition?: number;
+  no_data_alert?: number;
+  no_data_level?: string;
+  notice?: boolean;
+  notice_type?: string;
+  notice_users?: string[];
+  monitor_object?: number;
+  filter?: FilterItem[];
+  id?: number;
+  [key: string]: unknown;
+}
+
+export interface LevelMap {
+  critical: string;
+  error: string;
+  warning: string;
+  [key: string]: unknown;
+}
+
+export interface UnitMap {
+  [key: string]: number;
 }

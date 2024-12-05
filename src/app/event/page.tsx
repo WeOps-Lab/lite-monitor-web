@@ -25,10 +25,10 @@ const Event = () => {
       label: t('monitor.strategy'),
       value: 'strategy',
     },
-    {
-      label: t('monitor.template'),
-      value: 'template',
-    },
+    // {
+    //   label: t('monitor.template'),
+    //   value: 'template',
+    // },
   ]);
 
   useEffect(() => {

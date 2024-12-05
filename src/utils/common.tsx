@@ -179,7 +179,7 @@ export const showGroupName = (
   groupIds: string[],
   organizationList: Array<SubGroupItem>
 ) => {
-  if (!groupIds.length) return '--';
+  if (!groupIds?.length) return '--';
   const groupNames: any[] = [];
   groupIds.forEach((el) => {
     groupNames.push(findGroupNameById(organizationList, el));
@@ -247,4 +247,20 @@ export const calculateMetrics = (data: any[], key = 'value1') => {
     avgValue,
     latestValue,
   };
+};
+
+// 树形组件根据id查其title
+export const findLabelById = (data: any[], key: string): string | null => {
+  for (const node of data) {
+    if (node.key === key) {
+      return node.title;
+    }
+    if (node.children) {
+      const result = findLabelById(node.children, key);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
 };

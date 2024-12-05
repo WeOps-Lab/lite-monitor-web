@@ -36,3 +36,172 @@
         }
     }
 }
+
+.strategy {
+    width: calc(100vw - 20px);
+    overflow: hidden;
+
+    :global {
+        .ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+            position: absolute;
+            right: -3px;
+        }
+
+        .ant-form-item-label>label {
+            margin-right: 10px;
+        }
+    }
+
+    .title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .form {
+        height: calc(100vh - 170px);
+        overflow-y: auto;
+        padding: 10px;
+
+        .filterLabel {
+            width: 150px;
+
+            :global {
+                .ant-select-selector {
+                    border-radius: 6px 0 0 6px;
+                }
+            }
+        }
+
+        .thesholdvalue {
+            width: 150px;
+            border-radius: 0 6px 6px 0;
+        }
+
+
+
+        .condition {
+            display: flex;
+            flex-wrap: wrap;
+
+            :global {
+                .ant-btn-default {
+                    min-width: 32px;
+                }
+            }
+
+            .conditionItem {
+
+                .itemLabel {
+                    font-weight: 600;
+                    font-size: 13px;
+                    margin-bottom: 10px;
+                }
+
+                .itemOption {
+                    display: flex;
+                }
+
+                .source {
+                    .sourceObjectType {
+                        :global {
+                            .ant-select-selector {
+                                border-radius: 6px 0 0 6px;
+                            }
+                        }
+                    }
+
+                    .sourceObject {
+                        :global {
+                            .ant-select-selector {
+                                border-radius: 0 6px 6px 0;
+                            }
+                        }
+                    }
+                }
+
+                .conditions {
+                    display: flex;
+                    flex-wrap: wrap;
+
+                    .filter {
+                        margin-bottom: 10px;
+
+                        :global {
+                            .ant-btn:nth-of-type(1) {
+                                border-radius: 0 6px 6px 0;
+                                margin-right: 10px;
+                            }
+
+                            .ant-btn:nth-of-type(2) {
+                                margin-right: 10px;
+                            }
+
+                            .ant-btn {
+                                background: var(--color-fill-2);
+                            }
+
+                            .ant-btn-icon {
+                                transform: scale(0.8);
+                            }
+
+                            .ant-select-selector {
+                                border-radius: 0;
+                            }
+
+                            .ant-input {
+                                border-radius: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .footer {
+        margin-top: 10px;
+        padding-left: 20px;
+    }
+}
+
+.selectInstance {
+    display: flex;
+
+    .instanceList {
+        width: 650px;
+        padding-right: 10px;
+    }
+
+    .previewList {
+        flex: 1;
+        padding: 0 0 10px 10px;
+        border-left: 1px solid var(--ant-color-border);
+
+        .list {
+            overflow-y: hidden;
+            overflow-y: auto;
+
+            .listItem {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 10px;
+
+                .operate {
+                    visibility: hidden;
+                }
+
+                &:hover {
+                    background: var(--color-fill-1);
+
+                    .operate {
+                        visibility: visible;
+                        cursor: pointer;
+                        color: var(--color-primary);
+                    }
+                }
+            }
+        }
+    }
+
+}

@@ -24,6 +24,7 @@ import AlertDetail from './alertDetail';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import dayjs, { Dayjs } from 'dayjs';
 import alertStyle from './index.module.less';
+import { LEVEL_MAP } from '@/constants/monitor';
 
 const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const { get, patch, isLoading } = useApiClient();
@@ -59,16 +60,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       dataIndex: 'level',
       key: 'level',
       render: (_, { level }) => (
-        <Tag
-          icon={<AlertOutlined />}
-          color={
-            level === 'critical'
-              ? '#F43B2C'
-              : level === 'error'
-                ? '#D97007'
-                : '#FFAD42'
-          }
-        >
+        <Tag icon={<AlertOutlined />} color={LEVEL_MAP[level] as string}>
           {level}
         </Tag>
       ),
@@ -431,7 +423,9 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                   <Checkbox value="error">
                     <div
                       className={alertStyle.level}
-                      style={{ borderColor: '#D97007' }}
+                      style={{
+                        borderLeft: `4px solid ${LEVEL_MAP.error}`,
+                      }}
                     >
                       {t('monitor.error')}
                     </div>
@@ -439,7 +433,9 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                   <Checkbox value="warning">
                     <div
                       className={alertStyle.level}
-                      style={{ borderColor: '#FFAD42' }}
+                      style={{
+                        borderLeft: `4px solid ${LEVEL_MAP.warning}`,
+                      }}
                     >
                       {t('monitor.warning')}
                     </div>
