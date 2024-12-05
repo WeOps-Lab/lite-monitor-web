@@ -37,7 +37,7 @@ const { confirm } = Modal;
 
 const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const { t } = useTranslation();
-  const { get, del, isLoading } = useApiClient();
+  const { get, del } = useApiClient();
   const commonContext = useCommon();
   const { convertToLocalizedTime } = useLocalizedTime();
   const router = useRouter();
