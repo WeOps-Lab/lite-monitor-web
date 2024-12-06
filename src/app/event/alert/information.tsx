@@ -79,9 +79,11 @@ const Information: React.FC<TableDataItem> = ({
   };
 
   const showNotifiers = (row: TableDataItem) => {
-    return (row.policy?.notice_users || [])
-      .map((item: string) => getUsers(item))
-      .join(',');
+    return (
+      (row.policy?.notice_users || [])
+        .map((item: string) => getUsers(item))
+        .join(',') || '--'
+    );
   };
 
   return (
@@ -144,6 +146,13 @@ const Information: React.FC<TableDataItem> = ({
         <Descriptions.Item label={t('monitor.strategy')}>
           {formData.policy?.name || '--'}
         </Descriptions.Item>
+        {formData.status === 'closed' && (
+          <Descriptions.Item label={t('monitor.alertEndTime')}>
+            {formData.end_event_time
+              ? convertToLocalizedTime(formData.end_event_time)
+              : '--'}
+          </Descriptions.Item>
+        )}
         <Descriptions.Item label={t('monitor.notify')}>
           {formData.policy.notice ? 'Notified' : 'Unnotified'}
         </Descriptions.Item>
