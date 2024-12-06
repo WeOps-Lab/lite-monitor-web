@@ -1,5 +1,5 @@
 import { ListItem } from '@/types';
-import { LevelMap, UnitMap, StateMap } from '@/types/monitor';
+import { LevelMap, UnitMap, StateMap, MonitorGroupMap } from '@/types/monitor';
 const FREQUENCY_LIST: ListItem[] = [
   { label: 'off', value: 0 },
   { label: '1m', value: 60000 },
@@ -425,6 +425,45 @@ const LEVEL_LIST: ListItem[] = [
   { label: 'Warning', value: 'warning' },
 ];
 
+const MONITOR_GROUPS_MAP: MonitorGroupMap = {
+  Host: {
+    list: ['instance_id'],
+    default: ['instance_id'],
+  },
+  Website: {
+    list: ['instance_id', 'instance_name', 'host'],
+    default: ['instance_id'],
+  },
+  Cluster: {
+    list: ['instance_id'],
+    default: ['instance_id'],
+  },
+  Pod: {
+    list: ['instance_id', 'uid'],
+    default: ['instance_id', 'uid'],
+  },
+  Node: {
+    list: ['instance_id', 'node'],
+    default: ['instance_id', 'node'],
+  },
+  Switch: {
+    list: ['instance_id'],
+    default: ['instance_id'],
+  },
+  Router: {
+    list: ['instance_id'],
+    default: ['instance_id'],
+  },
+  Loadbalance: {
+    list: ['instance_id'],
+    default: ['instance_id'],
+  },
+  Firewall: {
+    list: ['instance_id'],
+    default: ['instance_id'],
+  },
+};
+
 const LEVEL_MAP: LevelMap = {
   critical: '#F43B2C',
   error: '#D97007',
@@ -451,4 +490,5 @@ export {
   LEVEL_LIST,
   SCHEDULE_UNIT_MAP,
   STATE_MAP,
+  MONITOR_GROUPS_MAP,
 };

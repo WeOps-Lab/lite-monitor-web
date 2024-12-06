@@ -42,9 +42,11 @@ import {
   LEVEL_MAP,
   LEVEL_LIST,
   SCHEDULE_UNIT_MAP,
+  MONITOR_GROUPS_MAP,
 } from '@/constants/monitor';
 const { Option } = Select;
 import Icon from '@/components/icon';
+const defaultGroup = ['instance_id'];
 
 const StrategyOperation = () => {
   const { t } = useTranslation();
@@ -78,6 +80,9 @@ const StrategyOperation = () => {
   const [conditions, setConditions] = useState<FilterItem[]>([]);
   const [noDataAlert, setNoDataAlert] = useState<number | null>(null);
   const [noDataLevel, setNoDataLevel] = useState<string>();
+  const [groupBy, setGroupBy] = useState<string[]>(
+    MONITOR_GROUPS_MAP[monitorName as string]?.default || defaultGroup
+  );
   const [formData, setFormData] = useState<StrategyFields>({
     threshold: [],
     source: { type: '', values: [] },
@@ -133,6 +138,7 @@ const StrategyOperation = () => {
       no_data_alert,
       no_data_level,
       recovery_condition,
+      group_by,
     } = data;
     form.setFieldsValue({
       ...data,
@@ -144,6 +150,7 @@ const StrategyOperation = () => {
     setMetric(_metrics?.name || '');
     setLabels(_labels);
     setConditions(filter || []);
+    setGroupBy(group_by || []);
     const _threshold = deepClone(threshold);
     _threshold.forEach((item: ThresholdField) => {
       const target = thresholdList.find((tex) => tex.level === item.level);
@@ -256,6 +263,10 @@ const StrategyOperation = () => {
     setConditions(_conditions);
   };
 
+  const handleGroupByChange = (val: string[]) => {
+    setGroupBy(val);
+  };
+
   const handleConditionChange = (val: string, index: number) => {
     const _conditions = deepClone(conditions);
     _conditions[index].method = val;
@@ -341,6 +352,7 @@ const StrategyOperation = () => {
         _values.no_data_alert = 0;
       }
       _values.recovery_condition = _values.recovery_condition || 0;
+      _values.group_by = groupBy;
       operateStrategy(_values);
     });
   };
@@ -480,7 +492,7 @@ const StrategyOperation = () => {
                             allowClear
                             style={{
                               width: '300px',
-                              margin: '0 10px 10px 0',
+                              margin: '0 20px 10px 0',
                             }}
                             placeholder={t('monitor.metric')}
                             showSearch
@@ -497,6 +509,9 @@ const StrategyOperation = () => {
                           <div className={strategyStyle.conditionItem}>
                             {conditions.length ? (
                               <ul className={strategyStyle.conditions}>
+                                <li className={strategyStyle.conditionTitle}>
+                                  <span>{t('monitor.filter')}</span>
+                                </li>
                                 {conditions.map((conditionItem, index) => (
                                   <li
                                     className={`${strategyStyle.itemOption} ${strategyStyle.filter}`}
@@ -555,12 +570,43 @@ const StrategyOperation = () => {
                                 ))}
                               </ul>
                             ) : (
-                              <Button
-                                disabled={!metric}
-                                icon={<PlusOutlined />}
-                                onClick={addConditionItem}
-                              />
+                              <div className="flex items-center mr-[20px]">
+                                <span className="mr-[10px]">
+                                  {t('monitor.filter')}
+                                </span>
+                                <Button
+                                  disabled={!metric}
+                                  icon={<PlusOutlined />}
+                                  onClick={addConditionItem}
+                                />
+                              </div>
                             )}
+                          </div>
+                          <div>
+                            <span className="mr-[10px]">
+                              {t('common.group')}
+                            </span>
+                            <Select
+                              allowClear
+                              style={{
+                                width: '300px',
+                                margin: '0 10px 10px 0',
+                              }}
+                              mode="tags"
+                              maxTagCount="responsive"
+                              placeholder={t('common.group')}
+                              value={groupBy}
+                              onChange={handleGroupByChange}
+                            >
+                              {(
+                                MONITOR_GROUPS_MAP[monitorName as string]
+                                  ?.list || defaultGroup
+                              ).map((item) => (
+                                <Option value={item} key={item}>
+                                  {item}
+                                </Option>
+                              ))}
+                            </Select>
                           </div>
                         </div>
                         <div className="text-[var(--color-text-3)]">

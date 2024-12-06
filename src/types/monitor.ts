@@ -163,6 +163,7 @@ export interface StrategyFields {
   monitor_object?: number;
   filter?: FilterItem[];
   id?: number;
+  group_by?: string[];
   [key: string]: unknown;
 }
 
@@ -182,4 +183,11 @@ export interface StateMap {
 
 export interface UnitMap {
   [key: string]: number;
+}
+
+export interface MonitorGroupMap {
+  [key: string]: {
+    list: string[];
+    default: string[];
+  };
 }
