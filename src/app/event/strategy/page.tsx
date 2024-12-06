@@ -33,7 +33,6 @@ import {
 } from '@ant-design/icons';
 import SelectAssets from './selectAssets';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Router from 'next/router';
 import {
   CONDITION_LIST,
   METHOD_LIST,
@@ -319,13 +318,6 @@ const StrategyOperation = () => {
 
   const goBack = () => {
     router.push(`/event?active=strategy&objId=${monitorObjId}`);
-    // Router.push({
-    //   pathname: '/event',
-    //   query: {
-    //     active: 'strategy',
-    //     objId: monitorObjId,
-    //   },
-    // });
   };
 
   const createStrategy = () => {

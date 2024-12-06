@@ -7,7 +7,7 @@ import informationStyle from './index.module.less';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import LineChart from '@/components/charts/lineChart';
 import { MetricItem, ObectItem } from '@/types/monitor';
-import { findUnitNameById, showGroupName, deepClone } from '@/utils/common';
+import { findUnitNameById, showGroupName } from '@/utils/common';
 import { useCommon } from '@/context/common';
 import { Modal, message, Button } from 'antd';
 import useApiClient from '@/utils/request';
@@ -42,9 +42,11 @@ const Information: React.FC<TableDataItem> = ({
     const params = {
       monitorObjId: row.monitor_instance?.monitor_object,
       name:
-        objects.find((item: ObectItem) => item.id === row.monitorObjId)?.name ||
-        '',
+        objects.find(
+          (item: ObectItem) => item.id === row.monitor_instance?.monitor_object
+        )?.name || '',
       instance_id: row.monitor_instance?.id,
+      instance_name: row.monitor_instance?.name,
     };
     const queryString = new URLSearchParams(params).toString();
     const url = `/view/detail/overview?${queryString}`;
@@ -108,8 +110,8 @@ const Information: React.FC<TableDataItem> = ({
           </div>
         </Descriptions.Item>
         <Descriptions.Item label={t('monitor.firstAlertTime')}>
-          {formData.created_at
-            ? convertToLocalizedTime(formData.created_at)
+          {formData.start_event_time
+            ? convertToLocalizedTime(formData.start_event_time)
             : '--'}
         </Descriptions.Item>
         <Descriptions.Item label={t('monitor.information')} span={3}>
@@ -143,7 +145,7 @@ const Information: React.FC<TableDataItem> = ({
           {formData.policy?.name || '--'}
         </Descriptions.Item>
         <Descriptions.Item label={t('monitor.notify')}>
-          {formData.notice || 'Unnotified'}
+          {formData.policy.notice ? 'Notified' : 'Unnotified'}
         </Descriptions.Item>
         <Descriptions.Item label={t('common.operator')}>
           {formData.operator || '--'}

@@ -78,21 +78,21 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
       },
       {
         title: t('monitor.eventName'),
-        dataIndex: 'title',
-        key: 'title',
-        render: (_, record) => <>{record.name || '--'}</>,
+        dataIndex: 'content',
+        key: 'content',
+        render: (_, record) => <>{record.content || '--'}</>,
       },
       {
         title: t('monitor.index'),
         dataIndex: 'index',
         key: 'index',
-        render: (_, record) => <>{showMetricName(record)}</>,
+        render: () => <>{showMetricName()}</>,
       },
       {
         title: t('monitor.value'),
         dataIndex: 'value',
         key: 'value',
-        render: (_, record) => <>{record.value + getUnit(record)}</>,
+        render: (_, record) => <>{record.value + getUnit()}</>,
       },
     ];
 
@@ -111,16 +111,16 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
       }
     }, [formData, groupVisible, activeTab]);
 
-    const getUnit = (row: TableDataItem) => {
+    const getUnit = () => {
       return findUnitNameById(
-        metrics.find((item: MetricItem) => item.id === row.policy?.metric)
+        metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
           ?.unit || ''
       );
     };
 
-    const showMetricName = (row: TableDataItem) => {
+    const showMetricName = () => {
       return (
-        metrics.find((item: MetricItem) => item.id === row.policy?.metric)
+        metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
           ?.display_name || '--'
       );
     };
@@ -137,7 +137,9 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         ),
       };
       const startTime = new Date(formData.start_event_time).getTime();
-      const endTime = new Date(formData.end_event_time).getTime();
+      const endTime = formData.end_event_time
+        ? new Date(formData.end_event_time).getTime()
+        : new Date().getTime();
       const MAX_POINTS = 100; // 最大数据点数
       const DEFAULT_STEP = 360; // 默认步长
       if (startTime && endTime) {
@@ -155,9 +157,19 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
 
     const getTableData = async () => {
       setTableLoading(true);
+      const params = {
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      };
       try {
-        const data = await get(`/api/monitor_event/query/${formData.id}/`);
-        setTableData(data);
+        const data = await get(`/api/monitor_event/query/${formData.id}/`, {
+          params,
+        });
+        setTableData(data.results);
+        setPagination((prev: Pagination) => ({
+          ...prev,
+          total: data.count,
+        }));
       } finally {
         setTableLoading(false);
       }
@@ -302,10 +314,10 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                 />
               ) : (
                 <CustomTable
-                  scroll={{ y: 'calc(100vh - 330px)' }}
+                  scroll={{ y: 'calc(100vh - 390px)' }}
                   columns={columns}
                   dataSource={tableData}
-                  pagination={false}
+                  pagination={pagination}
                   loading={tableLoading}
                   rowKey="id"
                   onChange={handleTableChange}

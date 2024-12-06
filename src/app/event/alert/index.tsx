@@ -121,7 +121,9 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       title: t('monitor.notify'),
       dataIndex: 'notify',
       key: 'notify',
-      render: (_, record) => <>{showNotifiers(record)}</>,
+      render: (_, record) => (
+        <>{record.policy?.notice ? 'Notified' : 'Unnotified'}</>
+      ),
     },
     {
       title: t('common.operator'),
@@ -152,18 +154,18 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       render: (_, record) => (
         <>
           <Button
+            className="mr-[10px]"
+            type="link"
+            onClick={() => openAlertDetail(record)}
+          >
+            {t('common.detail')}
+          </Button>
+          <Button
             type="link"
             disabled={record.status !== 'new'}
             onClick={() => showAlertCloseConfirm(record)}
           >
             {t('common.close')}
-          </Button>
-          <Button
-            className="ml-[10px]"
-            type="link"
-            onClick={() => openAlertDetail(record)}
-          >
-            {t('common.detail')}
           </Button>
         </>
       ),
@@ -236,11 +238,11 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
     return {
       status_in: filters.state.join(','),
       level_in: filters.level.join(','),
-      search: searchText,
+      content: searchText,
       page: pagination.current,
       page_size: pagination.pageSize,
-      //   created_at_after: dayjs(timeRange[0]).toISOString(),
-      //   created_at_before: dayjs(timeRange[1]).toISOString(),
+      created_at_after: dayjs(timeRange[0]).toISOString(),
+      created_at_before: dayjs(timeRange[1]).toISOString(),
     };
   };
 
@@ -287,7 +289,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const getAssetInsts = async (type: string, text?: string) => {
     const params = getParams();
     if (text) {
-      params.search = '';
+      params.content = '';
     }
     try {
       setTableLoading(type !== 'timer');
@@ -388,184 +390,6 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       //         monitor_object: 4,
       //       },
       //     },
-      //     {
-      //       id: 2,
-      //       created_at: '2024-12-05T16:43:02+0800',
-      //       updated_at: '2024-12-05T16:53:22+0800',
-      //       policy_id: 10,
-      //       monitor_instance_id: 'lite',
-      //       alert_type: 'alert',
-      //       level: 'critical',
-      //       value: 8800.0,
-      //       content: 'OS-Host  cpu_summary.usage > 98',
-      //       status: 'closed',
-      //       start_event_id: 2,
-      //       start_event_time: '2024-12-05T16:43:02+0800',
-      //       end_event_id: null,
-      //       end_event_time: null,
-      //       operator: 'system',
-      //       policy: {
-      //         id: 10,
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-12-04T17:28:55+0800',
-      //         updated_at: '2024-12-05T17:30:06+0800',
-      //         filter: [
-      //           {
-      //             name: 'cpu',
-      //             value: '1',
-      //             method: '!=',
-      //           },
-      //           {
-      //             name: 'cpu',
-      //             value: '0',
-      //             method: '=~',
-      //           },
-      //         ],
-      //         name: '123',
-      //         organizations: ['dde252a5-73c3-4b6f-8f3b-7c3ef95cee83'],
-      //         source: {
-      //           type: 'organization',
-      //           values: ['dde252a5-73c3-4b6f-8f3b-7c3ef95cee83'],
-      //         },
-      //         schedule: {
-      //           type: 'min',
-      //           value: 1,
-      //         },
-      //         period: 60,
-      //         algorithm: 'sum',
-      //         threshold: [
-      //           {
-      //             level: 'critical',
-      //             value: 99,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'error',
-      //             value: 999,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'warning',
-      //             value: 9999,
-      //             method: '>',
-      //           },
-      //         ],
-      //         recovery_condition: 1,
-      //         no_data_alert: 0,
-      //         no_data_level: 'critical',
-      //         notice: true,
-      //         notice_type: 'email',
-      //         notice_users: [
-      //           'c5719e53-d368-4412-b12e-c135b09bfa35',
-      //           '7532d08d-928b-4ac4-b07f-36cb4a91f8cc',
-      //           '21ce969d-e31d-4f3f-8e0a-287846d89cf2',
-      //         ],
-      //         monitor_object: 1,
-      //         metric: 1,
-      //       },
-      //       monitor_instance: {
-      //         id: 'lite',
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-11-26T10:55:59+0800',
-      //         updated_at: '2024-11-26T10:55:59+0800',
-      //         name: 'k8s-lite-cluster',
-      //         interval: 10,
-      //         agent_id: 'k3s-node-2',
-      //         auto: true,
-      //         monitor_object: 4,
-      //       },
-      //     },
-      //     {
-      //       id: 1,
-      //       created_at: '2024-12-05T16:43:02+0800',
-      //       updated_at: '2024-12-05T16:43:02+0800',
-      //       policy_id: 10,
-      //       monitor_instance_id: '10.10.26.236',
-      //       alert_type: 'alert',
-      //       level: 'critical',
-      //       value: 2200.0,
-      //       content: 'OS-Host  cpu_summary.usage > 98',
-      //       status: 'new',
-      //       start_event_id: 1,
-      //       start_event_time: '2024-12-05T16:43:02+0800',
-      //       end_event_id: null,
-      //       end_event_time: null,
-      //       operator: 'system',
-      //       policy: {
-      //         id: 10,
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-12-04T17:28:55+0800',
-      //         updated_at: '2024-12-05T17:30:06+0800',
-      //         filter: [
-      //           {
-      //             name: 'cpu',
-      //             value: '1',
-      //             method: '!=',
-      //           },
-      //           {
-      //             name: 'cpu',
-      //             value: '0',
-      //             method: '=~',
-      //           },
-      //         ],
-      //         name: '123',
-      //         organizations: ['dde252a5-73c3-4b6f-8f3b-7c3ef95cee83'],
-      //         source: {
-      //           type: 'organization',
-      //           values: ['dde252a5-73c3-4b6f-8f3b-7c3ef95cee83'],
-      //         },
-      //         schedule: {
-      //           type: 'min',
-      //           value: 1,
-      //         },
-      //         period: 60,
-      //         algorithm: 'sum',
-      //         threshold: [
-      //           {
-      //             level: 'critical',
-      //             value: 99,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'error',
-      //             value: 999,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'warning',
-      //             value: 9999,
-      //             method: '>',
-      //           },
-      //         ],
-      //         recovery_condition: 1,
-      //         no_data_alert: 0,
-      //         no_data_level: 'critical',
-      //         notice: true,
-      //         notice_type: 'email',
-      //         notice_users: [
-      //           'c5719e53-d368-4412-b12e-c135b09bfa35',
-      //           '7532d08d-928b-4ac4-b07f-36cb4a91f8cc',
-      //           '21ce969d-e31d-4f3f-8e0a-287846d89cf2',
-      //         ],
-      //         monitor_object: 1,
-      //         metric: 1,
-      //       },
-      //       monitor_instance: {
-      //         id: '10.10.26.236',
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-12-04T15:30:47+0800',
-      //         updated_at: '2024-12-04T15:30:47+0800',
-      //         name: 'WeDoc\u5b98\u7f51',
-      //         interval: 10,
-      //         agent_id: '10.10.26.236',
-      //         auto: true,
-      //         monitor_object: 2,
-      //       },
-      //     },
       //   ]);
       setTableLoading(false);
     }
@@ -628,7 +452,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                 onChange={(checkeds) => onFilterChange(checkeds, 'level')}
               >
                 <Space direction="vertical">
-                  <Checkbox value="=critical">
+                  <Checkbox value="critical">
                     <div className={alertStyle.level}>
                       {t('monitor.critical')}
                     </div>
