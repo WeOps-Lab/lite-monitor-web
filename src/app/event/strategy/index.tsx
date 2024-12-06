@@ -105,10 +105,10 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
     },
     {
       title: t('monitor.executionTime'),
-      dataIndex: 'time',
-      key: 'time',
-      render: (_, { time }) => (
-        <>{time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}</>
+      dataIndex: 'last_run_time',
+      key: 'last_run_time',
+      render: (_, { last_run_time }) => (
+        <>{last_run_time ? convertToLocalizedTime(last_run_time) : '--'}</>
       ),
     },
     {
