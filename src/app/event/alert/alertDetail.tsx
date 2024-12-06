@@ -92,7 +92,9 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         title: t('monitor.value'),
         dataIndex: 'value',
         key: 'value',
-        render: (_, record) => <>{record.value + getUnit()}</>,
+        render: (_, record) => (
+          <>{(record.value?.toFixed(2) ?? '--') + getUnit()}</>
+        ),
       },
     ];
 

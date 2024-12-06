@@ -101,10 +101,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       dataIndex: 'value',
       key: 'value',
       render: (_, record) => (
-        <>
-          {record.value ?? '--'}
-          {getUnit(record)}
-        </>
+        <>{(record.value?.toFixed(2) ?? '--') + getUnit(record)}</>
       ),
     },
     {
@@ -256,7 +253,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
     );
     let _condition = '--';
     if (condition) {
-      _condition = condition.method + condition.value;
+      _condition = condition.method + (condition.value?.toFixed(2) ?? '--');
     }
     return `${objectName}（${instName}）${showMetricName(
       row
@@ -410,7 +407,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       form: {
         ...row,
         alertTitle: showTitle(row),
-        alertValue: row.value + getUnit(row),
+        alertValue: (row.value?.toFixed(2) ?? '--') + getUnit(row),
       },
     });
   };

@@ -37,7 +37,7 @@ const { confirm } = Modal;
 
 const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const { t } = useTranslation();
-  const { get, del } = useApiClient();
+  const { get, del, patch } = useApiClient();
   const commonContext = useCommon();
   const searchParams = useSearchParams();
   const { convertToLocalizedTime } = useLocalizedTime();
@@ -60,7 +60,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
     []
   );
-
+  const [enableLoading, setEnableLoading] = useState<boolean>(false);
   const columns: ColumnItem[] = [
     {
       title: t('common.name'),
@@ -118,8 +118,9 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       render: (_, record) => (
         <Switch
           size="small"
-          onChange={handleEffectiveChange}
-          value={record.effective}
+          loading={enableLoading}
+          onChange={(val) => handleEffectiveChange(val, record.id)}
+          checked={record.enable}
         />
       ),
     },
@@ -172,8 +173,17 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
     };
   };
 
-  const handleEffectiveChange = () => {
-    console.log(123);
+  const handleEffectiveChange = async (val: boolean, id: number) => {
+    try {
+      setEnableLoading(true);
+      await patch(`/api/monitor_policy/${id}/`, {
+        enable: val,
+      });
+      message.success(t(val ? 'common.started' : 'common.closed'));
+      getAssetInsts(selectedKeys[0]);
+    } finally {
+      setEnableLoading(false);
+    }
   };
 
   const handleTableChange = (pagination: any) => {
@@ -185,7 +195,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       setTableLoading(true);
       const params = getParams(text);
       params.monitor_object_id = objectId;
-      const data = await get(`/api//monitor_policy/`, {
+      const data = await get(`/api/monitor_policy/`, {
         params,
       });
       setTableData(data.items || []);

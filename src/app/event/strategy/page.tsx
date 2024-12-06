@@ -353,6 +353,7 @@ const StrategyOperation = () => {
       }
       _values.recovery_condition = _values.recovery_condition || 0;
       _values.group_by = groupBy;
+      _values.enable = true;
       operateStrategy(_values);
     });
   };

@@ -87,7 +87,9 @@
     "close": "Close",
     "creator": "Creator",
     "createTime": "Create Time",
-    "uploadAction": "Click or drag file to this area to upload"
+    "uploadAction": "Click or drag file to this area to upload",
+    "started": "Started.",
+    "closed": "Closed."
   },
   "menu": {
     "search": "Search",

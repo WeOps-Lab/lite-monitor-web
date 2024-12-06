@@ -381,7 +381,7 @@ const METHOD_LIST: ListItem[] = [
   { label: 'AVG', value: 'avg' },
   { label: 'MAX', value: 'max' },
   { label: 'MIN', value: 'min' },
-  { label: 'NEW', value: 'new' },
+  //   { label: 'NEW', value: 'new' },
 ];
 
 const SCHEDULE_LIST: ListItem[] = [
@@ -431,7 +431,8 @@ const MONITOR_GROUPS_MAP: MonitorGroupMap = {
     default: ['instance_id'],
   },
   Website: {
-    list: ['instance_id', 'instance_name', 'host'],
+    list: ['instance_id'],
+    // list: ['instance_id', 'instance_name', 'host'],
     default: ['instance_id'],
   },
   Cluster: {
@@ -439,12 +440,16 @@ const MONITOR_GROUPS_MAP: MonitorGroupMap = {
     default: ['instance_id'],
   },
   Pod: {
-    list: ['instance_id', 'uid'],
-    default: ['instance_id', 'uid'],
+    // list: ['instance_id', 'uid'],
+    // default: ['instance_id', 'uid'],
+    list: ['uid'],
+    default: ['uid'],
   },
   Node: {
-    list: ['instance_id', 'node'],
-    default: ['instance_id', 'node'],
+    // list: ['instance_id', 'node'],
+    // default: ['instance_id', 'node'],
+    list: ['node'],
+    default: ['node'],
   },
   Switch: {
     list: ['instance_id'],
