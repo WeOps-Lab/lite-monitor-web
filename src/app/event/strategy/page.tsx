@@ -43,6 +43,7 @@ import {
   LEVEL_LIST,
   SCHEDULE_UNIT_MAP,
   MONITOR_GROUPS_MAP,
+  OBJECT_ICON_MAP,
 } from '@/constants/monitor';
 const { Option } = Select;
 import Icon from '@/components/icon';
@@ -740,11 +741,7 @@ const StrategyOperation = () => {
                         <div className="w-[220px] bg-[var(--color-bg-1)] border shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-3 relative cursor-pointer group">
                           <div className="flex items-center space-x-4 my-1">
                             <Icon
-                              type={
-                                monitorName === 'Cluster'
-                                  ? 'K8S'
-                                  : monitorName || ''
-                              }
+                              type={OBJECT_ICON_MAP[monitorName as string]}
                               className="text-2xl"
                             />
                             <h2 className="text-[16px] font-bold m-0">

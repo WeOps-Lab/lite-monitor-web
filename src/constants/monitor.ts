@@ -1,5 +1,11 @@
 import { ListItem } from '@/types';
-import { LevelMap, UnitMap, StateMap, MonitorGroupMap } from '@/types/monitor';
+import {
+  LevelMap,
+  UnitMap,
+  StateMap,
+  MonitorGroupMap,
+  ObjectIconMap,
+} from '@/types/monitor';
 const FREQUENCY_LIST: ListItem[] = [
   { label: 'off', value: 0 },
   { label: '1m', value: 60000 },
@@ -481,6 +487,16 @@ const STATE_MAP: StateMap = {
   closed: 'Closed',
 };
 
+const OBJECT_ICON_MAP: ObjectIconMap = {
+  Host: 'Host',
+  Website: 'Website',
+  Cluster: 'K8S',
+  'Router SNMP General Template': 'Router',
+  'Switch SNMP General Template': 'Switch',
+  'Firewall SNMP General Template': 'Firewall',
+  'Loadbalance SNMP General Template': 'Loadbalance',
+};
+
 export {
   FREQUENCY_LIST,
   CONDITION_LIST,
@@ -496,4 +512,5 @@ export {
   SCHEDULE_UNIT_MAP,
   STATE_MAP,
   MONITOR_GROUPS_MAP,
+  OBJECT_ICON_MAP,
 };

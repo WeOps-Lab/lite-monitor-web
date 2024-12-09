@@ -191,3 +191,7 @@ export interface MonitorGroupMap {
     default: string[];
   };
 }
+
+export interface ObjectIconMap {
+  [key: string]: string;
+}

@@ -3,9 +3,10 @@
 import React from 'react';
 import { Tooltip } from 'antd';
 import WithSideMenuLayout from '@/components/sub-layout';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
+import { OBJECT_ICON_MAP } from '@/constants/monitor';
 
 const IntergrationDetailLayout = ({
   children,
@@ -14,14 +15,11 @@ const IntergrationDetailLayout = ({
 }) => {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
   const router = useRouter();
   const groupId = searchParams.get('name');
   const desc = searchParams.get('description');
-  const icon =
-    searchParams.get('name') === 'Cluster'
-      ? 'K8S'
-      : searchParams.get('name') || '';
+  const icon = OBJECT_ICON_MAP[searchParams.get('name') as string] || 'Host';
+  console.log(icon);
 
   const handleBackButtonClick = () => {
     router.push(`/intergration`);
@@ -42,11 +40,11 @@ const IntergrationDetailLayout = ({
 
   const TopSection = () => (
     <div className="p-4 rounded-md w-full h-[95px] flex items-center bg-[var(--color-bg-1)]">
-      <Icon type={icon} className="text-6xl mr-[10px]" />
-      <div>
+      <Icon type={icon} className="text-6xl mr-[10px] min-w-[60px]" />
+      <div className="w-full">
         <h2 className="text-lg font-semibold mb-2">{groupId}</h2>
         <Tooltip title={desc}>
-          <p className="truncate max-w-full text-sm">{desc}</p>
+          <p className="truncate w-[95%] text-sm hide-text">{desc}</p>
         </Tooltip>
       </div>
     </div>
