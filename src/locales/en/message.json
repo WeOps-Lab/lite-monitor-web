@@ -79,6 +79,8 @@
     "successfulSetted": "Setting successful !",
     "successfulCopied": "Copy successful !",
     "successfullyModified": "Modified successfully !",
+    "successfullyExported": "Export successfully !",
+    "successfullyImported": "Import successfully !",
     "required": "Required",
     "valueValidate": "The value cannot be empty",
     "group": "Group",

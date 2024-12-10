@@ -111,12 +111,13 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
           ...values,
           monitor_object: monitorObject,
           grouping_rules: groupingRules,
+          organizations: (values.organizations || []).flat(),
         });
       });
     };
 
     const operateSelect = (list: string[]) => {
-      setInstList(list)
+      setInstList(list);
     };
 
     const handleCancel = () => {

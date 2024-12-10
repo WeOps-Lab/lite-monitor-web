@@ -601,10 +601,10 @@ const OBJECT_ICON_MAP: ObjectIconMap = {
   Host: 'Host',
   Website: 'Website',
   Cluster: 'K8S',
-  'Router SNMP General Template': 'Router',
-  'Switch SNMP General Template': 'Switch',
-  'Firewall SNMP General Template': 'Firewall',
-  'Loadbalance SNMP General Template': 'Loadbalance',
+  Router: 'Router',
+  Switch: 'Switch',
+  Firewall: 'Firewall',
+  Loadbalance: 'Loadbalance',
 };
 
 export {

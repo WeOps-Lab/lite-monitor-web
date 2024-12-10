@@ -51,7 +51,18 @@ export interface ObectItem {
   id: number;
   name: string;
   type: string;
+  plugin_name?: string;
+  plugin_id?: number;
+  plugin_description: string;
   description: string;
+  [key: string]: unknown;
+}
+
+export interface PluginItem {
+  id: number;
+  name: string;
+  description: string;
+  monitor_object: number[];
   [key: string]: unknown;
 }
 

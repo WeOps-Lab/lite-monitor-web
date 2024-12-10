@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
 import { Spin, Segmented } from 'antd';
-import searchStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import Intergration from './intergration';
 import Asset from './asset';
@@ -17,9 +16,9 @@ const IntergrationAsset = () => {
   };
 
   return (
-    <div className={searchStyle.search} style={{ width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <Spin spinning={pageLoading}>
-        <div className={searchStyle.chart}>
+        <div>
           <Segmented
             className="mb-[20px]"
             value={activeTab}
