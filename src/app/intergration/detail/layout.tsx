@@ -16,8 +16,8 @@ const IntergrationDetailLayout = ({
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const groupId = searchParams.get('name');
-  const desc = searchParams.get('description');
+  const groupId = searchParams.get('plugin_name');
+  const desc = searchParams.get('plugin_description');
   const icon = OBJECT_ICON_MAP[searchParams.get('name') as string] || 'Host';
   console.log(icon);
 

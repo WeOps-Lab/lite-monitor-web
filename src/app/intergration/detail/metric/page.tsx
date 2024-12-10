@@ -31,6 +31,7 @@ const Configure = () => {
   const searchParams = useSearchParams();
   const groupName = searchParams.get('name');
   const groupId = searchParams.get('id');
+  const pluginID = searchParams.get('plugin_id') || '';
   const groupRef = useRef<ModalRef>(null);
   const metricRef = useRef<ModalRef>(null);
   const [searchText, setSearchText] = useState<string>('');
@@ -176,7 +177,12 @@ const Configure = () => {
       monitor_object_id: +objId,
     };
     const getGroupList = get(`/api/metrics_group/`, { params });
-    const getMetrics = get('/api/metrics/', { params });
+    const getMetrics = get('/api/metrics/', {
+      params: {
+        ...params,
+        monitor_plugin_id: +pluginID,
+      },
+    });
     setLoading(true);
     try {
       Promise.all([getGroupList, getMetrics])
@@ -331,6 +337,7 @@ const Configure = () => {
       <MetricModal
         ref={metricRef}
         monitorObject={+activeTab}
+        pluginId={+pluginID}
         groupList={groupList}
         onSuccess={operateMtric}
       />

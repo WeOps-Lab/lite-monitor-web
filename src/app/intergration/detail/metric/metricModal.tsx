@@ -23,10 +23,11 @@ interface ModalProps {
   onSuccess: () => void;
   groupList: ListItem[];
   monitorObject: number;
+  pluginId: number;
 }
 
 const MetricModal = forwardRef<ModalRef, ModalProps>(
-  ({ onSuccess, groupList, monitorObject }, ref) => {
+  ({ onSuccess, groupList, monitorObject, pluginId }, ref) => {
     const { post, put } = useApiClient();
     const { t } = useTranslation();
     const formRef = useRef<FormInstance>(null);
@@ -100,6 +101,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
           ...values,
           dimensions: dimensions.some((item) => !item.name) ? [] : dimensions,
           monitor_object: monitorObject,
+          monitor_plugin: pluginId,
           type: 'metric',
           unit: values.unit.at(-1),
         });
