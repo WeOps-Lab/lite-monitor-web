@@ -204,7 +204,11 @@ const INDEX_CONFIG = [
         displayDimension: ['device '],
       },
     ],
-    tableDiaplay: ['cpu_summary.usage', 'mem.pct_usable', 'load5'],
+    tableDiaplay: [
+      { type: 'progress', key: 'cpu_summary.usage' },
+      { type: 'progress', key: 'mem.pct_usable' },
+      { type: 'value', key: 'load5' },
+    ],
   },
   {
     name: 'Website',
@@ -241,7 +245,23 @@ const INDEX_CONFIG = [
         displayDimension: [],
       },
     ],
-    tableDiaplay: ['http_success.rate', 'http_total.duration'],
+    tableDiaplay: [
+      {
+        type: 'enum',
+        key: 'http_success.rate',
+        list: [
+          {
+            value: '1',
+            label: 'Success',
+          },
+          {
+            value: '0',
+            label: 'Fail',
+          },
+        ],
+      },
+      { type: 'value', key: 'http_total.duration' },
+    ],
   },
   {
     name: 'Pod',
@@ -279,9 +299,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      'pod_status',
-      'pod_cpu_utilization',
-      'pod_memory_utilization',
+      { type: 'value', key: 'pod_status' },
+      { type: 'progress', key: 'pod_cpu_utilization' },
+      { type: 'progress', key: 'pod_memory_utilization' },
     ],
   },
   {
@@ -350,9 +370,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      'node_status_condition',
-      'node_cpu_utilization',
-      'node_app_memory_usage',
+      { type: 'value', key: 'node_status_condition' },
+      { type: 'progress', key: 'node_cpu_utilization' },
+      { type: 'progress', key: 'node_app_memory_usage' },
     ],
   },
   {
@@ -378,7 +398,97 @@ const INDEX_CONFIG = [
         displayDimension: [],
       },
     ],
-    tableDiaplay: ['cluster_pod_count', 'cluster_node_count'],
+    tableDiaplay: [
+      { type: 'value', key: 'cluster_pod_count' },
+      { type: 'value', key: 'cluster_node_count' },
+    ],
+  },
+  {
+    name: 'Switch',
+    id: 6,
+    dashboardDisplay: [
+      {
+        indexId: 'sysUpTime',
+        displayType: 'single',
+        sortIndex: 32,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalInOctets',
+        displayType: 'lineChart',
+        sortIndex: 33,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalOutOctets',
+        displayType: 'lineChart',
+        sortIndex: 34,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: [
+      { type: 'value', key: 'sysUpTime' },
+      { type: 'value', key: 'iftotalInOctets' },
+      { type: 'value', key: 'iftotalOutOctets' },
+    ],
+  },
+  {
+    name: 'Switch',
+    id: 7,
+    dashboardDisplay: [
+      {
+        indexId: 'sysUpTime',
+        displayType: 'single',
+        sortIndex: 35,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalInOctets',
+        displayType: 'lineChart',
+        sortIndex: 36,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalOutOctets',
+        displayType: 'lineChart',
+        sortIndex: 37,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: [
+      { type: 'value', key: 'sysUpTime' },
+      { type: 'value', key: 'iftotalInOctets' },
+      { type: 'value', key: 'iftotalOutOctets' },
+    ],
+  },
+  {
+    name: 'Switch',
+    id: 8,
+    dashboardDisplay: [
+      {
+        indexId: 'sysUpTime',
+        displayType: 'single',
+        sortIndex: 38,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalInOctets',
+        displayType: 'lineChart',
+        sortIndex: 39,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalOutOctets',
+        displayType: 'lineChart',
+        sortIndex: 40,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: [
+      { type: 'value', key: 'sysUpTime' },
+      { type: 'value', key: 'iftotalInOctets' },
+      { type: 'value', key: 'iftotalOutOctets' },
+    ],
   },
 ];
 

@@ -112,8 +112,12 @@ const Search: React.FC = () => {
   const getInstList = async (id: number) => {
     try {
       setInstanceLoading(true);
-      const data = await get(`/api/monitor_instance/${id}/list/`);
-      setInstances(data);
+      const data = await get(`/api/monitor_instance/${id}/list/`, {
+        params: {
+          page_size: -1,
+        },
+      });
+      setInstances(data.results || []);
     } finally {
       setInstanceLoading(false);
     }

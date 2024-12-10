@@ -6,19 +6,23 @@ import type { SelectProps, TimeRangePickerProps } from 'antd';
 import { FREQUENCY_LIST, TIME_RANGE_LIST } from '@/constants/monitor';
 import timeSelectorStyle from './index.module.less';
 import dayjs, { Dayjs } from 'dayjs';
+import { ListItem } from '@/types';
 type LabelRender = SelectProps['labelRender'];
 const { RangePicker } = DatePicker;
 
 interface TimeSelectorProps {
-  showTime?: boolean;
-  format?: string;
-  onlyRefresh?: boolean;
+  showTime?: boolean; //ant design组件属性，是否显示时分秒
+  format?: string; //ant design组件属性，格式化
+  onlyRefresh?: boolean; // 仅显示刷新按钮
+  onlyTimeSelect?: boolean; // 仅显示时间组件
+  customFrequencyList?: ListItem[];
+  customTimeRangeList?: ListItem[];
   value?: {
-    timeRangeValue: number;
-    timesValue: [Dayjs, Dayjs] | null;
+    timeRangeValue: number; // 近一段时间的值类型
+    timesValue: [Dayjs, Dayjs] | null; // ant design日期组件回显所需要值类型
   };
-  onFrequenceChange: (frequence: number) => void;
-  onRefresh: () => void;
+  onFrequenceChange?: (frequence: number) => void;
+  onRefresh?: () => void;
   onChange?: (range: number[]) => void;
 }
 
@@ -26,10 +30,13 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   showTime = true,
   format = 'YYYY-MM-DD HH:mm:ss',
   onlyRefresh = false,
+  onlyTimeSelect = false,
   value = {
     timeRangeValue: 15,
     timesValue: null,
   },
+  customFrequencyList,
+  customTimeRangeList,
   onFrequenceChange,
   onRefresh,
   onChange,
@@ -65,7 +72,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
 
   const handleFrequencyChange = (val: number) => {
     setFrequency(val);
-    onFrequenceChange(val);
+    onFrequenceChange && onFrequenceChange(val);
   };
 
   const handleRangePickerOpenChange = (open: boolean) => {
@@ -131,7 +138,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
           <Select
             className={`w-[350px] ${timeSelectorStyle.frequence}`}
             value={timeRange}
-            options={TIME_RANGE_LIST}
+            options={customTimeRangeList || TIME_RANGE_LIST}
             open={dropdownOpen}
             onChange={handleTimeRangeChange}
             onDropdownVisibleChange={handleDropdownVisibleChange}
@@ -155,20 +162,22 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
           />
         </div>
       )}
-      <div className={`${timeSelectorStyle.refreshBox} flex ml-[8px]`}>
-        <Button
-          className={timeSelectorStyle.refreshBtn}
-          icon={<ReloadOutlined />}
-          onClick={onRefresh}
-        />
-        <Select
-          className={`w-[100px] ${timeSelectorStyle.frequence}`}
-          value={frequency}
-          options={FREQUENCY_LIST}
-          labelRender={labelRender}
-          onChange={handleFrequencyChange}
-        />
-      </div>
+      {!onlyTimeSelect && (
+        <div className={`${timeSelectorStyle.refreshBox} flex ml-[8px]`}>
+          <Button
+            className={timeSelectorStyle.refreshBtn}
+            icon={<ReloadOutlined />}
+            onClick={onRefresh}
+          />
+          <Select
+            className={`w-[100px] ${timeSelectorStyle.frequence}`}
+            value={frequency}
+            options={customFrequencyList || FREQUENCY_LIST}
+            labelRender={labelRender}
+            onChange={handleFrequencyChange}
+          />
+        </div>
+      )}
     </div>
   );
 };

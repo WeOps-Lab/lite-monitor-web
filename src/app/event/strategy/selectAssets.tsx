@@ -5,7 +5,6 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
-  useCallback,
 } from 'react';
 import { Button, Input, Cascader, Tabs, Tree } from 'antd';
 import OperateModal from '@/components/operate-drawer';
@@ -40,7 +39,7 @@ const filterTreeData = (treeData: any, searchText: string) => {
 
   return treeData
     .map((item: any) => {
-      const { title, key, children } = item;
+      const { title, children } = item;
       if (title.toLowerCase().includes(searchText.toLowerCase())) {
         return item;
       }
@@ -88,7 +87,6 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
     const [tableLoading, setTableLoading] = useState<boolean>(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Array<string>>([]);
     const [tableData, setTableData] = useState<TableDataItem[]>([]);
-    const [filteredData, setFilteredData] = useState<TableDataItem[]>([]);
     const [searchText, setSearchText] = useState<string>('');
     const [selectedOrganizations, setSelectedOrganizations] = useState<
       string[]
@@ -100,11 +98,6 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
         title: t('common.name'),
         dataIndex: 'instance_name',
         key: 'instance_name',
-      },
-      {
-        title: t('monitor.collectionNode'),
-        dataIndex: 'agent_id',
-        key: 'agent_id',
       },
       {
         title: t('common.group'),
@@ -127,14 +120,8 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
     ];
 
     useEffect(() => {
-      applyFilters();
-    }, [
-      tableData,
-      searchText,
-      selectedOrganizations,
-      pagination.current,
-      pagination.pageSize,
-    ]);
+      fetchData();
+    }, [selectedOrganizations, pagination.current, pagination.pageSize]);
 
     useImperativeHandle(ref, () => ({
       showModal: ({ title, type: comType }) => {
@@ -143,7 +130,7 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
           ...prev,
           current: 1,
         }));
-        setFilteredData([]);
+        setTableData([]);
         setGroupVisible(true);
         setTitle(title);
         setActiveTab(type || 'instance');
@@ -165,36 +152,6 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
       }
     };
 
-    const applyFilters = useCallback(() => {
-      let filtered = tableData;
-      // Filter by instance_id
-      if (searchText) {
-        filtered = filtered.filter((item) =>
-          item.instance_id.toLowerCase().includes(searchText.toLowerCase())
-        );
-      }
-      // Filter by selected organizations
-      if (selectedOrganizations.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedOrganizations.some((org) => item.organization.includes(org))
-        );
-      }
-      // Pagination
-      const start = (pagination.current - 1) * pagination.pageSize;
-      const end = start + pagination.pageSize;
-      setFilteredData(filtered.slice(start, end));
-      setPagination((prev: Pagination) => ({
-        ...prev,
-        total: filtered.length,
-      }));
-    }, [
-      searchText,
-      selectedOrganizations,
-      pagination.current,
-      pagination.pageSize,
-      tableData,
-    ]);
-
     const onSelectChange = (selectedKeys: any) => {
       setSelectedRowKeys(selectedKeys);
     };
@@ -215,15 +172,22 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
       });
     };
 
-    const fetchData = async () => {
+    const fetchData = async (type?: string) => {
       try {
         setTableLoading(true);
         const data = await get(`/api/monitor_instance/${monitorObject}/list/`, {
           params: {
-            name: '',
+            page: pagination.current,
+            page_size: pagination.pageSize,
+            name: type === 'clear' ? '' : searchText,
+            organizations: selectedOrganizations.join(','),
           },
         });
-        setTableData(data);
+        setTableData(data?.results || []);
+        setPagination((prev: Pagination) => ({
+          ...prev,
+          total: data?.count || 0,
+        }));
       } finally {
         setTableLoading(false);
       }
@@ -249,6 +213,11 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
 
     const handleOrganizationSelect = (selectedKeys: any) => {
       setSelectedTreeKeys(selectedKeys);
+    };
+
+    const clearText = () => {
+      setSearchText('');
+      fetchData('clear');
     };
 
     return (
@@ -290,13 +259,17 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
                     />
                     <Input
                       className="w-[320px]"
+                      allowClear
                       placeholder={t('common.searchPlaceHolder')}
+                      value={searchText}
+                      onPressEnter={() => fetchData()}
+                      onClear={clearText}
                       onChange={(e) => setSearchText(e.target.value)}
                     ></Input>
                   </div>
                   <CustomTable
                     rowSelection={rowSelection}
-                    dataSource={filteredData}
+                    dataSource={tableData}
                     columns={columns}
                     pagination={pagination}
                     loading={tableLoading}

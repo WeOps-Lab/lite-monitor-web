@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Spin, Input, Button, Segmented, Tabs, Cascader, Progress } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
@@ -7,7 +7,15 @@ import { deepClone } from '@/utils/common';
 import { useRouter } from 'next/navigation';
 import { IntergrationItem, ObectItem, MetricItem } from '@/types/monitor';
 import ViewModal from './viewModal';
-import { TabItem, Organization, ColumnItem, ModalRef } from '@/types';
+import {
+  TabItem,
+  Organization,
+  ColumnItem,
+  ModalRef,
+  Pagination,
+  TableDataItem,
+  ListItem,
+} from '@/types';
 import CustomTable from '@/components/custom-table';
 import TimeSelector from '@/components/time-selector';
 import { useCommon } from '@/context/common';
@@ -35,9 +43,8 @@ const Intergration = () => {
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
     []
   );
-  const [filteredData, setFilteredData] = useState<any[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [pagination, setPagination] = useState<any>({
+  const [tableData, setTableData] = useState<TableDataItem[]>([]);
+  const [pagination, setPagination] = useState<Pagination>({
     current: 1,
     total: 0,
     pageSize: 20,
@@ -48,11 +55,6 @@ const Intergration = () => {
       title: t('common.name'),
       dataIndex: 'instance_name',
       key: 'instance_name',
-    },
-    {
-      title: t('monitor.collectionNode'),
-      dataIndex: 'agent_id',
-      key: 'agent_id',
     },
     {
       title: t('common.group'),
@@ -112,14 +114,20 @@ const Intergration = () => {
 
   useEffect(() => {
     if (objectId) {
-      setPagination((prev: any) => ({
+      setTableData([]);
+      setPagination((prev: Pagination) => ({
         ...prev,
         current: 1,
       }));
-      setFilteredData([]);
       getColoumnAndData();
     }
   }, [objectId]);
+
+  useEffect(() => {
+    if (objectId) {
+      onRefresh();
+    }
+  }, [pagination.current, pagination.pageSize, selectedOrganizations]);
 
   useEffect(() => {
     if (!frequence) {
@@ -132,20 +140,27 @@ const Intergration = () => {
     return () => {
       clearTimer();
     };
-  }, [frequence, objectId]);
-
-  useEffect(() => {
-    applyFilters();
   }, [
-    tableData,
-    searchText,
-    selectedOrganizations,
+    frequence,
+    objectId,
     pagination.current,
     pagination.pageSize,
+    selectedOrganizations,
+    searchText,
   ]);
 
   const getColoumnAndData = async () => {
-    const getInstList = get(`/api/monitor_instance/${objectId}/list/`);
+    const params = {
+      page: pagination.current,
+      page_size: pagination.pageSize,
+      add_metrics: true,
+      name: searchText,
+      organizations: selectedOrganizations.join(','),
+    };
+
+    const getInstList = get(`/api/monitor_instance/${objectId}/list/`, {
+      params,
+    });
     const getMetrics = get('/api/metrics/', {
       params: {
         monitor_object_id: objectId,
@@ -154,31 +169,63 @@ const Intergration = () => {
     setTableLoading(true);
     try {
       const res = await Promise.all([getInstList, getMetrics]);
-      setTableData(res[0]);
+      setTableData(res[0]?.results || []);
+      setPagination((prev: Pagination) => ({
+        ...prev,
+        total: res[0]?.count || 0,
+      }));
       const _objectName = apps.find((item) => item.key === objectId)?.label;
       if (_objectName) {
         const filterMetrics =
           INDEX_CONFIG.find((item) => item.name === _objectName)
             ?.tableDiaplay || [];
-        const data = (res[1] || []).filter((item: MetricItem) =>
-          filterMetrics.includes(item.name)
-        );
-        const _columns = data.map((item: MetricItem) => {
-          return {
-            title: item.display_name,
-            dataIndex: item.name,
-            key: item.name,
-            width: 200,
-            render: (_: any, record: any) => (
-              <Progress
-                strokeLinecap="butt"
-                showInfo={!!record[item.name]}
-                percent={record[item.name] || 0}
-                percentPosition={{ align: 'center', type: 'inner' }}
-                size={[100, 20]}
-              />
-            ),
-          };
+        const _columns = filterMetrics.map((item: any) => {
+          const target = (res[1] || []).find(
+            (tex: MetricItem) => tex.name === item.key
+          );
+          switch (item.type) {
+            case 'progress':
+              return {
+                title: target?.display_name,
+                dataIndex: target?.name,
+                key: target?.name,
+                width: 200,
+                render: (_: unknown, record: TableDataItem) => (
+                  <Progress
+                    strokeLinecap="butt"
+                    showInfo={!!record[target?.name]}
+                    percent={getPercent(record[target?.name] || 0)}
+                    percentPosition={{ align: 'center', type: 'inner' }}
+                    size={[100, 20]}
+                  />
+                ),
+              };
+            case 'enum':
+              return {
+                title: target?.display_name,
+                dataIndex: target?.name,
+                key: target?.name,
+                width: 200,
+                render: (_: unknown, record: TableDataItem) => (
+                  <>
+                    {(item.list || []).find(
+                      (listItem: ListItem) =>
+                        listItem.value === record[target?.name]
+                    )?.label || '--'}
+                  </>
+                ),
+              };
+            default:
+              return {
+                title: target?.display_name,
+                dataIndex: target?.name,
+                key: target?.name,
+                width: 200,
+                render: (_: unknown, record: TableDataItem) => (
+                  <>{record[target?.name] || '--'}</>
+                ),
+              };
+          }
         });
         const originColumns = deepClone(columns);
         const indexToInsert = originColumns.length - 2;
@@ -192,42 +239,15 @@ const Intergration = () => {
     }
   };
 
+  const getPercent = (value: number) => {
+    return +(+value).toFixed(2);
+  };
   const clearTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = null;
   };
 
-  const applyFilters = useCallback(() => {
-    let filtered = tableData;
-    // Filter by instance_id
-    if (searchText) {
-      filtered = filtered.filter((item) =>
-        item.instance_id.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-    // Filter by selected organizations
-    if (selectedOrganizations.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedOrganizations.some((org) => item.organization.includes(org))
-      );
-    }
-    // Pagination
-    const start = (pagination.current - 1) * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    setFilteredData(filtered.slice(start, end));
-    setPagination((prev: any) => ({
-      ...prev,
-      total: filtered.length,
-    }));
-  }, [
-    searchText,
-    selectedOrganizations,
-    pagination.current,
-    pagination.pageSize,
-    tableData,
-  ]);
-
-  const handleTableChange = (pagination = {}) => {
+  const handleTableChange = (pagination: any) => {
     setPagination(pagination);
   };
 
@@ -252,10 +272,26 @@ const Intergration = () => {
   };
 
   const getAssetInsts = async (objectId: React.Key, type?: string) => {
+    const params = {
+      page: pagination.current,
+      page_size: pagination.pageSize,
+      add_metrics: true,
+      name: searchText,
+      organizations: selectedOrganizations.join(','),
+    };
+    if (type === 'clear') {
+      params.name = '';
+    }
     try {
       setTableLoading(type !== 'timer');
-      const data = await get(`/api/monitor_instance/${objectId}/list/`);
-      setTableData(data);
+      const data = await get(`/api/monitor_instance/${objectId}/list/`, {
+        params,
+      });
+      setTableData(data.results || []);
+      setPagination((prev: Pagination) => ({
+        ...prev,
+        total: data.count || 0,
+      }));
     } finally {
       setTableLoading(false);
     }
@@ -300,7 +336,12 @@ const Intergration = () => {
     getAssetInsts(objectId);
   };
 
-  const openViewModal = (row: any) => {
+  const clearText = () => {
+    setSearchText('');
+    getAssetInsts(objectId, 'clear');
+  };
+
+  const openViewModal = (row: TableDataItem) => {
     viewRef.current?.showModal({
       title: t('monitor.indexView'),
       type: 'add',
@@ -331,9 +372,13 @@ const Intergration = () => {
                   onChange={(value) => setSelectedOrganizations(value as any)}
                 />
                 <Input
+                  allowClear
                   className="w-[320px]"
                   placeholder={t('common.searchPlaceHolder')}
+                  value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
+                  onPressEnter={onRefresh}
+                  onClear={clearText}
                 ></Input>
               </div>
               <TimeSelector
@@ -345,7 +390,7 @@ const Intergration = () => {
             <CustomTable
               scroll={{ y: 'calc(100vh - 380px)', x: 'calc(100vw - 500px)' }}
               columns={tableColumn}
-              dataSource={filteredData}
+              dataSource={tableData}
               pagination={pagination}
               loading={tableLoading}
               rowKey="instance_id"

@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Spin,
   Input,
@@ -13,7 +13,14 @@ import {
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
-import { ColumnItem, TreeItem, ModalRef, Organization } from '@/types';
+import {
+  ColumnItem,
+  TreeItem,
+  ModalRef,
+  Organization,
+  Pagination,
+  TableDataItem,
+} from '@/types';
 import { ObectItem, RuleInfo, ObjectInstItem } from '@/types/monitor';
 import CustomTable from '@/components/custom-table';
 import {
@@ -38,7 +45,7 @@ const Asset = () => {
   const authList = useRef(commonContext?.authOrganizations || []);
   const organizationList: Organization[] = authList.current;
   const ruleRef = useRef<ModalRef>(null);
-  const [pagination, setPagination] = useState<any>({
+  const [pagination, setPagination] = useState<Pagination>({
     current: 1,
     total: 0,
     pageSize: 20,
@@ -50,8 +57,7 @@ const Asset = () => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [ruleList, setRuleList] = useState<RuleInfo[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [tableData, setTableData] = useState<TableDataItem[]>([]);
   const [searchText, setSearchText] = useState<string>('');
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
     []
@@ -63,11 +69,6 @@ const Asset = () => {
       title: t('common.name'),
       dataIndex: 'instance_name',
       key: 'instance_name',
-    },
-    {
-      title: t('monitor.collectionNode'),
-      dataIndex: 'agent_id',
-      key: 'agent_id',
     },
     {
       title: t('common.group'),
@@ -107,47 +108,15 @@ const Asset = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    applyFilters();
-  }, [
-    tableData,
-    searchText,
-    selectedOrganizations,
-    pagination.current,
-    pagination.pageSize,
-  ]);
-
-  const applyFilters = useCallback(() => {
-    let filtered = tableData;
-    // Filter by instance_id
-    if (searchText) {
-      filtered = filtered.filter((item) =>
-        item.instance_id.toLowerCase().includes(searchText.toLowerCase())
-      );
+    if (selectedKeys.length) {
+      getAssetInsts(selectedKeys[0]);
     }
-    // Filter by selected organizations
-    if (selectedOrganizations.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedOrganizations.some((org) => item.organization.includes(org))
-      );
-    }
-    // Pagination
-    const start = (pagination.current - 1) * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    setFilteredData(filtered.slice(start, end));
-    setPagination((prev: any) => ({
-      ...prev,
-      total: filtered.length,
-    }));
-  }, [
-    searchText,
-    selectedOrganizations,
-    pagination.current,
-    pagination.pageSize,
-    tableData,
-  ]);
+  }, [pagination.current, pagination.pageSize, selectedOrganizations]);
 
   const openRuleModal = (type: string, row = {}) => {
-    const title = t(type === 'add' ? 'monitor.addRule' : 'monitor.editRule');
+    const title: string = t(
+      type === 'add' ? 'monitor.addRule' : 'monitor.editRule'
+    );
     ruleRef.current?.showModal({
       title,
       type,
@@ -165,19 +134,26 @@ const Asset = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const handleTableChange = (pagination = {}) => {
+  const handleTableChange = (pagination: any) => {
     setPagination(pagination);
   };
 
-  const getAssetInsts = async (objectId: React.Key) => {
+  const getAssetInsts = async (objectId: React.Key, type?: string) => {
     try {
       setTableLoading(true);
       const data = await get(`/api/monitor_instance/${objectId}/list/`, {
         params: {
-          name: '',
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          name: type === 'clear' ? '' : searchText,
+          organizations: selectedOrganizations.join(','),
         },
       });
-      setTableData(data);
+      setTableData(data?.results || []);
+      setPagination((prev: Pagination) => ({
+        ...prev,
+        total: data?.count || 0,
+      }));
     } finally {
       setTableLoading(false);
     }
@@ -191,7 +167,7 @@ const Asset = () => {
           monitor_object_id: objectId,
         },
       });
-      setRuleList(data);
+      setRuleList(data?.results || []);
     } finally {
       setRuleLoading(false);
     }
@@ -243,19 +219,18 @@ const Asset = () => {
   const onSelect = (selectedKeys: React.Key[], info: any) => {
     const isFirstLevel = !!info.node?.children?.length;
     if (!isFirstLevel && selectedKeys?.length) {
-      setPagination((prev: any) => ({
+      setPagination((prev: Pagination) => ({
         ...prev,
         current: 1,
       }));
-      setFilteredData([]);
-      setFilteredData([]);
+      setTableData([]);
       setSelectedKeys(selectedKeys);
       getAssetInsts(selectedKeys[0]);
       getRuleList(selectedKeys[0]);
     }
   };
 
-  const onSearchTree = (value: any) => {
+  const onSearchTree = (value: string) => {
     getObjects(value);
   };
 
@@ -280,6 +255,11 @@ const Asset = () => {
         });
       },
     });
+  };
+
+  const clearText = () => {
+    setSearchText('');
+    getAssetInsts(selectedKeys[0], 'clear');
   };
 
   return (
@@ -313,15 +293,19 @@ const Asset = () => {
                 allowClear
               />
               <Input
+                allowClear
                 className="w-[320px]"
                 placeholder={t('common.searchPlaceHolder')}
+                value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
+                onPressEnter={() => getAssetInsts(selectedKeys[0])}
+                onClear={clearText}
               ></Input>
             </div>
             <CustomTable
               scroll={{ y: 'calc(100vh - 320px)', x: 'calc(100vw - 500px)' }}
               columns={columns}
-              dataSource={filteredData}
+              dataSource={tableData}
               pagination={pagination}
               loading={tableLoading}
               rowKey="instance_id"

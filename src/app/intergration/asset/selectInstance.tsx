@@ -5,7 +5,6 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
-  useCallback,
 } from 'react';
 import { Button, Input, Cascader } from 'antd';
 import OperateModal from '@/components/operate-modal';
@@ -13,7 +12,13 @@ import { useTranslation } from '@/utils/i18n';
 import useApiClient from '@/utils/request';
 import CustomTable from '@/components/custom-table';
 import selectInstanceStyle from './selectInstance.module.less';
-import { ColumnItem, ModalRef, ModalConfig } from '@/types';
+import {
+  ColumnItem,
+  ModalRef,
+  ModalConfig,
+  Pagination,
+  TableDataItem,
+} from '@/types';
 import { CloseOutlined } from '@ant-design/icons';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 
@@ -23,7 +28,7 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     const { get } = useApiClient();
     const { convertToLocalizedTime } = useLocalizedTime();
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
-    const [pagination, setPagination] = useState<any>({
+    const [pagination, setPagination] = useState<Pagination>({
       current: 1,
       total: 0,
       pageSize: 20,
@@ -31,8 +36,7 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     const [title, setTitle] = useState<string>('');
     const [tableLoading, setTableLoading] = useState<boolean>(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
-    const [tableData, setTableData] = useState<any[]>([]);
-    const [filteredData, setFilteredData] = useState<any[]>([]);
+    const [tableData, setTableData] = useState<TableDataItem[]>([]);
     const [searchText, setSearchText] = useState<string>('');
     const [selectedOrganizations, setSelectedOrganizations] = useState<
       string[]
@@ -42,11 +46,6 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
         title: t('common.name'),
         dataIndex: 'instance_name',
         key: 'instance_name',
-      },
-      {
-        title: t('monitor.collectionNode'),
-        dataIndex: 'agent_id',
-        key: 'agent_id',
       },
       {
         title: t('common.group'),
@@ -69,59 +68,23 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     ];
 
     useEffect(() => {
-      applyFilters();
-    }, [
-      tableData,
-      searchText,
-      selectedOrganizations,
-      pagination.current,
-      pagination.pageSize,
-    ]);
+      fetchData();
+    }, [selectedOrganizations, pagination.current, pagination.pageSize]);
 
     useImperativeHandle(ref, () => ({
       showModal: ({ title }) => {
         // 开启弹窗的交互
-        setPagination((prev: any) => ({
+        setPagination((prev: Pagination) => ({
           ...prev,
           current: 1,
         }));
-        setFilteredData([]);
+        setTableData([]);
         setGroupVisible(true);
         setTitle(title);
         setSelectedRowKeys(list);
         fetchData();
       },
     }));
-
-    const applyFilters = useCallback(() => {
-      let filtered = tableData;
-      // Filter by instance_id
-      if (searchText) {
-        filtered = filtered.filter((item) =>
-          item.instance_id.toLowerCase().includes(searchText.toLowerCase())
-        );
-      }
-      // Filter by selected organizations
-      if (selectedOrganizations.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedOrganizations.some((org) => item.organization.includes(org))
-        );
-      }
-      // Pagination
-      const start = (pagination.current - 1) * pagination.pageSize;
-      const end = start + pagination.pageSize;
-      setFilteredData(filtered.slice(start, end));
-      setPagination((prev: any) => ({
-        ...prev,
-        total: filtered.length,
-      }));
-    }, [
-      searchText,
-      selectedOrganizations,
-      pagination.current,
-      pagination.pageSize,
-      tableData,
-    ]);
 
     const onSelectChange = (selectedKeys: any) => {
       setSelectedRowKeys(selectedKeys);
@@ -137,15 +100,22 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
       onSuccess(selectedRowKeys);
     };
 
-    const fetchData = async () => {
+    const fetchData = async (type?: string) => {
       try {
         setTableLoading(true);
         const data = await get(`/api/monitor_instance/${monitorObject}/list/`, {
           params: {
-            name: '',
+            page: pagination.current,
+            page_size: pagination.pageSize,
+            name: type === 'clear' ? '' : searchText,
+            organizations: selectedOrganizations.join(','),
           },
         });
-        setTableData(data);
+        setTableData(data?.results || []);
+        setPagination((prev: Pagination) => ({
+          ...prev,
+          total: data?.count || 0,
+        }));
       } finally {
         setTableLoading(false);
       }
@@ -156,7 +126,7 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
       setSelectedRowKeys([]); // 清空选中项
     };
 
-    const handleTableChange = (pagination = {}) => {
+    const handleTableChange = (pagination: any) => {
       setPagination(pagination);
     };
 
@@ -167,6 +137,11 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
     const handleRemoveItem = (key: string) => {
       const newSelectedRowKeys = selectedRowKeys.filter((item) => item !== key);
       setSelectedRowKeys(newSelectedRowKeys);
+    };
+
+    const clearText = () => {
+      setSearchText('');
+      fetchData('clear');
     };
 
     return (
@@ -202,14 +177,18 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
                   allowClear
                 />
                 <Input
+                  allowClear
                   className="w-[320px]"
                   placeholder={t('common.searchPlaceHolder')}
+                  value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
+                  onPressEnter={() => fetchData()}
+                  onClear={clearText}
                 ></Input>
               </div>
               <CustomTable
                 rowSelection={rowSelection}
-                dataSource={filteredData}
+                dataSource={tableData}
                 columns={columns}
                 pagination={pagination}
                 loading={tableLoading}
