@@ -205,7 +205,7 @@ const Overview = () => {
             ...interfaceData[0],
             display_name: 'Interfaces',
             unit: '',
-            description: '123',
+            description: '',
             viewData: interfaceViewData,
           },
         ];
