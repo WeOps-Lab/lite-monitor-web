@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Spin } from 'antd';
+import { Spin, Tooltip } from 'antd';
 import TimeSelector from '@/components/time-selector';
 import LineChart from '@/components/charts/lineChart';
 import BarChart from '@/components/charts/barChart';
@@ -10,6 +10,7 @@ import GuageChart from '@/components/charts/guageChart';
 import SingleValue from '@/components/charts/singleValue';
 import useApiClient from '@/utils/request';
 import { MetricItem, ChartDataItem, SearchParams } from '@/types/monitor';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ChartData } from '@/types';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
@@ -339,7 +340,7 @@ const Overview = () => {
                 >
                   <div className="flex justify-between items-center mb-[10px]">
                     <span className="text-[14px]">
-                      <span className="font-[600]">
+                      <span className="font-[600] mr-[2px]">
                         {metricItem.display_name}
                       </span>
                       <span className="text-[var(--color-text-3)] text-[12px]">
@@ -347,6 +348,15 @@ const Overview = () => {
                           ? `（${findUnitNameById(metricItem.unit)}）`
                           : ''}
                       </span>
+                      <Tooltip
+                        placement="topLeft"
+                        title={metricItem.description as string}
+                      >
+                        <QuestionCircleOutlined
+                          className="text-[12px] relative cursor-pointer text-[var(--color-text-2)]"
+                          style={{ top: '-6px' }}
+                        />
+                      </Tooltip>
                     </span>
                   </div>
                   <div className="h-[180px] flex justify-center items-center">

@@ -7,8 +7,12 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import { Button, Spin, Select } from 'antd';
-import { BellOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Spin, Select, Tooltip } from 'antd';
+import {
+  BellOutlined,
+  SearchOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
 import OperateDrawer from '@/components/operate-drawer';
 import TimeSelector from '@/components/time-selector';
 import LineChart from '@/components/charts/lineChart';
@@ -21,7 +25,6 @@ import {
   IndexViewItem,
   SearchParams,
   ChartDataItem,
-  ObectItem,
 } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById } from '@/utils/common';
@@ -379,7 +382,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                         >
                           <div className="flex justify-between items-center">
                             <span className="text-[14px]">
-                              <span className="font-[600]">
+                              <span className="font-[600] mr-[2px]">
                                 {item.display_name}
                               </span>
                               <span className="text-[var(--color-text-3)] text-[12px]">
@@ -389,6 +392,15 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                                     : ''
                                 }`}
                               </span>
+                              <Tooltip
+                                placement="topLeft"
+                                title={item.description}
+                              >
+                                <QuestionCircleOutlined
+                                  className="text-[12px] relative cursor-pointer text-[var(--color-text-2)]"
+                                  style={{ top: '-6px' }}
+                                />
+                              </Tooltip>
                             </span>
                             <div className="text-[var(--color-text-3)]">
                               <SearchOutlined
