@@ -424,15 +424,17 @@ const Overview = () => {
                           ? `（${findUnitNameById(metricItem.unit)}）`
                           : ''}
                       </span>
-                      <Tooltip
-                        placement="topLeft"
-                        title={metricItem.description as string}
-                      >
-                        <QuestionCircleOutlined
-                          className="text-[12px] relative cursor-pointer text-[var(--color-text-2)]"
-                          style={{ top: '-6px' }}
-                        />
-                      </Tooltip>
+                      {metricItem.description && (
+                        <Tooltip
+                          placement="topLeft"
+                          title={metricItem.description as string}
+                        >
+                          <QuestionCircleOutlined
+                            className="text-[12px] relative cursor-pointer text-[var(--color-text-2)]"
+                            style={{ top: '-6px' }}
+                          />
+                        </Tooltip>
+                      )}
                     </span>
                   </div>
                   <div className="h-[180px] flex justify-center items-center">

@@ -33,10 +33,11 @@ import dayjs, { Dayjs } from 'dayjs';
 interface ModalProps {
   monitorObject: React.Key;
   monitorName: string;
+  monitorId: string;
 }
 
 const ViewModal = forwardRef<ModalRef, ModalProps>(
-  ({ monitorObject, monitorName }, ref) => {
+  ({ monitorObject, monitorName, monitorId }, ref) => {
     const { get } = useApiClient();
     const { t } = useTranslation();
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -318,6 +319,19 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
       window.open(url, '_blank', 'noopener,noreferrer');
     };
 
+    const linkToPolicy = (row: any) => {
+      const _row = {
+        monitorName: monitorName,
+        monitorObjId: monitorId,
+        instanceId: instId,
+        metricId: row.name,
+        type: 'add',
+      };
+      const queryString = new URLSearchParams(_row).toString();
+      const url = `/event/strategy?${queryString}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    };
+
     return (
       <div>
         <OperateDrawer
@@ -409,7 +423,12 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                                   linkToSearch(item);
                                 }}
                               />
-                              <BellOutlined className="ml-[6px] cursor-pointer" />
+                              <BellOutlined
+                                className="ml-[6px] cursor-pointer"
+                                onClick={() => {
+                                  linkToPolicy(item);
+                                }}
+                              />
                             </div>
                           </div>
                           <div className="h-[200px] mt-[10px]">

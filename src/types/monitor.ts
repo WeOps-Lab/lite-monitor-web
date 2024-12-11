@@ -77,6 +77,7 @@ export interface MetricItem {
   query?: string;
   unit?: string;
   displayType?: string;
+  description?: string;
   viewData?: any[];
   [key: string]: unknown;
 }

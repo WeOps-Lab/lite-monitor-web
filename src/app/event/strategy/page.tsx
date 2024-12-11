@@ -124,6 +124,13 @@ const StrategyOperation = () => {
         period: 300,
         schedule: 5,
       });
+      setMetric(searchParams.get('metricId') || null);
+      setSource({
+        type: 'instance',
+        values: searchParams.get('instanceId')
+          ? (searchParams.get('instanceId')?.split(',') as string[])
+          : [],
+      });
     } else {
       dealDetail(formData);
     }

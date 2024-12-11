@@ -188,7 +188,15 @@ const Search: React.FC = () => {
   };
 
   const createPolicy = () => {
-    console.log('创建监控策略');
+    const params = new URLSearchParams({
+      monitorName: object as string,
+      monitorObjId: objects.find((item) => item.name === object)?.id + '',
+      metricId: metric || '',
+      instanceId: instanceId.join(','),
+      type: 'add',
+    });
+    const targetUrl = `/event/strategy?${params.toString()}`;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleInstanceChange = (val: string[]) => {
@@ -405,7 +413,14 @@ const Search: React.FC = () => {
       <div className={searchStyle.criteria}>
         <Collapse
           title={t('monitor.searchCriteria')}
-          icon={<BellOutlined onClick={createPolicy} />}
+          icon={
+            <Button
+              disabled={!object}
+              onClick={createPolicy}
+              type="link"
+              icon={<BellOutlined />}
+            />
+          }
         >
           <div className={`${searchStyle.condition} px-[10px]`}>
             <div className={searchStyle.conditionItem}>

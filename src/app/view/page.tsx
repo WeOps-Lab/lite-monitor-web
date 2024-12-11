@@ -196,7 +196,7 @@ const Intergration = () => {
                     showInfo={!!record[target?.name]}
                     percent={getPercent(record[target?.name] || 0)}
                     percentPosition={{ align: 'center', type: 'inner' }}
-                    size={[100, 20]}
+                    size={[160, 20]}
                   />
                 ),
               };
@@ -403,6 +403,7 @@ const Intergration = () => {
         ref={viewRef}
         monitorObject={objectId}
         monitorName={apps.find((item) => item.key === objectId)?.label || ''}
+        monitorId={apps.find((item) => item.key === objectId)?.key || ''}
       />
     </div>
   );
