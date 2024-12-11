@@ -19,12 +19,6 @@ const IntergrationDetailLayout = ({
   const groupId = searchParams.get('plugin_name');
   const desc = searchParams.get('plugin_description');
   const icon = OBJECT_ICON_MAP[searchParams.get('name') as string] || 'Host';
-  console.log(icon);
-
-  const handleBackButtonClick = () => {
-    router.push(`/intergration`);
-  };
-
   const menuItems = [
     {
       label: t('monitor.configure'),
@@ -37,6 +31,10 @@ const IntergrationDetailLayout = ({
       icon: 'zichan-quanbushebei',
     },
   ];
+
+  const handleBackButtonClick = () => {
+    router.push(`/intergration`);
+  };
 
   const TopSection = () => (
     <div className="p-4 rounded-md w-full h-[95px] flex items-center bg-[var(--color-bg-1)]">

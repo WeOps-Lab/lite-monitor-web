@@ -176,7 +176,12 @@ const Configure = () => {
     const params = {
       monitor_object_id: +objId,
     };
-    const getGroupList = get(`/api/metrics_group/`, { params });
+    const getGroupList = get(`/api/metrics_group/`, {
+      params: {
+        ...params,
+        name: searchText,
+      },
+    });
     const getMetrics = get('/api/metrics/', {
       params: {
         ...params,

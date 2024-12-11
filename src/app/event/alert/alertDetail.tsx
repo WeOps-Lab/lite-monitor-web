@@ -113,6 +113,10 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
       }
     }, [formData, groupVisible, activeTab]);
 
+    useEffect(() => {
+      getTableData();
+    }, [pagination.current, pagination.pageSize]);
+
     const getUnit = () => {
       return findUnitNameById(
         metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
