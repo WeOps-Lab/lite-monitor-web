@@ -9,14 +9,19 @@ import CustomTable from '@/components/custom-table';
 import GuageChart from '@/components/charts/guageChart';
 import SingleValue from '@/components/charts/singleValue';
 import useApiClient from '@/utils/request';
-import { MetricItem, ChartDataItem, SearchParams } from '@/types/monitor';
+import {
+  MetricItem,
+  ChartDataItem,
+  SearchParams,
+  InterfaceTableItem,
+} from '@/types/monitor';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ChartData } from '@/types';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
-import { INDEX_CONFIG } from '@/constants/monitor';
+import { INDEX_CONFIG, INTERFACE_LABEL_MAP } from '@/constants/monitor';
 
 const Overview = () => {
   const { get, isLoading } = useApiClient();
@@ -67,9 +72,16 @@ const Overview = () => {
     setLoading(true);
     try {
       getMetrics.then((res) => {
-        const responseData = res
+        const interfaceConfig = indexList.find(
+          (item) => item.indexId === 'interfaces'
+        );
+        const metricData = res
           .filter((item: MetricItem) =>
-            indexList.find((indexItem) => indexItem.indexId === item.name)
+            indexList.find(
+              (indexItem) =>
+                indexItem.indexId === item.name ||
+                (interfaceConfig?.displayDimension || []).includes(item.name)
+            )
           )
           .map((item: MetricItem) => {
             const target = indexList.find(
@@ -78,12 +90,11 @@ const Overview = () => {
             if (target) {
               Object.assign(item, target);
             }
-            return item;
+            if ((interfaceConfig?.displayDimension || []).includes(item.name)) {
+              Object.assign(item, interfaceConfig);
+            }
+            return { ...item, viewData: [] };
           });
-        const metricData = responseData.map((metric: MetricItem) => ({
-          ...metric,
-          viewData: [],
-        }));
         setMetricData(metricData);
         fetchViewData(metricData, id);
       });
@@ -176,10 +187,50 @@ const Overview = () => {
     } catch (error) {
       console.error('Error fetching view data:', error);
     } finally {
-      const _data = deepClone(data);
+      const interfaceData = data.filter(
+        (item) => item.displayType === 'multipleIndexsTable'
+      );
+      const interfaceViewData = mergeData(
+        interfaceData
+          .map((item) => getTableData(item.viewData || [], item.name))
+          .flat()
+      );
+      let _data = data.filter(
+        (item) => item.displayType !== 'multipleIndexsTable'
+      );
+      if (interfaceData.length) {
+        _data = [
+          ..._data,
+          {
+            ...interfaceData[0],
+            display_name: 'Interfaces',
+            unit: '',
+            description: '123',
+            viewData: interfaceViewData,
+          },
+        ];
+      }
       setMetricData(_data);
       setLoading(false);
     }
+  };
+
+  const mergeData = (data: InterfaceTableItem[]): InterfaceTableItem[] => {
+    if (!data.length) {
+      return [];
+    }
+    const mergedData: Record<string, InterfaceTableItem> = {};
+    data.forEach((item) => {
+      if (!mergedData[item.id]) {
+        mergedData[item.id] = { id: item.id };
+      }
+      Object.keys(item).forEach((key) => {
+        if (key !== 'id') {
+          mergedData[item.id][key] = item[key];
+        }
+      });
+    });
+    return Object.values(mergedData);
   };
 
   const onTimeChange = (val: number[]) => {
@@ -221,7 +272,7 @@ const Overview = () => {
     );
   };
 
-  const getTableData = (data: ChartDataItem[]) => {
+  const getTableData = (data: ChartDataItem[], type?: string) => {
     if (data.length === 0) return [];
     const latestData = data[data.length - 1];
     const { details } = latestData;
@@ -236,11 +287,20 @@ const Overview = () => {
       if (key.startsWith('value')) {
         const detailKey = key;
         if (details[detailKey]) {
-          tableData.push({
-            Device: createName(details[detailKey]),
-            Value: latestData[detailKey].toFixed(2),
-            id: detailKey,
-          });
+          if (type) {
+            const item: any = {};
+            item[type] = latestData[detailKey].toFixed(2);
+            tableData.push({
+              ...item,
+              id: detailKey,
+            });
+          } else {
+            tableData.push({
+              Device: createName(details[detailKey]),
+              Value: latestData[detailKey].toFixed(2),
+              id: detailKey,
+            });
+          }
         }
       }
     }
@@ -293,6 +353,22 @@ const Overview = () => {
               dataSource={getTableData(metricItem.viewData || [])}
               columns={metricItem.displayDimension.map((item: any) => ({
                 title: item,
+                dataIndex: item,
+                key: item,
+              }))}
+              scroll={{ y: 130 }}
+              rowKey="id"
+            />
+          </div>
+        );
+      case 'multipleIndexsTable':
+        return (
+          <div className="w-[900px]">
+            <CustomTable
+              pagination={false}
+              dataSource={metricItem.viewData || []}
+              columns={metricItem.displayDimension.map((item: any) => ({
+                title: INTERFACE_LABEL_MAP[item],
                 dataIndex: item,
                 key: item,
               }))}

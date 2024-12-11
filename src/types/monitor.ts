@@ -76,6 +76,8 @@ export interface MetricItem {
   dimensions: any[];
   query?: string;
   unit?: string;
+  displayType?: string;
+  viewData?: any[];
   [key: string]: unknown;
 }
 
@@ -110,6 +112,11 @@ export interface ChartDataItem {
   metric: Record<string, string>;
   values: [number, string][];
   [key: string]: any;
+}
+
+export interface InterfaceTableItem {
+  id: string;
+  [key: string]: string;
 }
 
 export interface ConditionItem {
