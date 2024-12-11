@@ -114,7 +114,9 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     }, [formData, groupVisible, activeTab]);
 
     useEffect(() => {
-      getTableData();
+      if (formData?.id) {
+        getTableData();
+      }
     }, [pagination.current, pagination.pageSize]);
 
     const getUnit = () => {

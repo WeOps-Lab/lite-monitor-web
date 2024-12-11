@@ -433,7 +433,7 @@ const INDEX_CONFIG = [
     ],
   },
   {
-    name: 'Switch',
+    name: 'Loadbalance',
     id: 7,
     dashboardDisplay: [
       {
@@ -462,7 +462,7 @@ const INDEX_CONFIG = [
     ],
   },
   {
-    name: 'Switch',
+    name: 'Router',
     id: 8,
     dashboardDisplay: [
       {
@@ -481,6 +481,35 @@ const INDEX_CONFIG = [
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 40,
+        displayDimension: [],
+      },
+    ],
+    tableDiaplay: [
+      { type: 'value', key: 'sysUpTime' },
+      { type: 'value', key: 'iftotalInOctets' },
+      { type: 'value', key: 'iftotalOutOctets' },
+    ],
+  },
+  {
+    name: 'Firewall',
+    id: 9,
+    dashboardDisplay: [
+      {
+        indexId: 'sysUpTime',
+        displayType: 'single',
+        sortIndex: 41,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalInOctets',
+        displayType: 'lineChart',
+        sortIndex: 42,
+        displayDimension: [],
+      },
+      {
+        indexId: 'iftotalOutOctets',
+        displayType: 'lineChart',
+        sortIndex: 43,
         displayDimension: [],
       },
     ],
