@@ -5,7 +5,6 @@ import {
   Input,
   Button,
   Form,
-  Cascader,
   Select,
   message,
   Steps,
@@ -16,6 +15,7 @@ import {
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { ModalRef, Organization, ListItem, UserItem } from '@/types';
+import CustomCascader from '@/components/custom-cascader';
 import {
   StrategyFields,
   SourceFeild,
@@ -440,13 +440,15 @@ const StrategyOperation = () => {
                           { required: true, message: t('common.required') },
                         ]}
                       >
-                        <Cascader
+                        <CustomCascader
                           style={{
                             width: '300px',
                           }}
+                          multiple
                           placeholder={t('common.group')}
                           className="mr-[8px]"
                           showSearch
+                          maxTagCount="responsive"
                           options={organizationList}
                           allowClear
                         />

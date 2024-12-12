@@ -51,10 +51,7 @@ const Intergration = () => {
       Promise.all([getObjects, getPlugins])
         .then((res) => {
           setOriginObjects(res[0] || []);
-          const _items = getAppsByType(
-            res[0].filter((item: ObectItem) => item.level === 'base'),
-            res[1]
-          );
+          const _items = getAppsByType(res[0], res[1]);
           setItems(_items);
           setActiveTab('All');
         })
@@ -127,17 +124,16 @@ const Intergration = () => {
           list: [],
         };
       }
-      const target = plugins.find((plugin) =>
-        (plugin.monitor_object || []).includes(item.id)
-      );
-      if (target) {
-        acc[item.type].list.push({
-          ...item,
-          plugin_name: target?.name,
-          plugin_id: target?.id,
-          plugin_description: target?.description,
-        });
-      }
+      plugins.forEach((plugin) => {
+        if ((plugin.monitor_object || []).includes(item.id)) {
+          acc[item.type].list.push({
+            ...item,
+            plugin_name: plugin?.name,
+            plugin_id: plugin?.id,
+            plugin_description: plugin?.description,
+          });
+        }
+      });
       acc[item.type].label = `${item.type}(${acc[item.type].list.length})`;
       return acc;
     }, {} as Record<string, IntergrationItem>);
@@ -227,13 +223,16 @@ const Intergration = () => {
         <div className="flex flex-wrap w-full">
           {apps.map((app) => (
             <div
-              key={app.id}
+              key={app.plugin_id + app.name}
               className="w-full sm:w-1/4 p-2 min-w-[200px]"
               onClick={() => onAppClick(app)}
             >
               <div
                 className={`bg-[var(--color-bg-1)] border shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-4 relative cursor-pointer group ${
-                  selectedApp?.id === app.id ? 'border-2 border-blue-300' : ''
+                  (selectedApp?.plugin_id || '') + (selectedApp?.name || '') ===
+                  app.plugin_id + app.name
+                    ? 'border-2 border-blue-300'
+                    : ''
                 }`}
               >
                 <div className="flex items-center space-x-4 my-2">

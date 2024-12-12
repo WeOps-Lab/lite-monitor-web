@@ -1,11 +1,12 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { Spin, Input, Button, Segmented, Tabs, Cascader, Progress } from 'antd';
+import { Spin, Input, Button, Segmented, Tabs, Progress } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone } from '@/utils/common';
 import { useRouter } from 'next/navigation';
 import { IntergrationItem, ObectItem, MetricItem } from '@/types/monitor';
+import CustomCascader from '@/components/custom-cascader';
 import ViewModal from './viewModal';
 import {
   TabItem,
@@ -365,13 +366,16 @@ const Intergration = () => {
           <div>
             <div className="flex justify-between mb-[10px]">
               <div className="flex items-center">
-                <Cascader
-                  className="mr-[8px]"
+                <CustomCascader
+                  className="mr-[8px] w-[250px]"
                   showSearch
                   options={organizationList}
                   multiple
+                  maxTagCount="responsive"
                   allowClear
-                  onChange={(value) => setSelectedOrganizations(value as any)}
+                  onChange={(value) =>
+                    setSelectedOrganizations(value as string[])
+                  }
                 />
                 <Input
                   allowClear

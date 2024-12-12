@@ -6,11 +6,12 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import { Button, Input, Cascader, Tabs, Tree } from 'antd';
+import { Button, Input, Tabs, Tree } from 'antd';
 import OperateModal from '@/components/operate-drawer';
 import { useTranslation } from '@/utils/i18n';
 import useApiClient from '@/utils/request';
 import CustomTable from '@/components/custom-table';
+import CustomCascader from '@/components/custom-cascader';
 import {
   ColumnItem,
   ModalRef,
@@ -247,12 +248,13 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
               <div className={selectInstanceStyle.selectInstance}>
                 <div className={selectInstanceStyle.instanceList}>
                   <div className="flex items-center justify-between mb-[10px]">
-                    <Cascader
+                    <CustomCascader
                       className="mr-[8px]"
                       showSearch
+                      maxTagCount="responsive"
                       options={organizationList}
                       onChange={(value) =>
-                        setSelectedOrganizations(value as any)
+                        setSelectedOrganizations(value as string[])
                       }
                       multiple
                       allowClear

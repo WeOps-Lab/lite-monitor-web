@@ -6,7 +6,6 @@ import {
   Input,
   Button,
   Tree,
-  Cascader,
   Modal,
   message,
   Switch,
@@ -15,6 +14,7 @@ import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
 import { ColumnItem, TreeItem, Organization, Pagination } from '@/types';
+import CustomCascader from '@/components/custom-cascader';
 import {
   ObectItem,
   RuleInfo,
@@ -330,11 +330,12 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
         <div className={assetStyle.table}>
           <div className={assetStyle.search}>
             <div>
-              <Cascader
-                className="mr-[8px]"
+              <CustomCascader
+                className="mr-[8px] w-[250px]"
                 showSearch
+                maxTagCount="responsive"
                 options={organizationList}
-                onChange={(value) => setSelectedOrganizations(value as any)}
+                onChange={(value) => setSelectedOrganizations(value as string[])}
                 multiple
                 allowClear
               />

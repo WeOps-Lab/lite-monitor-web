@@ -877,6 +877,8 @@ const OBJECT_ICON_MAP: ObjectIconMap = {
   Host: 'Host',
   Website: 'Website',
   Cluster: 'K8S',
+  Pod: 'K8S',
+  Node: 'K8S',
   Router: 'Router',
   Switch: 'Switch',
   Firewall: 'Firewall',

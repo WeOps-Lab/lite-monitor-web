@@ -7,7 +7,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import { Input, Button, Form, message, Radio, Cascader } from 'antd';
+import { Input, Button, Form, message, Radio } from 'antd';
 import SelectInstance from './selectInstance';
 import { PlusOutlined } from '@ant-design/icons';
 import OperateModal from '@/components/operate-modal';
@@ -17,6 +17,7 @@ import { ModalRef, ListItem } from '@/types';
 import { RuleInfo, GroupingRules } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone } from '@/utils/common';
+import CustomCascader from '@/components/custom-cascader';
 
 interface ModalProps {
   onSuccess: () => void;
@@ -111,7 +112,7 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
           ...values,
           monitor_object: monitorObject,
           grouping_rules: groupingRules,
-          organizations: (values.organizations || []).flat(),
+          organizations: values.organizations || [],
         });
       });
     };
@@ -219,7 +220,12 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
               name="organizations"
               rules={[{ required: true, message: t('common.required') }]}
             >
-              <Cascader multiple showSearch options={groupList} />
+              <CustomCascader
+                multiple
+                showSearch
+                maxTagCount="responsive"
+                options={groupList}
+              />
             </Form.Item>
           </Form>
           <SelectInstance

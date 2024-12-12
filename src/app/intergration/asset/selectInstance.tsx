@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import { Button, Input, Cascader } from 'antd';
+import { Button, Input } from 'antd';
 import OperateModal from '@/components/operate-modal';
 import { useTranslation } from '@/utils/i18n';
 import useApiClient from '@/utils/request';
@@ -21,6 +21,8 @@ import {
 } from '@/types';
 import { CloseOutlined } from '@ant-design/icons';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
+import { showGroupName } from '@/utils/common';
+import CustomCascader from '@/components/custom-cascader';
 
 const SelectInstance = forwardRef<ModalRef, ModalConfig>(
   ({ onSuccess, organizationList, monitorObject, list }, ref) => {
@@ -52,7 +54,7 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
         dataIndex: 'organization',
         key: 'organization',
         render: (_, { organization }) => (
-          <>{organization?.length ? organization.join(',') : '--'}</>
+          <>{showGroupName(organization || [], organizationList)}</>
         ),
       },
       {
@@ -168,11 +170,14 @@ const SelectInstance = forwardRef<ModalRef, ModalConfig>(
           <div className={selectInstanceStyle.selectInstance}>
             <div className={selectInstanceStyle.instanceList}>
               <div className="flex items-center justify-between mb-[10px]">
-                <Cascader
-                  className="mr-[8px]"
+                <CustomCascader
+                  className="mr-[8px] w-[250px]"
                   showSearch
+                  maxTagCount="responsive"
                   options={organizationList}
-                  onChange={(value) => setSelectedOrganizations(value as any)}
+                  onChange={(value) =>
+                    setSelectedOrganizations(value as string[])
+                  }
                   multiple
                   allowClear
                 />

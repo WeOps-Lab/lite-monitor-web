@@ -1,15 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Spin,
-  Input,
-  Button,
-  Tree,
-  Cascader,
-  Modal,
-  message,
-  Tooltip,
-} from 'antd';
+import { Spin, Input, Button, Tree, Modal, message, Tooltip } from 'antd';
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
@@ -35,6 +26,7 @@ const { Search } = Input;
 import { useCommon } from '@/context/common';
 import { deepClone, showGroupName } from '@/utils/common';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
+import CustomCascader from '@/components/custom-cascader';
 const { confirm } = Modal;
 
 const Asset = () => {
@@ -284,11 +276,14 @@ const Asset = () => {
         <Spin spinning={pageLoading}>
           <div className={assetStyle.table}>
             <div className={assetStyle.search}>
-              <Cascader
-                className="mr-[8px]"
+              <CustomCascader
+                className="mr-[8px] w-[250px]"
                 showSearch
+                maxTagCount="responsive"
                 options={organizationList}
-                onChange={(value) => setSelectedOrganizations(value as any)}
+                onChange={(value) =>
+                  setSelectedOrganizations(value as string[])
+                }
                 multiple
                 allowClear
               />
