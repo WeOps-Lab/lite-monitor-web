@@ -23,6 +23,7 @@ import {
 import { CloseOutlined } from '@ant-design/icons';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import selectInstanceStyle from './selectInstance.module.less';
+import { showGroupName } from '@/utils/common';
 
 const convertCascaderToTreeData = (cascaderData: any) => {
   return cascaderData.map((item: any) => {
@@ -105,7 +106,7 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
         dataIndex: 'organization',
         key: 'organization',
         render: (_, { organization }) => (
-          <>{organization?.length ? organization.join(',') : '--'}</>
+          <>{showGroupName(organization || [], organizationList)}</>
         ),
       },
       {

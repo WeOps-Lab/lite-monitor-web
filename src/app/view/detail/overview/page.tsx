@@ -293,6 +293,10 @@ const Overview = () => {
             tableData.push({
               ...item,
               id: detailKey,
+              interface:
+                (latestData.details?.[detailKey] || []).find(
+                  (interfaceKey: any) => interfaceKey?.name === 'ifDescr'
+                )?.value || '--',
             });
           } else {
             tableData.push({
@@ -367,11 +371,13 @@ const Overview = () => {
             <CustomTable
               pagination={false}
               dataSource={metricItem.viewData || []}
-              columns={metricItem.displayDimension.map((item: any) => ({
-                title: INTERFACE_LABEL_MAP[item],
-                dataIndex: item,
-                key: item,
-              }))}
+              columns={['interface', ...metricItem.displayDimension].map(
+                (item: any) => ({
+                  title: INTERFACE_LABEL_MAP[item],
+                  dataIndex: item,
+                  key: item,
+                })
+              )}
               scroll={{ y: 130 }}
               rowKey="id"
             />

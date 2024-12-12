@@ -758,6 +758,7 @@ const INDEX_CONFIG = [
 ];
 
 const INTERFACE_LABEL_MAP: ObjectIconMap = {
+  interface: 'Interface',
   ifOperStatus: 'Status',
   ifHighSpeed: 'Bandwidth',
   ifInErrors: 'In Errors',
