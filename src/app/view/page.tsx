@@ -22,6 +22,7 @@ import { useCommon } from '@/context/common';
 import { showGroupName } from '@/utils/common';
 import { INDEX_CONFIG } from '@/constants/monitor';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
+import viewStyle from './index.module.less';
 
 const Intergration = () => {
   const { get, isLoading } = useApiClient();
@@ -189,14 +190,15 @@ const Intergration = () => {
                 title: target?.display_name,
                 dataIndex: target?.name,
                 key: target?.name,
-                width: 200,
+                width: 300,
                 render: (_: unknown, record: TableDataItem) => (
                   <Progress
                     strokeLinecap="butt"
                     showInfo={!!record[target?.name]}
+                    format={(percent) => `${percent}%`}
                     percent={getPercent(record[target?.name] || 0)}
-                    percentPosition={{ align: 'center', type: 'inner' }}
-                    size={[160, 20]}
+                    percentPosition={{ align: 'start', type: 'outer' }}
+                    size={[260, 20]}
                   />
                 ),
               };
@@ -350,7 +352,7 @@ const Intergration = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className={`${viewStyle.view} w-full`}>
       <Spin spinning={pageLoading}>
         <Segmented
           className="mb-[20px] custom-tabs"
@@ -388,7 +390,7 @@ const Intergration = () => {
               />
             </div>
             <CustomTable
-              scroll={{ y: 'calc(100vh - 380px)', x: 'calc(100vw - 500px)' }}
+              scroll={{ y: 'calc(100vh - 386px)', x: 'calc(100vw - 100px)' }}
               columns={tableColumn}
               dataSource={tableData}
               pagination={pagination}
