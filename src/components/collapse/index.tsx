@@ -55,7 +55,7 @@ const Collapse: React.FC<AccordionProps> = ({
           </div>
         )}
       </div>
-      {open && <div className="py-[10px]">{children}</div>}
+      {open && <div className="py-[10px] collapse-content">{children}</div>}
     </div>
   );
 };

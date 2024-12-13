@@ -11,17 +11,27 @@
         background: var(--color-bg-1);
         padding: 20px;
 
+        :global {
+            .collapse-content {
+                padding: 0 !important;
+            }
+        }
+
         .condition {
             display: flex;
             flex-wrap: wrap;
 
             .conditionItem {
-                margin: 10px 15px 10px 0;
+                margin: 10px 15px 0 0;
 
                 .itemLabel {
                     font-weight: 600;
                     font-size: 13px;
                     margin-bottom: 10px;
+                }
+
+                .conditionLabel {
+                    margin-bottom: 0 !important;
                 }
 
                 .itemOption {
@@ -51,7 +61,7 @@
                     flex-wrap: wrap;
 
                     .filter {
-                        margin-bottom: 10px;
+                        margin-top: 10px;
 
                         .filterLabel {
                             :global {
@@ -60,6 +70,7 @@
                                 }
                             }
                         }
+
 
                         :global {
                             .ant-btn:nth-of-type(1) {
@@ -98,9 +109,10 @@
         padding: 20px;
         background: var(--color-bg-1);
         width: 100%;
+        height: calc(100vh - 310px);
 
         .chartArea {
-            height: 300px;
+            height: 280px;
         }
     }
 }

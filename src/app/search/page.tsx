@@ -418,11 +418,12 @@ const Search: React.FC = () => {
               disabled={!object}
               onClick={createPolicy}
               type="link"
+              size="small"
               icon={<BellOutlined />}
             />
           }
         >
-          <div className={`${searchStyle.condition} px-[10px]`}>
+          <div className={searchStyle.condition}>
             <div className={searchStyle.conditionItem}>
               <div className={searchStyle.itemLabel}>{t('monitor.source')}</div>
               <div
@@ -479,7 +480,11 @@ const Search: React.FC = () => {
               </div>
             </div>
             <div className={searchStyle.conditionItem}>
-              <div className={searchStyle.itemLabel}>{t('monitor.filter')}</div>
+              <div
+                className={`${searchStyle.itemLabel} ${searchStyle.conditionLabel}`}
+              >
+                {t('monitor.filter')}
+              </div>
               <div className="flex">
                 {conditions.length ? (
                   <ul className={searchStyle.conditions}>
@@ -502,7 +507,7 @@ const Search: React.FC = () => {
                           ))}
                         </Select>
                         <Select
-                          className="w-[100px]"
+                          className="w-[90px]"
                           placeholder={t('monitor.term')}
                           value={conditionItem.condition}
                           onChange={(val) => handleConditionChange(val, index)}
@@ -514,7 +519,7 @@ const Search: React.FC = () => {
                           ))}
                         </Select>
                         <Input
-                          className="w-[250px]"
+                          className="w-[150px]"
                           placeholder={t('monitor.value')}
                           value={conditionItem.value}
                           onChange={(e) => handleValueChange(e, index)}
@@ -532,6 +537,7 @@ const Search: React.FC = () => {
                   </ul>
                 ) : (
                   <Button
+                    className="mt-[10px]"
                     disabled={!metric}
                     icon={<PlusOutlined />}
                     onClick={addConditionItem}
@@ -545,7 +551,7 @@ const Search: React.FC = () => {
       <Spin spinning={pageLoading}>
         <div className={searchStyle.chart}>
           <Segmented
-            className="mb-[20px]"
+            className="mb-[10px]"
             value={activeTab}
             options={[
               {
@@ -600,7 +606,7 @@ const Search: React.FC = () => {
             </div>
           ) : (
             <CustomTable
-              scroll={{ y: 300 }}
+              scroll={{ y: 'calc(100vh - 440px)' }}
               columns={columns}
               dataSource={tableData}
               pagination={false}
