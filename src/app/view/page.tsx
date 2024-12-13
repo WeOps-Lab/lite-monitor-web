@@ -361,7 +361,9 @@ const Intergration = () => {
           options={items}
           onChange={onTabChange}
         />
-        <div className="w-full bg-[var(--color-bg-1)] px-[20px] pb-[20px]">
+        <div
+          className={`${viewStyle.table} w-full bg-[var(--color-bg-1)] px-[20px] pb-[20px]`}
+        >
           <Tabs activeKey={objectId} items={apps} onChange={changeTab} />
           <div>
             <div className="flex justify-between mb-[10px]">
@@ -394,7 +396,7 @@ const Intergration = () => {
               />
             </div>
             <CustomTable
-              scroll={{ y: 'calc(100vh - 386px)', x: 'calc(100vw - 100px)' }}
+              scroll={{ y: 'calc(100vh - 370px)', x: 'calc(100vw - 100px)' }}
               columns={tableColumn}
               dataSource={tableData}
               pagination={pagination}

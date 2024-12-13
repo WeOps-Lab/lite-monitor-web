@@ -4,6 +4,7 @@ import { SettingFilled } from '@ant-design/icons';
 import customTableStyle from './index.module.less';
 import FieldSettingModal from './fieldSettingModal';
 import { ColumnItem } from '@/types';
+
 interface CustomTableProps
   extends Omit<
     TableProps,
@@ -30,19 +31,33 @@ const CustomTable: React.FC<CustomTableProps> = ({
   fieldSetting = {
     showSetting: false,
     displayFieldKeys: [],
-    choosableField: [],
+    choosableFields: [],
   },
   onSelectFields = () => [],
+  pagination,
   ...TableProps
 }) => {
   const fieldRef = useRef<FieldRef>(null);
+
   const showFeildSetting = () => {
     fieldRef.current?.showModal();
   };
 
+  const paginationConfig = !pagination
+    ? false
+    : {
+      ...pagination,
+      hideOnSinglePage: true,
+    };
+
   return (
     <div className={customTableStyle.customTable}>
-      <Table bordered={bordered} size={size} {...TableProps}></Table>
+      <Table
+        bordered={bordered}
+        size={size}
+        pagination={paginationConfig}
+        {...TableProps}
+      />
       {fieldSetting.showSetting ? (
         <SettingFilled
           className={customTableStyle.setting}
