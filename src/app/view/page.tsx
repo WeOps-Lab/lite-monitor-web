@@ -17,6 +17,7 @@ import {
   TableDataItem,
   ListItem,
 } from '@/types';
+import { KEY_METRIC_LABEL_MAP } from '@/constants/monitor';
 import CustomTable from '@/components/custom-table';
 import TimeSelector from '@/components/time-selector';
 import { useCommon } from '@/context/common';
@@ -188,7 +189,10 @@ const Intergration = () => {
           switch (item.type) {
             case 'progress':
               return {
-                title: target?.display_name,
+                title:
+                  KEY_METRIC_LABEL_MAP[target?.name] ||
+                  target?.display_name ||
+                  '--',
                 dataIndex: target?.name,
                 key: target?.name,
                 width: 300,
@@ -205,7 +209,10 @@ const Intergration = () => {
               };
             case 'enum':
               return {
-                title: target?.display_name,
+                title:
+                  KEY_METRIC_LABEL_MAP[target?.name] ||
+                  target?.display_name ||
+                  '--',
                 dataIndex: target?.name,
                 key: target?.name,
                 width: 200,
@@ -220,7 +227,10 @@ const Intergration = () => {
               };
             default:
               return {
-                title: target?.display_name,
+                title:
+                  KEY_METRIC_LABEL_MAP[target?.name] ||
+                  target?.display_name ||
+                  '--',
                 dataIndex: target?.name,
                 key: target?.name,
                 width: 200,

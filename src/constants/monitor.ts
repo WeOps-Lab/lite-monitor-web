@@ -1142,6 +1142,25 @@ const OBJECT_ICON_MAP: ObjectIconMap = {
   'Audit System': 'AuditSystem',
 };
 
+const KEY_METRIC_LABEL_MAP: ObjectIconMap = {
+  'cpu_summary.usage': 'CPU',
+  'mem.pct_usable': 'Memory',
+  load5: 'Load(5min)',
+  sysUpTime: 'Time',
+  iftotalInOctets: 'Incoming Traffic',
+  iftotalOutOctets: 'Outgoing Traffic',
+  'http_success.rate': 'Status',
+  'http_total.duration': 'Duration',
+  pod_status: 'Status',
+  pod_cpu_utilization: 'CPU',
+  pod_memory_utilization: 'Memory',
+  node_status_condition: 'Status',
+  node_cpu_utilization: 'CPU',
+  node_memory_utilization: 'Memory',
+  cluster_pod_count: 'Pod Count',
+  cluster_node_count: 'Node Conut',
+};
+
 export {
   FREQUENCY_LIST,
   CONDITION_LIST,
@@ -1159,4 +1178,5 @@ export {
   MONITOR_GROUPS_MAP,
   OBJECT_ICON_MAP,
   INTERFACE_LABEL_MAP,
+  KEY_METRIC_LABEL_MAP,
 };
