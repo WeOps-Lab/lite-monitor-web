@@ -82,15 +82,15 @@ const Intergration = () => {
       fixed: 'right',
       render: (_, record) => (
         <>
-          <Button type="link" onClick={() => linkToDetial(record)}>
-            {t('common.detail')}
-          </Button>
           <Button
-            className="ml-[10px]"
+            className="mr-[10px]"
             type="link"
             onClick={() => openViewModal(record)}
           >
             {t('menu.view')}
+          </Button>
+          <Button type="link" onClick={() => linkToDetial(record)}>
+            {t('common.detail')}
           </Button>
         </>
       ),

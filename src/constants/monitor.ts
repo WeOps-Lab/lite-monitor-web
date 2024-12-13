@@ -136,6 +136,10 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'load1',
@@ -148,6 +152,10 @@ const INDEX_CONFIG = [
           { value: 4, color: '#D97007' }, // 黄色区域
           { value: 20, color: '#F43B2C' }, // 红色区域
         ],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'load5',
@@ -160,48 +168,80 @@ const INDEX_CONFIG = [
           { value: 5, color: '#D97007' }, // 黄色区域
           { value: 20, color: '#F43B2C' }, // 红色区域
         ],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'disk.used',
         displayType: 'table',
         sortIndex: 3,
         displayDimension: ['Device', 'Value'],
+        style: {
+          height: '200px',
+          width: '48%',
+        },
       },
       {
         indexId: 'cpu_summary.usage',
         displayType: 'lineChart',
         sortIndex: 4,
         displayDimension: ['cpu'],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'disk.is_use',
         displayType: 'lineChart',
         sortIndex: 5,
         displayDimension: ['device '],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'mem.pct_usable',
         displayType: 'lineChart',
         sortIndex: 6,
         displayDimension: ['device '],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'io.util',
         displayType: 'lineChart',
         sortIndex: 7,
         displayDimension: ['device '],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'net.speed_sent',
         displayType: 'lineChart',
         sortIndex: 8,
         displayDimension: ['device '],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'net.speed_recv',
         displayType: 'lineChart',
         sortIndex: 9,
         displayDimension: ['device '],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
     ],
     tableDiaplay: [
@@ -219,30 +259,50 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'http_total.duration',
         displayType: 'single',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'http_ssl',
         displayType: 'single',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'http_status_code',
         displayType: 'lineChart',
         sortIndex: 3,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '48%',
+        },
       },
       {
         indexId: 'http_dns.lookup.time',
         displayType: 'lineChart',
         sortIndex: 4,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '48%',
+        },
       },
     ],
     tableDiaplay: [
@@ -272,30 +332,50 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'pod_cpu_utilization',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'pod_memory_utilization',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'pod_io_writes',
         displayType: 'lineChart',
         sortIndex: 3,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'pod_io_read',
         displayType: 'lineChart',
         sortIndex: 4,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
     ],
     tableDiaplay: [
@@ -313,6 +393,10 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'node_cpu_load1',
@@ -325,6 +409,10 @@ const INDEX_CONFIG = [
           { value: 4, color: '#D97007' }, // 黄色区域
           { value: 20, color: '#F43B2C' }, // 红色区域
         ],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'node_cpu_load5',
@@ -337,36 +425,60 @@ const INDEX_CONFIG = [
           { value: 5, color: '#D97007' }, // 黄色区域
           { value: 20, color: '#F43B2C' }, // 红色区域
         ],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'node_cpu_utilization',
         displayType: 'lineChart',
         sortIndex: 3,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'node_app_memory_utilization',
         displayType: 'lineChart',
         sortIndex: 4,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'node_io_current',
         displayType: 'lineChart',
         sortIndex: 5,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'node_network_receive',
         displayType: 'lineChart',
         sortIndex: 6,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
       {
         indexId: 'node_network_transmit',
         displayType: 'lineChart',
         sortIndex: 7,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
     ],
     tableDiaplay: [
@@ -384,18 +496,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'cluster_node_count',
         displayType: 'single',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'k8s_cluster',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '32%',
+        },
       },
     ],
     tableDiaplay: [
@@ -412,18 +536,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -439,6 +575,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -456,18 +596,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -483,6 +635,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -500,18 +656,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -527,6 +695,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -544,18 +716,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -571,6 +755,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -588,18 +776,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -615,6 +815,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -632,18 +836,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -659,6 +875,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -676,18 +896,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -703,6 +935,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [
@@ -720,18 +956,30 @@ const INDEX_CONFIG = [
         displayType: 'single',
         sortIndex: 0,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '15%',
+        },
       },
       {
         indexId: 'iftotalInOctets',
         displayType: 'lineChart',
         sortIndex: 1,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'iftotalOutOctets',
         displayType: 'lineChart',
         sortIndex: 2,
         displayDimension: [],
+        style: {
+          height: '200px',
+          width: '40%',
+        },
       },
       {
         indexId: 'interfaces',
@@ -747,6 +995,10 @@ const INDEX_CONFIG = [
           'ifInOctets',
           'ifOutOctets',
         ],
+        style: {
+          height: '400px',
+          width: '100%',
+        },
       },
     ],
     tableDiaplay: [

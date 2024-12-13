@@ -46,7 +46,6 @@ const CustomCascader: React.FC<CustomCascaderProps> = ({
   );
 
   useEffect(() => {
-    console.log(value);
     if (value?.length) {
       if (multiple) {
         const paths = (value as string[]).map((val) => findPath(options, val));

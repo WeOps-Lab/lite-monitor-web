@@ -79,6 +79,10 @@ export interface MetricItem {
   displayType?: string;
   description?: string;
   viewData?: any[];
+  style?: {
+    width: string;
+    height: string;
+  };
   [key: string]: unknown;
 }
 

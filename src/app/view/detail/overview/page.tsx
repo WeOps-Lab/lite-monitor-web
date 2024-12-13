@@ -315,84 +315,70 @@ const Overview = () => {
     switch (metricItem.displayType) {
       case 'barChart':
         return (
-          <div className="w-[500px] h-full">
-            <BarChart
-              data={metricItem.viewData || []}
-              unit={metricItem.unit}
-              showDimensionFilter
-              onXRangeChange={onXRangeChange}
-            />
-          </div>
+          <BarChart
+            data={metricItem.viewData || []}
+            unit={metricItem.unit}
+            showDimensionFilter
+            onXRangeChange={onXRangeChange}
+          />
         );
       case 'dashboard':
         return (
-          <div className="w-[200px]">
-            <GuageChart
-              value={
-                calculateMetrics(metricItem.viewData || []).latestValue || 0
-              }
-              max={20}
-              segments={metricItem.segments}
-              label={getGuageLabel(metricItem.viewData || [])}
-            />
-          </div>
+          <GuageChart
+            value={calculateMetrics(metricItem.viewData || []).latestValue || 0}
+            max={20}
+            segments={metricItem.segments}
+            label={getGuageLabel(metricItem.viewData || [])}
+          />
         );
       case 'single':
         return (
-          <div className="w-[100px]">
-            <SingleValue
-              fontSize={30}
-              value={
-                calculateMetrics(metricItem.viewData || []).latestValue || '--'
-              }
-              label={getGuageLabel(metricItem.viewData || [])}
-            />
-          </div>
+          <SingleValue
+            fontSize={30}
+            value={
+              calculateMetrics(metricItem.viewData || []).latestValue || '--'
+            }
+            label={getGuageLabel(metricItem.viewData || [])}
+          />
         );
       case 'table':
         return (
-          <div className="w-[300px]">
-            <CustomTable
-              pagination={false}
-              dataSource={getTableData(metricItem.viewData || [])}
-              columns={metricItem.displayDimension.map((item: any) => ({
-                title: item,
-                dataIndex: item,
-                key: item,
-              }))}
-              scroll={{ y: 130 }}
-              rowKey="id"
-            />
-          </div>
+          <CustomTable
+            pagination={false}
+            dataSource={getTableData(metricItem.viewData || [])}
+            columns={metricItem.displayDimension.map((item: any) => ({
+              title: item,
+              dataIndex: item,
+              key: item,
+            }))}
+            scroll={{ y: 100 }}
+            rowKey="id"
+          />
         );
       case 'multipleIndexsTable':
         return (
-          <div className="w-[900px]">
-            <CustomTable
-              pagination={false}
-              dataSource={metricItem.viewData || []}
-              columns={['interface', ...metricItem.displayDimension].map(
-                (item: any) => ({
-                  title: INTERFACE_LABEL_MAP[item],
-                  dataIndex: item,
-                  key: item,
-                })
-              )}
-              scroll={{ y: 130 }}
-              rowKey="id"
-            />
-          </div>
+          <CustomTable
+            pagination={false}
+            dataSource={metricItem.viewData || []}
+            columns={['interface', ...metricItem.displayDimension].map(
+              (item: any) => ({
+                title: INTERFACE_LABEL_MAP[item],
+                dataIndex: item,
+                key: item,
+              })
+            )}
+            scroll={{ y: 300 }}
+            rowKey="id"
+          />
         );
       default:
         return (
-          <div className="w-[500px] h-full">
-            <LineChart
-              data={metricItem.viewData || []}
-              unit={metricItem.unit}
-              showDimensionFilter
-              onXRangeChange={onXRangeChange}
-            />
-          </div>
+          <LineChart
+            data={metricItem.viewData || []}
+            unit={metricItem.unit}
+            showDimensionFilter
+            onXRangeChange={onXRangeChange}
+          />
         );
     }
   };
@@ -412,13 +398,14 @@ const Overview = () => {
       </div>
       <div className="h-[calc(100vh-180px)] overflow-y-auto">
         <Spin spinning={loading}>
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap justify-evenly">
             {metricData
               .sort((a: any, b: any) => a.sortIndex - b.sortIndex)
               .map((metricItem: MetricItem) => (
                 <div
                   key={metricItem.id}
-                  className="mb-[20px] mr-[20px] p-[10px] shadow"
+                  className="mb-[20px] p-[10px] shadow"
+                  style={metricItem.style}
                 >
                   <div className="flex justify-between items-center mb-[10px]">
                     <span className="text-[14px]">
@@ -443,7 +430,12 @@ const Overview = () => {
                       )}
                     </span>
                   </div>
-                  <div className="h-[180px] flex justify-center items-center">
+                  <div
+                    className="flex justify-center items-center h-full"
+                    style={{
+                      height: 'calc(100% - 30px)',
+                    }}
+                  >
                     {renderChart(metricItem)}
                   </div>
                 </div>
