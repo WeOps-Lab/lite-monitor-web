@@ -220,7 +220,9 @@ const Intergration = () => {
           options={items}
           onChange={onTabChange}
         />
-        <div className="flex flex-wrap w-full">
+        <div
+          className={`flex flex-wrap w-full ${intergrationStyle.intergrationList}`}
+        >
           {apps.map((app) => (
             <div
               key={app.plugin_id + app.name}
