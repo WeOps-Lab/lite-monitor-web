@@ -87,6 +87,7 @@ const Configure = () => {
       title: t('common.action'),
       key: 'action',
       dataIndex: 'action',
+      width: 130,
       render: (_, record) => (
         <>
           <Button
@@ -300,39 +301,40 @@ const Configure = () => {
         </div>
       </div>
       <Spin spinning={loading}>
-        {metricData.map((metricItem, index) => (
-          <Collapse
-            className="mb-[10px]"
-            key={metricItem.id}
-            title={metricItem.name || ''}
-            isOpen={!index}
-            icon={
-              <div>
-                <Button
-                  type="link"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => openGroupModal('edit', metricItem)}
-                ></Button>
-                <Button
-                  type="link"
-                  size="small"
-                  disabled={!!metricItem.child?.length}
-                  icon={<DeleteOutlined />}
-                  onClick={() => showGroupDeleteConfirm(metricItem)}
-                ></Button>
-              </div>
-            }
-          >
-            <CustomTable
-              pagination={false}
-              dataSource={metricItem.child || []}
-              columns={columns}
-              scroll={{ y: 300 }}
-              rowKey="id"
-            />
-          </Collapse>
-        ))}
+        <div className={metricStyle.metricTable}>
+          {metricData.map((metricItem, index) => (
+            <Collapse
+              className="mb-[10px]"
+              key={metricItem.id}
+              title={metricItem.name || ''}
+              isOpen={!index}
+              icon={
+                <div>
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => openGroupModal('edit', metricItem)}
+                  ></Button>
+                  <Button
+                    type="link"
+                    size="small"
+                    disabled={!!metricItem.child?.length}
+                    icon={<DeleteOutlined />}
+                    onClick={() => showGroupDeleteConfirm(metricItem)}
+                  ></Button>
+                </div>
+              }
+            >
+              <CustomTable
+                pagination={false}
+                dataSource={metricItem.child || []}
+                columns={columns}
+                rowKey="id"
+              />
+            </Collapse>
+          ))}
+        </div>
       </Spin>
       <GroupModal
         ref={groupRef}
