@@ -1,14 +1,18 @@
 .asset {
     display: flex;
 
-    .tree {
+    .assetTree {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 140px);
-        overflow-y: auto;
-        overflow-x: hidden;
         padding: 20px 10px;
         background-color: var(--color-bg-1);
+        // width: 240px;
+
+        .tree {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
 
         :global {
             .ant-tree-list {
@@ -22,6 +26,7 @@
         height: calc(100vh - 140px);
         padding: 20px;
         margin-left: 10px;
+        // flex: 1;
 
         .search {
             display: flex;

@@ -1,15 +1,7 @@
 'use client';
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Spin,
-  Input,
-  Button,
-  Tree,
-  Modal,
-  message,
-  Switch,
-} from 'antd';
+import { Spin, Input, Button, Tree, Modal, message, Switch } from 'antd';
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
@@ -311,7 +303,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
   return (
     <Spin spinning={pageLoading}>
       <div className={assetStyle.asset}>
-        <div className={assetStyle.tree}>
+        <div className={assetStyle.assetTree}>
           <Search
             className="mb-[10px]"
             placeholder={t('common.searchPlaceHolder')}
@@ -335,7 +327,9 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
                 showSearch
                 maxTagCount="responsive"
                 options={organizationList}
-                onChange={(value) => setSelectedOrganizations(value as string[])}
+                onChange={(value) =>
+                  setSelectedOrganizations(value as string[])
+                }
                 multiple
                 allowClear
               />
