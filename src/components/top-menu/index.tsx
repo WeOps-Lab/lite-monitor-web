@@ -12,11 +12,11 @@ const TopMenu = () => {
 
   // 菜单项配置
   const menuItems = [
-    { label: t('menu.search'), icon: 'search-f', path: '/search' },
-    { label: t('menu.view'), icon: 'zichan-quanbushebei', path: '/view' },
-    { label: t('menu.event'), icon: 'mulu', path: '/event' },
+    { label: t('common.search'), icon: 'search-f', path: '/search' },
+    { label: t('monitor.view'), icon: 'zichan-quanbushebei', path: '/view' },
+    { label: t('monitor.events.event'), icon: 'mulu', path: '/event' },
     {
-      label: t('menu.intergration'),
+      label: t('monitor.intergrations.intergration'),
       icon: 'zichan-quanbushebei',
       path: '/intergration',
     },

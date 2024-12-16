@@ -107,7 +107,9 @@ const Asset = () => {
 
   const openRuleModal = (type: string, row = {}) => {
     const title: string = t(
-      type === 'add' ? 'monitor.addRule' : 'monitor.editRule'
+      type === 'add'
+        ? 'monitor.intergrations.addRule'
+        : 'monitor.intergrations.editRule'
     );
     ruleRef.current?.showModal({
       title,
@@ -159,7 +161,7 @@ const Asset = () => {
           monitor_object_id: objectId,
         },
       });
-      setRuleList(data?.results || []);
+      setRuleList(data || []);
     } finally {
       setRuleLoading(false);
     }
@@ -311,8 +313,11 @@ const Asset = () => {
         <Spin spinning={ruleLoading}>
           <div className={assetStyle.rule}>
             <div className={assetStyle.ruleTips}>
-              {t('monitor.rule')}
-              <Tooltip placement="top" title={t('monitor.ruleTips')}>
+              {t('monitor.intergrations.rule')}
+              <Tooltip
+                placement="top"
+                title={t('monitor.intergrations.ruleTips')}
+              >
                 <QuestionCircleOutlined className={assetStyle.ruleIcon} />
               </Tooltip>
             </div>

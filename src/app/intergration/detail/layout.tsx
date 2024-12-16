@@ -21,7 +21,7 @@ const IntergrationDetailLayout = ({
   const icon = OBJECT_ICON_MAP[searchParams.get('name') as string] || 'Host';
   const menuItems = [
     {
-      label: t('monitor.configure'),
+      label: t('monitor.intergrations.configure'),
       path: '/intergration/detail/configure',
       icon: 'shujumoxingguanli',
     },

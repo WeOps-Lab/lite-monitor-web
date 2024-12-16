@@ -24,7 +24,7 @@ const IntergrationDetailLayout = ({
 
   const menuItems = [
     {
-      label: t('monitor.overview'),
+      label: t('monitor.views.overview'),
       path: '/view/detail/overview',
       icon: 'shujumoxingguanli',
     },

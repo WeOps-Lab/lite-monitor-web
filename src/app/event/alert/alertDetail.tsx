@@ -38,11 +38,11 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     const [chartData, setChartData] = useState<ChartDataItem[]>([]);
     const [tabs, setTabs] = useState<TabItem[]>([
       {
-        label: t('monitor.information'),
+        label: t('monitor.events.information'),
         key: 'information',
       },
       {
-        label: t('menu.event'),
+        label: t('monitor.events.event'),
         key: 'event',
       },
     ]);
@@ -58,7 +58,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     const isInformation = activeTab === 'information';
     const columns: ColumnItem[] = [
       {
-        title: t('monitor.level'),
+        title: t('monitor.events.level'),
         dataIndex: 'level',
         key: 'level',
         render: (_, { level }) => (
@@ -77,13 +77,13 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         ),
       },
       {
-        title: t('monitor.eventName'),
+        title: t('monitor.events.eventName'),
         dataIndex: 'content',
         key: 'content',
         render: (_, record) => <>{record.content || '--'}</>,
       },
       {
-        title: t('monitor.index'),
+        title: t('monitor.events.index'),
         dataIndex: 'index',
         key: 'index',
         render: () => <>{showMetricName()}</>,
@@ -298,7 +298,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                   </span>
                 </li>
                 <li>
-                  <span>{t('monitor.state')}：</span>
+                  <span>{t('monitor.events.state')}：</span>
                   <Tag
                     color={
                       formData.status === 'new' ? 'blue' : 'var(--color-text-4)'

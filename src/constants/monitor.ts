@@ -1,3 +1,5 @@
+import { useTranslation } from '@/utils/i18n';
+import { useMemo } from 'react';
 import { ListItem } from '@/types';
 import {
   LevelMap,
@@ -6,6 +8,7 @@ import {
   MonitorGroupMap,
   ObjectIconMap,
 } from '@/types/monitor';
+
 const FREQUENCY_LIST: ListItem[] = [
   { label: 'off', value: 0 },
   { label: '1m', value: 60000 },
@@ -25,12 +28,18 @@ const TIME_RANGE_LIST: ListItem[] = [
   { label: 'Custom', value: 0 },
 ];
 
-const CONDITION_LIST: ListItem[] = [
-  { id: '=', name: '=' },
-  { id: '!=', name: '!=' },
-  { id: '=~', name: 'include' },
-  { id: '!~', name: 'exclude' },
-];
+const useConditionList = (): ListItem[] => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { id: '=', name: '=' },
+      { id: '!=', name: '!=' },
+      { id: '=~', name: t('monitor.include') },
+      { id: '!~', name: t('monitor.exclude') },
+    ],
+    [t]
+  );
+};
 
 const UNIT_LIST = [
   {
@@ -1163,7 +1172,6 @@ const KEY_METRIC_LABEL_MAP: ObjectIconMap = {
 
 export {
   FREQUENCY_LIST,
-  CONDITION_LIST,
   UNIT_LIST,
   INDEX_CONFIG,
   TIME_RANGE_LIST,
@@ -1179,4 +1187,5 @@ export {
   OBJECT_ICON_MAP,
   INTERFACE_LABEL_MAP,
   KEY_METRIC_LABEL_MAP,
+  useConditionList,
 };

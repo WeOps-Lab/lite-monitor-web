@@ -22,15 +22,15 @@ const Event = () => {
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [items, setItems] = useState<SegmentedItem[]>([
     {
-      label: t('monitor.alert'),
+      label: t('monitor.events.alert'),
       value: 'alert',
     },
     {
-      label: t('monitor.strategy'),
+      label: t('monitor.events.strategy'),
       value: 'strategy',
     },
     // {
-    //   label: t('monitor.template'),
+    //   label: t('monitor.events.template'),
     //   value: 'template',
     // },
   ]);

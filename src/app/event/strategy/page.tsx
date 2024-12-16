@@ -33,8 +33,8 @@ import {
 } from '@ant-design/icons';
 import SelectAssets from './selectAssets';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useConditionList } from '@/constants/monitor';
 import {
-  CONDITION_LIST,
   METHOD_LIST,
   PERIOD_LIST,
   SCHEDULE_LIST,
@@ -52,6 +52,7 @@ const defaultGroup = ['instance_id'];
 const StrategyOperation = () => {
   const { t } = useTranslation();
   const { get, post, put, isLoading } = useApiClient();
+  const CONDITION_LIST = useConditionList();
   const commonContext = useCommon();
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
@@ -197,7 +198,7 @@ const StrategyOperation = () => {
 
   const validateMetric = async () => {
     if (!metric) {
-      return Promise.reject(new Error(t('monitor.metricValidate')));
+      return Promise.reject(new Error(t('monitor.events.metricValidate')));
     }
     if (
       conditions.length &&
@@ -205,7 +206,7 @@ const StrategyOperation = () => {
         return Object.values(item).some((tex) => !tex);
       })
     ) {
-      return Promise.reject(new Error(t('monitor.conditionValidate')));
+      return Promise.reject(new Error(t('monitor.events.conditionValidate')));
     }
     return Promise.resolve();
   };
@@ -220,14 +221,14 @@ const StrategyOperation = () => {
           return !!item.value || item.value === 0;
         }))
     ) {
-      return Promise.reject(new Error(t('monitor.conditionValidate')));
+      return Promise.reject(new Error(t('monitor.events.conditionValidate')));
     }
     return Promise.resolve();
   };
 
   const validateNoData = async () => {
     if (openNoData && (!noDataAlert || !noDataLevel)) {
-      return Promise.reject(new Error(t('monitor.conditionValidate')));
+      return Promise.reject(new Error(t('monitor.events.conditionValidate')));
     }
     return Promise.resolve();
   };
@@ -398,10 +399,10 @@ const StrategyOperation = () => {
             onClick={goBack}
           />
           {type === 'add' ? (
-            t('monitor.createPolicy')
+            t('monitor.events.createPolicy')
           ) : (
             <span>
-              {t('monitor.editPolicy')} -{' '}
+              {t('monitor.events.editPolicy')} -{' '}
               <span className="text-[var(--color-text-3)] text-[12px]">
                 {detailName}
               </span>
@@ -414,7 +415,7 @@ const StrategyOperation = () => {
               direction="vertical"
               items={[
                 {
-                  title: t('monitor.basicInformation'),
+                  title: t('monitor.events.basicInformation'),
                   description: (
                     <>
                       <Form.Item<StrategyFields>
@@ -458,7 +459,7 @@ const StrategyOperation = () => {
                   status: 'process',
                 },
                 {
-                  title: t('monitor.defineTheMetric'),
+                  title: t('monitor.events.defineTheMetric'),
                   description: (
                     <>
                       <Form.Item<StrategyFields>
@@ -485,7 +486,7 @@ const StrategyOperation = () => {
                             ></Button>
                           </div>
                           <div className="text-[var(--color-text-3)] mt-[10px]">
-                            {t('monitor.setAssets')}
+                            {t('monitor.events.setAssets')}
                           </div>
                         </div>
                       </Form.Item>
@@ -621,14 +622,14 @@ const StrategyOperation = () => {
                           </div>
                         </div>
                         <div className="text-[var(--color-text-3)]">
-                          {t('monitor.setDimensions')}
+                          {t('monitor.events.setDimensions')}
                         </div>
                       </Form.Item>
                       <Form.Item<StrategyFields>
                         required
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.frequency')}
+                            {t('monitor.events.frequency')}
                           </span>
                         }
                       >
@@ -659,14 +660,14 @@ const StrategyOperation = () => {
                           />
                         </Form.Item>
                         <div className="text-[var(--color-text-3)] mt-[10px]">
-                          {t('monitor.setFrequency')}
+                          {t('monitor.events.setFrequency')}
                         </div>
                       </Form.Item>
                       <Form.Item<StrategyFields>
                         required
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.period')}
+                            {t('monitor.events.period')}
                           </span>
                         }
                       >
@@ -682,7 +683,7 @@ const StrategyOperation = () => {
                             style={{
                               width: '300px',
                             }}
-                            placeholder={t('monitor.period')}
+                            placeholder={t('monitor.events.period')}
                           >
                             {PERIOD_LIST.map((item: ListItem) => (
                               <Option value={item.value} key={item.value}>
@@ -692,14 +693,14 @@ const StrategyOperation = () => {
                           </Select>
                         </Form.Item>
                         <div className="text-[var(--color-text-3)] mt-[10px]">
-                          {t('monitor.setPeriod')}
+                          {t('monitor.events.setPeriod')}
                         </div>
                       </Form.Item>
                       <Form.Item<StrategyFields>
                         required
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.method')}
+                            {t('monitor.events.method')}
                           </span>
                         }
                       >
@@ -715,7 +716,7 @@ const StrategyOperation = () => {
                             style={{
                               width: '300px',
                             }}
-                            placeholder={t('monitor.method')}
+                            placeholder={t('monitor.events.method')}
                           >
                             {METHOD_LIST.map((item: ListItem) => (
                               <Option value={item.value} key={item.value}>
@@ -725,7 +726,7 @@ const StrategyOperation = () => {
                           </Select>
                         </Form.Item>
                         <div className="text-[var(--color-text-3)] mt-[10px]">
-                          {t('monitor.setMethod')}
+                          {t('monitor.events.setMethod')}
                         </div>
                       </Form.Item>
                     </>
@@ -733,14 +734,14 @@ const StrategyOperation = () => {
                   status: 'process',
                 },
                 {
-                  title: t('monitor.setAlertConditions'),
+                  title: t('monitor.events.setAlertConditions'),
                   description: (
                     <>
                       <Form.Item<StrategyFields>
                         name="threshold"
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.algorithm')}
+                            {t('monitor.events.algorithm')}
                           </span>
                         }
                         rules={[
@@ -754,13 +755,13 @@ const StrategyOperation = () => {
                               className="text-2xl"
                             />
                             <h2 className="text-[16px] font-bold m-0">
-                              {t('monitor.threshold')}
+                              {t('monitor.events.threshold')}
                             </h2>
                           </div>
                           <p
                             className={`text-[var(--color-text-3)] text-[13px]`}
                           >
-                            {t('monitor.setThreshold')}
+                            {t('monitor.events.setThreshold')}
                           </p>
                         </div>
                         {threshold.map((item, index) => (
@@ -777,11 +778,11 @@ const StrategyOperation = () => {
                                 paddingLeft: '10px',
                               }}
                             >
-                              {t(`monitor.${item.level}`)}
+                              {t(`monitor.events.${item.level}`)}
                             </div>
                             <div className="flex items-center">
                               <span className="mr-[10px]">
-                                {t('monitor.whenResultIs')}
+                                {t('monitor.events.whenResultIs')}
                               </span>
                               <Select
                                 className={strategyStyle.filterLabel}
@@ -789,7 +790,7 @@ const StrategyOperation = () => {
                                   width: '100px',
                                 }}
                                 value={item.method}
-                                placeholder={t('monitor.method')}
+                                placeholder={t('monitor.events.method')}
                                 onChange={(val) => {
                                   handleThresholdMethodChange(val, index);
                                 }}
@@ -818,11 +819,11 @@ const StrategyOperation = () => {
                       <Form.Item<StrategyFields>
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.recovery')}
+                            {t('monitor.events.recovery')}
                           </span>
                         }
                       >
-                        {t('monitor.recoveryCondition')}
+                        {t('monitor.events.recoveryCondition')}
                         <Form.Item
                           name="recovery_condition"
                           noStyle
@@ -836,16 +837,16 @@ const StrategyOperation = () => {
                             precision={0}
                           />
                         </Form.Item>
-                        {t('monitor.consecutivePeriods')}
+                        {t('monitor.events.consecutivePeriods')}
                         <div className="text-[var(--color-text-3)] mt-[10px]">
-                          {t('monitor.setRecovery')}
+                          {t('monitor.events.setRecovery')}
                         </div>
                       </Form.Item>
                       <Form.Item<StrategyFields>
                         name="no_data_alert"
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.nodata')}
+                            {t('monitor.events.nodata')}
                           </span>
                         }
                         rules={[{ required: true, validator: validateNoData }]}
@@ -856,7 +857,7 @@ const StrategyOperation = () => {
                         />
                         {openNoData && (
                           <div className="mt-[10px]">
-                            {t('monitor.reportedFor')}
+                            {t('monitor.events.reportedFor')}
                             <InputNumber
                               className="mx-[10px] w-[100px]"
                               min={1}
@@ -864,14 +865,14 @@ const StrategyOperation = () => {
                               onChange={handleNoDataAlertChange}
                               value={noDataAlert}
                             />
-                            {t('monitor.nodataPeriods')}
+                            {t('monitor.events.nodataPeriods')}
                             <Select
                               value={noDataLevel}
                               style={{
                                 width: '100px',
                                 marginLeft: '10px',
                               }}
-                              placeholder={t('monitor.level')}
+                              placeholder={t('monitor.events.level')}
                               onChange={(val: string) => setNoDataLevel(val)}
                             >
                               {LEVEL_LIST.map((item: ListItem) => (
@@ -888,13 +889,13 @@ const StrategyOperation = () => {
                   status: 'process',
                 },
                 {
-                  title: t('monitor.configureNotifications'),
+                  title: t('monitor.events.configureNotifications'),
                   description: (
                     <>
                       <Form.Item<StrategyFields>
                         label={
                           <span className="w-[100px]">
-                            {t('monitor.notification')}
+                            {t('monitor.events.notification')}
                           </span>
                         }
                         name="notice"
@@ -916,7 +917,7 @@ const StrategyOperation = () => {
                               <Form.Item<StrategyFields>
                                 label={
                                   <span className="w-[100px]">
-                                    {t('monitor.method')}
+                                    {t('monitor.events.method')}
                                   </span>
                                 }
                                 name="notice_type"
@@ -929,14 +930,14 @@ const StrategyOperation = () => {
                               >
                                 <Radio.Group>
                                   <Radio value="email">
-                                    {t('monitor.email')}
+                                    {t('monitor.events.email')}
                                   </Radio>
                                 </Radio.Group>
                               </Form.Item>
                               <Form.Item<StrategyFields>
                                 label={
                                   <span className="w-[100px]">
-                                    {t('monitor.notifier')}
+                                    {t('monitor.events.notifier')}
                                   </span>
                                 }
                                 name="notice_users"
@@ -955,7 +956,7 @@ const StrategyOperation = () => {
                                   allowClear
                                   mode="tags"
                                   maxTagCount="responsive"
-                                  placeholder={t('monitor.notifier')}
+                                  placeholder={t('monitor.events.notifier')}
                                 >
                                   {userList.map((item) => (
                                     <Option value={item.id} key={item.id}>

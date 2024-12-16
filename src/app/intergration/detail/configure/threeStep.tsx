@@ -37,8 +37,8 @@ const Step1: React.FC<Step1Props> = ({ children }) => {
   return (
     <div className={threeStepStyle.step}>
       <b>
-        <span>{t('monitor.step1')}：</span>
-        {t('monitor.configureStep1')}
+        <span>{t('monitor.intergrations.step1')}：</span>
+        {t('monitor.intergrations.configureStep1')}
       </b>
       <div className={threeStepStyle.content}>{children}</div>
     </div>
@@ -62,8 +62,8 @@ const Step2: React.FC<Step2Props> = ({
   return (
     <div className={threeStepStyle.step}>
       <b>
-        <span>{t('monitor.step2')}：</span>
-        {t('monitor.configureStep2')}
+        <span>{t('monitor.intergrations.step2')}：</span>
+        {t('monitor.intergrations.configureStep2')}
       </b>
       <div className={threeStepStyle.content}>
         {options.map((option) => (
@@ -97,8 +97,8 @@ const Step3: React.FC<Step3Props> = ({ content, config }) => {
   return (
     <div className={threeStepStyle.step}>
       <b>
-        <span>{t('monitor.step3')}：</span>
-        {t('monitor.configureStep3')}
+        <span>{t('monitor.intergrations.step3')}：</span>
+        {t('monitor.intergrations.configureStep3')}
       </b>
       <div className="mb-[15px] ml-[100px]">{config}</div>
       {!!content && (

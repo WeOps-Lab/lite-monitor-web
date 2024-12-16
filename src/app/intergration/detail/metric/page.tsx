@@ -53,7 +53,7 @@ const Configure = () => {
       key: 'display_name',
     },
     {
-      title: t('monitor.dimension'),
+      title: t('monitor.intergrations.dimension'),
       dataIndex: 'dimensions',
       key: 'dimensions',
       render: (_, record) => (
@@ -67,7 +67,7 @@ const Configure = () => {
       ),
     },
     {
-      title: t('monitor.dataType'),
+      title: t('monitor.intergrations.dataType'),
       dataIndex: 'data_type',
       key: 'data_type',
       render: (_, record) => <>{record.data_type || '--'}</>,
@@ -231,7 +231,11 @@ const Configure = () => {
   };
 
   const openGroupModal = (type: string, row = {}) => {
-    const title = t(type === 'add' ? 'monitor.addGroup' : 'monitor.editGroup');
+    const title = t(
+      type === 'add'
+        ? 'monitor.intergrations.addGroup'
+        : 'monitor.intergrations.editGroup'
+    );
     groupRef.current?.showModal({
       title,
       type,
@@ -241,7 +245,9 @@ const Configure = () => {
 
   const openMetricModal = (type: string, row = {}) => {
     const title = t(
-      type === 'add' ? 'monitor.addMetric' : 'monitor.editMetric'
+      type === 'add'
+        ? 'monitor.intergrations.addMetric'
+        : 'monitor.intergrations.editMetric'
     );
     metricRef.current?.showModal({
       title,
@@ -275,7 +281,7 @@ const Configure = () => {
         />
       )}
       <p className="mb-[10px] text-[var(--color-text-2)]">
-        {t('monitor.metricTitle')}
+        {t('monitor.intergrations.metricTitle')}
       </p>
       <div className="flex items-center justify-between mb-[15px]">
         <Input
@@ -293,10 +299,10 @@ const Configure = () => {
             className="mr-[8px]"
             onClick={() => openGroupModal('add')}
           >
-            {t('monitor.addGroup')}
+            {t('monitor.intergrations.addGroup')}
           </Button>
           <Button onClick={() => openMetricModal('add')}>
-            {t('monitor.addMetric')}
+            {t('monitor.intergrations.addMetric')}
           </Button>
         </div>
       </div>

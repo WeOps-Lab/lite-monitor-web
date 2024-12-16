@@ -55,8 +55,8 @@ const Information: React.FC<TableDataItem> = ({
 
   const showAlertCloseConfirm = (row: TableDataItem) => {
     confirm({
-      title: t('monitor.closeTitle'),
-      content: t('monitor.closeContent'),
+      title: t('monitor.events.closeTitle'),
+      content: t('monitor.events.closeContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve) => {
@@ -64,7 +64,7 @@ const Information: React.FC<TableDataItem> = ({
             await patch(`/api/monitor_alert/${row.id}/`, {
               status: 'closed',
             });
-            message.success(t('monitor.successfullyClosed'));
+            message.success(t('monitor.events.successfullyClosed'));
             onClose();
           } finally {
             resolve(true);
@@ -88,13 +88,13 @@ const Information: React.FC<TableDataItem> = ({
 
   return (
     <div className={informationStyle.information}>
-      <Descriptions title={t('monitor.information')} column={2} bordered>
+      <Descriptions title={t('monitor.events.information')} column={2} bordered>
         <Descriptions.Item label={t('common.time')}>
           {formData.updated_at
             ? convertToLocalizedTime(formData.updated_at)
             : '--'}
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.level')}>
+        <Descriptions.Item label={t('monitor.events.level')}>
           <div
             className={informationStyle.level}
             style={{
@@ -111,15 +111,15 @@ const Information: React.FC<TableDataItem> = ({
             </span>
           </div>
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.firstAlertTime')}>
+        <Descriptions.Item label={t('monitor.events.firstAlertTime')}>
           {formData.start_event_time
             ? convertToLocalizedTime(formData.start_event_time)
             : '--'}
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.information')} span={3}>
+        <Descriptions.Item label={t('monitor.events.information')} span={3}>
           {`${formData.content},${t('monitor.value')}:${formData.alertValue}`}
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.assetType')}>
+        <Descriptions.Item label={t('monitor.events.assetType')}>
           {objects.find(
             (item: ObectItem) =>
               item.id === formData.monitor_instance?.monitor_object
@@ -137,29 +137,29 @@ const Information: React.FC<TableDataItem> = ({
             </a>
           </div>
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.assetGroup')}>
+        <Descriptions.Item label={t('monitor.events.assetGroup')}>
           {showGroupName(
             formData.policy?.organizations || [],
             organizationList
           )}
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.strategy')}>
+        <Descriptions.Item label={t('monitor.events.strategy')}>
           {formData.policy?.name || '--'}
         </Descriptions.Item>
         {formData.status === 'closed' && (
-          <Descriptions.Item label={t('monitor.alertEndTime')}>
+          <Descriptions.Item label={t('monitor.events.alertEndTime')}>
             {formData.end_event_time
               ? convertToLocalizedTime(formData.end_event_time)
               : '--'}
           </Descriptions.Item>
         )}
-        <Descriptions.Item label={t('monitor.notify')}>
+        <Descriptions.Item label={t('monitor.events.notify')}>
           {formData.policy.notice ? 'Notified' : 'Unnotified'}
         </Descriptions.Item>
         <Descriptions.Item label={t('common.operator')}>
           {formData.operator || '--'}
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.notifier')}>
+        <Descriptions.Item label={t('monitor.events.notifier')}>
           {showNotifiers(formData)}
         </Descriptions.Item>
       </Descriptions>
@@ -169,12 +169,12 @@ const Information: React.FC<TableDataItem> = ({
           disabled={formData.status !== 'new'}
           onClick={() => showAlertCloseConfirm(formData)}
         >
-          {t('monitor.closeAlert')}
+          {t('monitor.events.closeAlert')}
         </Button>
       </div>
       <div className="mt-4">
         <h3 className="font-[600] text-[16px] mb-[15px]">
-          {t('monitor.indexView')}
+          {t('monitor.views.indexView')}
         </h3>
         <div className="text-[12px]">{getIndexName()}</div>
         <div className="h-[250px]">

@@ -174,7 +174,9 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
             >
               <Radio.Group>
                 <Radio value="select">{t('common.select')}</Radio>
-                <Radio value="condition">{t('monitor.condition')}</Radio>
+                <Radio value="condition">
+                  {t('monitor.intergrations.condition')}
+                </Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
@@ -206,7 +208,7 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
                   </Form.Item>
                 ) : (
                   <Form.Item<RuleInfo>
-                    label={t('monitor.condition')}
+                    label={t('monitor.intergrations.condition')}
                     name="grouping_rules"
                     rules={[{ required: true, message: t('common.required') }]}
                   >

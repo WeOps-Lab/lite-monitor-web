@@ -222,7 +222,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               </Select>
             </Form.Item>
             <Form.Item<MetricInfo>
-              label={t('monitor.dimension')}
+              label={t('monitor.intergrations.dimension')}
               name="dimensions"
             >
               <ul>
@@ -257,7 +257,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               </ul>
             </Form.Item>
             <Form.Item<MetricInfo>
-              label={t('monitor.formula')}
+              label={t('monitor.intergrations.formula')}
               name="query"
               rules={[{ required: true, message: t('common.required') }]}
             >
@@ -285,13 +285,15 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               }
             </Form.Item> */}
             <Form.Item<MetricInfo>
-              label={t('monitor.dataType')}
+              label={t('monitor.intergrations.dataType')}
               name="data_type"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Select>
-                <Option value="number">{t('monitor.number')}</Option>
-                <Option value="enum">{t('monitor.enum')}</Option>
+                <Option value="number">
+                  {t('monitor.intergrations.number')}
+                </Option>
+                <Option value="enum">{t('monitor.intergrations.enum')}</Option>
               </Select>
             </Form.Item>
             <Form.Item<MetricInfo>

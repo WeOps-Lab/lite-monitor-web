@@ -24,7 +24,7 @@ const IntergrationAsset = () => {
             value={activeTab}
             options={[
               {
-                label: t('monitor.intergration'),
+                label: t('monitor.intergrations.intergration'),
                 value: 'intergration',
               },
               {

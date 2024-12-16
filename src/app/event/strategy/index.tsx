@@ -96,7 +96,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       ),
     },
     {
-      title: t('monitor.executionTime'),
+      title: t('monitor.events.executionTime'),
       dataIndex: 'last_run_time',
       key: 'last_run_time',
       render: (_, { last_run_time }) => (
@@ -104,7 +104,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       ),
     },
     {
-      title: t('monitor.effective'),
+      title: t('monitor.events.effective'),
       dataIndex: 'effective',
       key: 'effective',
       render: (_, record) => (

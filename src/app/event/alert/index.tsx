@@ -66,7 +66,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
 
   const columns: ColumnItem[] = [
     {
-      title: t('monitor.level'),
+      title: t('monitor.events.level'),
       dataIndex: 'level',
       key: 'level',
       render: (_, { level }) => (
@@ -85,13 +85,13 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       ),
     },
     {
-      title: t('monitor.title'),
+      title: t('monitor.events.title'),
       dataIndex: 'title',
       key: 'title',
       render: (_, record) => <>{record.content || '--'}</>,
     },
     {
-      title: t('monitor.index'),
+      title: t('monitor.events.index'),
       dataIndex: 'index',
       key: 'index',
       render: (_, record) => <>{showMetricName(record)}</>,
@@ -105,7 +105,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       ),
     },
     {
-      title: t('monitor.state'),
+      title: t('monitor.events.state'),
       dataIndex: 'status',
       key: 'status',
       render: (_, { status }) => (
@@ -115,7 +115,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       ),
     },
     {
-      title: t('monitor.notify'),
+      title: t('monitor.events.notify'),
       dataIndex: 'notify',
       key: 'notify',
       render: (_, record) => (
@@ -207,8 +207,8 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
 
   const showAlertCloseConfirm = (row: TableDataItem) => {
     confirm({
-      title: t('monitor.closeTitle'),
-      content: t('monitor.closeContent'),
+      title: t('monitor.events.closeTitle'),
+      content: t('monitor.events.closeContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve) => {
@@ -216,7 +216,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
             await patch(`/api/monitor_alert/${row.id}/`, {
               status: 'closed',
             });
-            message.success(t('monitor.successfullyClosed'));
+            message.success(t('monitor.events.successfullyClosed'));
             getAssetInsts('refresh');
           } finally {
             resolve(true);
@@ -402,7 +402,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
 
   const openAlertDetail = (row: TableDataItem) => {
     detailRef.current?.showModal({
-      title: t('monitor.alertDetail'),
+      title: t('monitor.events.alertDetail'),
       type: 'add',
       form: {
         ...row,
@@ -439,10 +439,12 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       <Spin spinning={pageLoading}>
         <div className={alertStyle.alert}>
           <div className={alertStyle.filters}>
-            <h3 className="font-[800] mb-[20px]">{t('monitor.filterItems')}</h3>
+            <h3 className="font-[800] mb-[20px]">
+              {t('monitor.events.filterItems')}
+            </h3>
             <div className="mb-[15px]">
               <h4 className="font-[600] text-[var(--color-text-3)] mb-[10px]">
-                {t('monitor.level')}
+                {t('monitor.events.level')}
               </h4>
               <Checkbox.Group
                 className="ml-[20px]"
@@ -451,7 +453,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                 <Space direction="vertical">
                   <Checkbox value="critical">
                     <div className={alertStyle.level}>
-                      {t('monitor.critical')}
+                      {t('monitor.events.critical')}
                     </div>
                   </Checkbox>
                   <Checkbox value="error">
@@ -461,7 +463,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                         borderLeft: `4px solid ${LEVEL_MAP.error}`,
                       }}
                     >
-                      {t('monitor.error')}
+                      {t('monitor.events.error')}
                     </div>
                   </Checkbox>
                   <Checkbox value="warning">
@@ -471,7 +473,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                         borderLeft: `4px solid ${LEVEL_MAP.warning}`,
                       }}
                     >
-                      {t('monitor.warning')}
+                      {t('monitor.events.warning')}
                     </div>
                   </Checkbox>
                 </Space>
@@ -479,31 +481,35 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
             </div>
             <div className="mb-[15px]">
               <h4 className="font-[600] text-[var(--color-text-3)] mb-[10px]">
-                {t('monitor.state')}
+                {t('monitor.events.state')}
               </h4>
               <Checkbox.Group
                 className="ml-[20px]"
                 onChange={(checkeds) => onFilterChange(checkeds, 'state')}
               >
                 <Space direction="vertical">
-                  <Checkbox value="new">{t('monitor.new')}</Checkbox>
-                  <Checkbox value="recovered">{t('monitor.recovery')}</Checkbox>
-                  <Checkbox value="closed">{t('monitor.closed')}</Checkbox>
+                  <Checkbox value="new">{t('monitor.events.new')}</Checkbox>
+                  <Checkbox value="recovered">
+                    {t('monitor.events.recovery')}
+                  </Checkbox>
+                  <Checkbox value="closed">
+                    {t('monitor.events.closed')}
+                  </Checkbox>
                 </Space>
               </Checkbox.Group>
             </div>
             {/* <div className="mb-[15px]">
               <h4 className="font-[600] text-[var(--color-text-3)] mb-[10px]">
-                {t('monitor.notify')}
+                {t('monitor.events.notify')}
               </h4>
               <Checkbox.Group
                 className="ml-[20px]"
                 onChange={(checkeds) => onFilterChange(checkeds, 'notify')}
               >
                 <Space direction="vertical">
-                  <Checkbox value="Notified">{t('monitor.notified')}</Checkbox>
+                  <Checkbox value="Notified">{t('monitor.events.notified')}</Checkbox>
                   <Checkbox value="Unnotified">
-                    {t('monitor.unnotified')}
+                    {t('monitor.events.unnotified')}
                   </Checkbox>
                 </Space>
               </Checkbox.Group>

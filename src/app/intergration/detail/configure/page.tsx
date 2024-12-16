@@ -214,14 +214,16 @@ const Configure: React.FC = () => {
   return (
     <div className={configureStyle.configure}>
       <Spin spinning={pageLoading}>
-        <p className="mb-[20px]">{t('monitor.configureStepIntro')}</p>
+        <p className="mb-[20px]">
+          {t('monitor.intergrations.configureStepIntro')}
+        </p>
         <ThreeStep
           metricsDisabled={true}
           step2Options={originMetrics}
           step3Content={step3Content}
           step3Config={
             <Button type="primary" loading={loading} onClick={createContent}>
-              {t('monitor.generateConfiguration')}
+              {t('monitor.intergrations.generateConfiguration')}
             </Button>
           }
           onStep2Change={handleStep2Change}
@@ -229,7 +231,9 @@ const Configure: React.FC = () => {
           <Form form={form} name="basic" onValuesChange={handleValuesChange}>
             <Form.Item<CollectionTargetField>
               label={
-                <span className="w-[100px]">{t('monitor.instanceName')}</span>
+                <span className="w-[100px]">
+                  {t('monitor.intergrations.instanceName')}
+                </span>
               }
               name="monitor_instance_name"
               rules={[{ required: true, message: t('common.required') }]}
@@ -238,7 +242,11 @@ const Configure: React.FC = () => {
             </Form.Item>
             {name === 'Website' && (
               <Form.Item<CollectionTargetField>
-                label={<span className="w-[100px]">{t('monitor.url')}</span>}
+                label={
+                  <span className="w-[100px]">
+                    {t('monitor.intergrations.url')}
+                  </span>
+                }
                 name="monitor_url"
                 rules={[{ required: true, message: t('common.required') }]}
               >
@@ -246,7 +254,11 @@ const Configure: React.FC = () => {
               </Form.Item>
             )}
             <Form.Item<CollectionTargetField>
-              label={<span className="w-[100px]">{t('monitor.interval')}</span>}
+              label={
+                <span className="w-[100px]">
+                  {t('monitor.intergrations.interval')}
+                </span>
+              }
               className={configureStyle.interval}
             >
               <Form.Item

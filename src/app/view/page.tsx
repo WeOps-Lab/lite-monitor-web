@@ -88,7 +88,7 @@ const Intergration = () => {
             type="link"
             onClick={() => openViewModal(record)}
           >
-            {t('menu.view')}
+            {t('monitor.view')}
           </Button>
           <Button type="link" onClick={() => linkToDetial(record)}>
             {t('common.detail')}
@@ -356,7 +356,7 @@ const Intergration = () => {
 
   const openViewModal = (row: TableDataItem) => {
     viewRef.current?.showModal({
-      title: t('monitor.indexView'),
+      title: t('monitor.views.indexView'),
       type: 'add',
       form: row,
     });

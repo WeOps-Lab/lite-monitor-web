@@ -170,7 +170,7 @@ const Intergration = () => {
 
   const openImportModal = () => {
     importRef.current?.showModal({
-      title: t('monitor.importMetric'),
+      title: t('common.import'),
       type: 'add',
       form: {},
     });
@@ -202,14 +202,14 @@ const Intergration = () => {
         />
         <div>
           <Button className="mx-[8px]" type="primary" onClick={openImportModal}>
-            {t('monitor.importMetric')}
+            {t('common.import')}
           </Button>
           <Button
             disabled={exportDisabled}
             loading={exportLoading}
             onClick={exportMetric}
           >
-            {t('monitor.exportMetric')}
+            {t('common.export')}
           </Button>
         </div>
       </div>

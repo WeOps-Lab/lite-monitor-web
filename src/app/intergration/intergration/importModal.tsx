@@ -104,7 +104,9 @@ const ImportModal = forwardRef<ModalRef, ModalConfig>(({ onSuccess }, ref) => {
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">{t('common.uploadAction')}</p>
-          <p className="ant-upload-hint">{t('monitor.GroupImportTips')}</p>
+          <p className="ant-upload-hint">
+            {t('monitor.intergrations.groupImportTips')}
+          </p>
         </Dragger>
       </OperateModal>
     </div>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Spin, Select, Button, Segmented, Input } from 'antd';
 import { BellOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { useConditionList } from '@/constants/monitor';
 import useApiClient from '@/utils/request';
 import TimeSelector from '@/components/time-selector';
 import Collapse from '@/components/collapse';
@@ -21,7 +22,6 @@ import {
   SearchParams,
 } from '@/types/monitor';
 import { deepClone, findUnitNameById } from '@/utils/common';
-import { CONDITION_LIST } from '@/constants/monitor';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 const { Option } = Select;
@@ -29,6 +29,7 @@ const { Option } = Select;
 const Search: React.FC = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const CONDITION_LIST = useConditionList();
   const searchParams = useSearchParams();
   const url_instance_id = searchParams.get('instance_id');
   const url_obj_name = searchParams.get('monitor_object');
@@ -412,7 +413,7 @@ const Search: React.FC = () => {
       </div>
       <div className={searchStyle.criteria}>
         <Collapse
-          title={t('monitor.searchCriteria')}
+          title={t('monitor.search.searchCriteria')}
           icon={
             <Button
               disabled={!object}
@@ -431,7 +432,7 @@ const Search: React.FC = () => {
               >
                 <Select
                   className={`w-[150px] ${searchStyle.sourceObjectType}`}
-                  placeholder={t('monitor.object')}
+                  placeholder={t('monitor.search.object')}
                   showSearch
                   loading={objLoading}
                   value={object}
@@ -558,7 +559,7 @@ const Search: React.FC = () => {
                 label: (
                   <div className="flex items-center">
                     <Icon type="duijimianjitu" className="mr-[8px]" />
-                    {t('monitor.area')}
+                    {t('monitor.search.area')}
                   </div>
                 ),
                 value: 'area',
@@ -567,7 +568,7 @@ const Search: React.FC = () => {
                 label: (
                   <div className="flex items-center">
                     <Icon type="tabulation" className="mr-[8px]" />
-                    {t('monitor.table')}
+                    {t('monitor.search.table')}
                   </div>
                 ),
                 value: 'table',
