@@ -17,7 +17,7 @@ import {
   TableDataItem,
   ListItem,
 } from '@/types';
-import { KEY_METRIC_LABEL_MAP } from '@/constants/monitor';
+import { useKeyMetricLabelMap } from '@/constants/monitor';
 import CustomTable from '@/components/custom-table';
 import TimeSelector from '@/components/time-selector';
 import { useCommon } from '@/context/common';
@@ -29,6 +29,7 @@ import viewStyle from './index.module.less';
 const Intergration = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const KEY_METRIC_LABEL_MAP = useKeyMetricLabelMap();
   const router = useRouter();
   const commonContext = useCommon();
   const { convertToLocalizedTime } = useLocalizedTime();

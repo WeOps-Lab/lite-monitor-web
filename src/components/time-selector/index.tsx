@@ -3,7 +3,7 @@ import Icon from '@/components/icon';
 import { Select, Button, DatePicker } from 'antd';
 import { CalendarOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { SelectProps, TimeRangePickerProps } from 'antd';
-import { FREQUENCY_LIST, TIME_RANGE_LIST } from '@/constants/monitor';
+import { useFrequencyList, useTimeRangeList } from '@/constants/monitor';
 import timeSelectorStyle from './index.module.less';
 import dayjs, { Dayjs } from 'dayjs';
 import { ListItem } from '@/types';
@@ -41,6 +41,8 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   onRefresh,
   onChange,
 }) => {
+  const TIME_RANGE_LIST = useTimeRangeList();
+  const FREQUENCY_LIST = useFrequencyList();
   const [frequency, setFrequency] = useState<number>(0);
   const [timeRange, setTimeRange] = useState<number>(15);
   const [rangePickerOpen, setRangePickerOpen] = useState<boolean>(false);

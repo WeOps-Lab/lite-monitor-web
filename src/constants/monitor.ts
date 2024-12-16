@@ -9,24 +9,36 @@ import {
   ObjectIconMap,
 } from '@/types/monitor';
 
-const FREQUENCY_LIST: ListItem[] = [
-  { label: 'off', value: 0 },
-  { label: '1m', value: 60000 },
-  { label: '5m', value: 300000 },
-  { label: '10m', value: 600000 },
-];
+const useFrequencyList = (): ListItem[] => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { label: t('common.timeSelector.off'), value: 0 },
+      { label: '1m', value: 60000 },
+      { label: '5m', value: 300000 },
+      { label: '10m', value: 600000 },
+    ],
+    [t]
+  );
+};
 
-const TIME_RANGE_LIST: ListItem[] = [
-  { label: 'The past 15 minutes', value: 15 },
-  { label: 'The past 30 minutes', value: 30 },
-  { label: 'The past 1 hour', value: 60 },
-  { label: 'The past 6 hours', value: 360 },
-  { label: 'The past 12 hours', value: 720 },
-  { label: 'The past 1 day', value: 1440 },
-  { label: 'The past 7 days', value: 10080 },
-  { label: 'The past 30 days', value: 43200 },
-  { label: 'Custom', value: 0 },
-];
+const useTimeRangeList = (): ListItem[] => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { label: t('common.timeSelector.15Minutes'), value: 15 },
+      { label: t('common.timeSelector.30Minutes'), value: 30 },
+      { label: t('common.timeSelector.1Hour'), value: 60 },
+      { label: t('common.timeSelector.6Hours'), value: 360 },
+      { label: t('common.timeSelector.12Hours'), value: 720 },
+      { label: t('common.timeSelector.1Day'), value: 1440 },
+      { label: t('common.timeSelector.7Days'), value: 10080 },
+      { label: t('common.timeSelector.30Days'), value: 43200 },
+      { label: t('common.timeSelector.custom'), value: 0 },
+    ],
+    [t]
+  );
+};
 
 const useConditionList = (): ListItem[] => {
   const { t } = useTranslation();
@@ -39,6 +51,61 @@ const useConditionList = (): ListItem[] => {
     ],
     [t]
   );
+};
+
+const useKeyMetricLabelMap = (): ObjectIconMap => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => ({
+      'cpu_summary.usage': t('monitor.views.cpu_summary.usage'),
+      'mem.pct_usable': t('monitor.views.mem.pct_usable'),
+      load5: t('monitor.views.load5'),
+      sysUpTime: t('monitor.views.sysUpTime'),
+      iftotalInOctets: t('monitor.views.iftotalInOctets'),
+      iftotalOutOctets: t('monitor.views.iftotalOutOctets'),
+      'http_success.rate': t('monitor.views.http_success.rate'),
+      'http_total.duration': t('monitor.views.http_total.duration'),
+      pod_status: t('monitor.views.pod_status'),
+      pod_cpu_utilization: t('monitor.views.pod_cpu_utilization'),
+      pod_memory_utilization: t('monitor.views.pod_memory_utilization'),
+      node_status_condition: t('monitor.views.node_status_condition'),
+      node_cpu_utilization: t('monitor.views.node_cpu_utilization'),
+      node_memory_utilization: t('monitor.views.node_memory_utilization'),
+      cluster_pod_count: t('monitor.views.cluster_pod_count'),
+      cluster_node_count: t('monitor.views.cluster_node_count'),
+    }),
+    [t]
+  );
+};
+
+const useStateMap = (): StateMap => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => ({
+      new: t('monitor.events.new'),
+      recovery: t('monitor.events.recovery'),
+      closed: t('monitor.events.closed'),
+    }),
+    [t]
+  );
+};
+
+const useLevelList = (): ListItem[] => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { label: t('monitor.events.critical'), value: 'critical' },
+      { label: t('monitor.events.error'), value: 'error' },
+      { label: t('monitor.events.warning'), value: 'warning' },
+    ],
+    [t]
+  );
+};
+
+const LEVEL_MAP: LevelMap = {
+  critical: '#F43B2C',
+  error: '#D97007',
+  warning: '#FFAD42',
 };
 
 const UNIT_LIST = [
@@ -1073,12 +1140,6 @@ const COMPARISON_METHOD: ListItem[] = [
   { label: '≤', value: '<=' },
 ];
 
-const LEVEL_LIST: ListItem[] = [
-  { label: 'Critical', value: 'critical' },
-  { label: 'Error', value: 'error' },
-  { label: 'Warning', value: 'warning' },
-];
-
 const MONITOR_GROUPS_MAP: MonitorGroupMap = {
   Host: {
     list: ['instance_id'],
@@ -1123,18 +1184,6 @@ const MONITOR_GROUPS_MAP: MonitorGroupMap = {
   },
 };
 
-const LEVEL_MAP: LevelMap = {
-  critical: '#F43B2C',
-  error: '#D97007',
-  warning: '#FFAD42',
-};
-
-const STATE_MAP: StateMap = {
-  new: 'New',
-  recovery: 'Recovery',
-  closed: 'Closed',
-};
-
 const OBJECT_ICON_MAP: ObjectIconMap = {
   Host: 'Host',
   Website: 'Website',
@@ -1151,41 +1200,22 @@ const OBJECT_ICON_MAP: ObjectIconMap = {
   'Audit System': 'AuditSystem',
 };
 
-const KEY_METRIC_LABEL_MAP: ObjectIconMap = {
-  'cpu_summary.usage': 'CPU',
-  'mem.pct_usable': 'Memory',
-  load5: 'Load(5min)',
-  sysUpTime: 'Time',
-  iftotalInOctets: 'Incoming Traffic',
-  iftotalOutOctets: 'Outgoing Traffic',
-  'http_success.rate': 'Status',
-  'http_total.duration': 'Duration',
-  pod_status: 'Status',
-  pod_cpu_utilization: 'CPU',
-  pod_memory_utilization: 'Memory',
-  node_status_condition: 'Status',
-  node_cpu_utilization: 'CPU',
-  node_memory_utilization: 'Memory',
-  cluster_pod_count: 'Pod Count',
-  cluster_node_count: 'Node Conut',
-};
-
 export {
-  FREQUENCY_LIST,
   UNIT_LIST,
   INDEX_CONFIG,
-  TIME_RANGE_LIST,
   METHOD_LIST,
   SCHEDULE_LIST,
   PERIOD_LIST,
   COMPARISON_METHOD,
   LEVEL_MAP,
-  LEVEL_LIST,
   SCHEDULE_UNIT_MAP,
-  STATE_MAP,
   MONITOR_GROUPS_MAP,
   OBJECT_ICON_MAP,
   INTERFACE_LABEL_MAP,
-  KEY_METRIC_LABEL_MAP,
+  useLevelList,
+  useKeyMetricLabelMap,
   useConditionList,
+  useTimeRangeList,
+  useFrequencyList,
+  useStateMap,
 };

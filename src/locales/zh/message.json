@@ -93,13 +93,23 @@
     "started": "已启动。",
     "closed": "已关闭。",
     "import": "导入",
-    "export": "导出"
-  },
-  "menu": {
-    "intergration": "集成"
-  },
-  "cutomTable": {
-    "fieldSetting": "列表字段设置"
+    "export": "导出",
+    "more": "详情",
+    "cutomTable": {
+      "fieldSetting": "列表字段设置"
+    },
+    "timeSelector": {
+      "15Minutes": "最近15分钟",
+      "30Minutes": "最近30分钟",
+      "1Hour": "最近1小时",
+      "6Hours": "最近6小时",
+      "12Hours": "最近12小时",
+      "1Day": "最近1天",
+      "7Days": "最近7天",
+      "30Days": "最近30天",
+      "custom": "自定义",
+      "off": "关闭"
+    }
   },
   "monitor": {
     "view": "视图",
@@ -124,7 +134,23 @@
     },
     "views": {
       "indexView": "视图",
-      "overview": "概览"
+      "overview": "概览",
+      "cpu_summary.usage": "CPU使用率",
+      "mem.pct_usable": "应用程序内存可用率",
+      "load5": "平均负载(5min)",
+      "sysUpTime": "系统运行时间",
+      "iftotalInOctets": "设备每秒接收总流量",
+      "iftotalOutOctets": "设备每秒发送总流量",
+      "http_success.rate": "拨测状态",
+      "http_total.duration": "HTTP响应时间",
+      "pod_status": "Pod状态",
+      "pod_cpu_utilization": "CPU使用率",
+      "pod_memory_utilization": "内存使用率",
+      "node_status_condition": "Node状态",
+      "node_cpu_utilization": "CPU使用率",
+      "node_memory_utilization": "内存使用率",
+      "cluster_pod_count": "集群Pod总数",
+      "cluster_node_count": "集群节点数"
     },
     "events": {
       "event": "事件",

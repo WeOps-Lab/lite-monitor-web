@@ -11,7 +11,7 @@ import { findUnitNameById, showGroupName } from '@/utils/common';
 import { useCommon } from '@/context/common';
 import { Modal, message, Button } from 'antd';
 import useApiClient from '@/utils/request';
-import { LEVEL_MAP, LEVEL_LIST } from '@/constants/monitor';
+import { LEVEL_MAP, useLevelList } from '@/constants/monitor';
 
 const Information: React.FC<TableDataItem> = ({
   formData,
@@ -23,6 +23,7 @@ const Information: React.FC<TableDataItem> = ({
 }) => {
   const { t } = useTranslation();
   const { convertToLocalizedTime } = useLocalizedTime();
+  const LEVEL_LIST = useLevelList();
   const { confirm } = Modal;
   const { patch } = useApiClient();
   const commonContext = useCommon();
@@ -133,7 +134,7 @@ const Information: React.FC<TableDataItem> = ({
               className="text-blue-500 w-[36px]"
               onClick={() => checkDetail(formData)}
             >
-              More
+              {t('common.more')}
             </a>
           </div>
         </Descriptions.Item>

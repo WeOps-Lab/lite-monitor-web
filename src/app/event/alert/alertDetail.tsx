@@ -25,13 +25,15 @@ import useApiClient from '@/utils/request';
 import Information from './information';
 import CustomTable from '@/components/custom-table';
 import { findUnitNameById } from '@/utils/common';
-import { LEVEL_MAP, LEVEL_LIST, STATE_MAP } from '@/constants/monitor';
+import { LEVEL_MAP, useLevelList, useStateMap } from '@/constants/monitor';
 
 const AlertDetail = forwardRef<ModalRef, ModalConfig>(
   ({ objects, metrics, userList, onSuccess }, ref) => {
     const { t } = useTranslation();
     const { get } = useApiClient();
     const { convertToLocalizedTime } = useLocalizedTime();
+    const STATE_MAP = useStateMap();
+    const LEVEL_LIST = useLevelList();
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [formData, setFormData] = useState<TableDataItem>({});
     const [title, setTitle] = useState<string>('');

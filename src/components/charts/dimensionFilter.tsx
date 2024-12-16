@@ -1,5 +1,6 @@
 import React from 'react';
 import chartStyle from './index.module.less';
+import { useTranslation } from '@/utils/i18n';
 
 interface DimensionFilterProps {
   data: any[];
@@ -35,10 +36,12 @@ const DimensionFilter: React.FC<DimensionFilterProps> = ({
   details,
   onLegendClick,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={chartStyle.filterArea}>
       <div className="bg-[var(--color-fill-2)] text-[14px] font-[800] p-[4px] text-center">
-        维度
+        {t('monitor.intergrations.dimension')}
       </div>
       <ul className="text-[12px]">
         {getChartAreaKeys(data).map((key, index) => (

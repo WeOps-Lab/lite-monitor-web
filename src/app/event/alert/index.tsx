@@ -31,11 +31,13 @@ import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCommon } from '@/context/common';
 import alertStyle from './index.module.less';
-import { LEVEL_MAP, LEVEL_LIST, STATE_MAP } from '@/constants/monitor';
+import { LEVEL_MAP, useLevelList, useStateMap } from '@/constants/monitor';
 
 const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const { get, patch, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const STATE_MAP = useStateMap();
+  const LEVEL_LIST = useLevelList();
   const { confirm } = Modal;
   const { convertToLocalizedTime } = useLocalizedTime();
   const commonContext = useCommon();

@@ -93,13 +93,23 @@
     "started": "Started.",
     "closed": "Closed.",
     "import": "Import",
-    "export": "Export"
-  },
-  "menu": {
-    "intergration": "Intergration"
-  },
-  "cutomTable": {
-    "fieldSetting": "List field settings"
+    "export": "Export",
+    "more": "More",
+    "cutomTable": {
+      "fieldSetting": "List field settings"
+    },
+    "timeSelector": {
+      "15Minutes": "The past 15 minutes",
+      "30Minutes": "The past 30 minutes",
+      "1Hour": "The past 1 hour",
+      "6Hours": "The past 6 hours",
+      "12Hours": "The past 12 hours",
+      "1Day": "The past 1 day",
+      "7Days": "The past 7 days",
+      "30Days": "The past 30 days",
+      "custom": "Custom",
+      "off": "off"
+    }
   },
   "monitor": {
     "view": "View",
@@ -124,7 +134,23 @@
     },
     "views": {
       "indexView": "Index View",
-      "overview": "Overview"
+      "overview": "Overview",
+      "cpu_summary.usage": "CPU",
+      "mem.pct_usable": "Memory",
+      "load5": "Load(5min)",
+      "sysUpTime": "Time",
+      "iftotalInOctets": "Incoming Traffic",
+      "iftotalOutOctets": "Outgoing Traffic",
+      "http_success.rate": "Status",
+      "http_total.duration": "Duration",
+      "pod_status": "Status",
+      "pod_cpu_utilization": "CPU",
+      "pod_memory_utilization": "Memory",
+      "node_status_condition": "Status",
+      "node_cpu_utilization": "CPU",
+      "node_memory_utilization": "Memory",
+      "cluster_pod_count": "Pod Count",
+      "cluster_node_count": "Node Conut"
     },
     "events": {
       "event": "Event",

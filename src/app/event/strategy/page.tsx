@@ -40,7 +40,7 @@ import {
   SCHEDULE_LIST,
   COMPARISON_METHOD,
   LEVEL_MAP,
-  LEVEL_LIST,
+  useLevelList,
   SCHEDULE_UNIT_MAP,
   MONITOR_GROUPS_MAP,
   OBJECT_ICON_MAP,
@@ -53,6 +53,7 @@ const StrategyOperation = () => {
   const { t } = useTranslation();
   const { get, post, put, isLoading } = useApiClient();
   const CONDITION_LIST = useConditionList();
+  const LEVEL_LIST = useLevelList();
   const commonContext = useCommon();
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
