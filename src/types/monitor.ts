@@ -99,6 +99,12 @@ export interface DimensionItem {
   [key: string]: unknown;
 }
 
+export interface EnumItem {
+  name: string | null;
+  id: number | null;
+  [key: string]: unknown;
+}
+
 export interface IndexViewItem {
   name?: string;
   id: number;

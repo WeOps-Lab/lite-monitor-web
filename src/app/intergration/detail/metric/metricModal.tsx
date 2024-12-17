@@ -7,13 +7,21 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import { Input, Button, Form, message, Select, Cascader } from 'antd';
+import {
+  Input,
+  Button,
+  Form,
+  message,
+  Select,
+  Cascader,
+  InputNumber,
+} from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import OperateModal from '@/components/operate-modal';
 import type { FormInstance } from 'antd';
 import useApiClient from '@/utils/request';
 import { ModalRef, ListItem, CascaderItem } from '@/types';
-import { MetricInfo, DimensionItem } from '@/types/monitor';
+import { MetricInfo, DimensionItem, EnumItem } from '@/types/monitor';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findCascaderPath } from '@/utils/common';
 import { UNIT_LIST } from '@/constants/monitor';
@@ -45,6 +53,9 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
     const [dimensions, setDimensions] = useState<DimensionItem[]>([
       { name: '' },
     ]);
+    const [enumList, setEnumList] = useState<EnumItem[]>([
+      { id: null, name: null },
+    ]);
 
     useImperativeHandle(ref, () => ({
       showModal: ({ type, form, title }) => {
@@ -53,16 +64,28 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
         setGroupVisible(true);
         setType(type);
         setTitle(title);
-        if (type === 'add') {
-          formData.type = 'metric';
-          setDimensions([{ name: '' }]);
-        } else {
-          setDimensions(
-            formData.dimensions?.length ? formData.dimensions : [{ name: '' }]
-          );
-          formData.unit = findCascaderPath(unitList.current, formData.unit);
+        try {
+          if (type === 'add') {
+            formData.type = 'metric';
+            setDimensions([{ name: '' }]);
+            setEnumList([{ name: null, id: null }]);
+          } else {
+            setDimensions(
+              formData.dimensions?.length ? formData.dimensions : [{ name: '' }]
+            );
+            if (formData.data_type === 'Number') {
+              formData.unit = findCascaderPath(unitList.current, formData.unit);
+            } else {
+              formData.data_type = 'Enum';
+              const _enumList = JSON.parse(formData.unit);
+              setEnumList(_enumList);
+            }
+          }
+          setGroupForm(formData);
+        } catch (error) {
+          setGroupForm(formData);
+          setEnumList([{ name: null, id: null }]);
         }
-        setGroupForm(formData);
       },
     }));
 
@@ -103,7 +126,10 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
           monitor_object: monitorObject,
           monitor_plugin: pluginId,
           type: 'metric',
-          unit: values.unit.at(-1),
+          unit:
+            values.data_type === 'Enum'
+              ? JSON.stringify(enumList)
+              : values.unit.at(-1),
         });
       });
     };
@@ -114,13 +140,24 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
       setDimensions(_dimensions);
     };
 
+    const addEnumItem = () => {
+      const _enumList = deepClone(enumList);
+      _enumList.push({ name: null, id: null });
+      setEnumList(_enumList);
+    };
+
     const handleCancel = () => {
       setGroupVisible(false);
     };
 
     // 自定义验证枚举列表
-    const validateDimensions = async () => {
-      if (dimensions.some((item) => !item.name)) {
+    const validateEnumList = async () => {
+      if (
+        enumList.length &&
+        enumList.some((item) => {
+          return Object.values(item).some((tex) => !tex && tex !== 0);
+        })
+      ) {
         return Promise.reject(new Error(t('common.valueValidate')));
       }
       return Promise.resolve();
@@ -135,10 +172,31 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
       setDimensions(_dimensions);
     };
 
+    const handleEnumIdChange = (val: number | null, index: number) => {
+      const _enumList = deepClone(enumList);
+      _enumList[index].id = val;
+      setEnumList(_enumList);
+    };
+
+    const handleEnumNameChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+      index: number
+    ) => {
+      const _enumList = deepClone(enumList);
+      _enumList[index].name = e.target.value;
+      setEnumList(_enumList);
+    };
+
     const deleteDimensiontem = (index: number) => {
       const _dimensions = deepClone(dimensions);
       _dimensions.splice(index, 1);
       setDimensions(_dimensions);
+    };
+
+    const deleteEnumItem = (index: number) => {
+      const _enumList = deepClone(enumList);
+      _enumList.splice(index, 1);
+      setEnumList(_enumList);
     };
 
     return (
@@ -263,45 +321,96 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
             >
               <Input.TextArea rows={4} />
             </Form.Item>
-            {/* <Form.Item
-              noStyle
-              shouldUpdate={(prevValues, currentValues) =>
-                prevValues.type !== currentValues.type
-              }
-            >
-              {({ getFieldValue }) =>
-                getFieldValue('type') === 'metric' ? (
-                  <Form.Item<MetricInfo>
-                    label={t('monitor.dataType')}
-                    name="data_type"
-                    rules={[{ required: true, message: t('common.required') }]}
-                  >
-                    <Select>
-                      <Option value="number">{t('monitor.number')}</Option>
-                      <Option value="enum">{t('monitor.enum')}</Option>
-                    </Select>
-                  </Form.Item>
-                ) : null
-              }
-            </Form.Item> */}
             <Form.Item<MetricInfo>
               label={t('monitor.intergrations.dataType')}
               name="data_type"
               rules={[{ required: true, message: t('common.required') }]}
             >
               <Select>
-                <Option value="number">
+                <Option value="Number">
                   {t('monitor.intergrations.number')}
                 </Option>
-                <Option value="enum">{t('monitor.intergrations.enum')}</Option>
+                <Option value="Enum">{t('monitor.intergrations.enum')}</Option>
               </Select>
             </Form.Item>
-            <Form.Item<MetricInfo>
-              label={t('common.unit')}
-              name="unit"
-              rules={[{ required: true, message: t('common.required') }]}
+            <Form.Item
+              noStyle
+              shouldUpdate={(prevValues, currentValues) =>
+                prevValues.data_type !== currentValues.data_type
+              }
             >
-              <Cascader showSearch options={unitList.current} />
+              {({ getFieldValue }) =>
+                getFieldValue('data_type') === 'Number' ? (
+                  <Form.Item<MetricInfo>
+                    label={t('common.unit')}
+                    name="unit"
+                    rules={[{ required: true, message: t('common.required') }]}
+                  >
+                    <Cascader showSearch options={unitList.current} />
+                  </Form.Item>
+                ) : (
+                  <Form.Item<MetricInfo>
+                    label={t('common.unit')}
+                    name="unit"
+                    rules={[{ required: true, validator: validateEnumList }]}
+                  >
+                    <ul>
+                      <li className="mb-[6px] text-[var(--color-text-3)] font-[600]">
+                        <div className="w-[80%] flex justify-between">
+                          <span className="w-[160px]">
+                            {t('monitor.intergrations.originalValue')}
+                          </span>
+                          <span className="w-[160px]">
+                            {t('monitor.intergrations.mappedValue')}
+                          </span>
+                        </div>
+                      </li>
+                      {enumList.map((item, index) => (
+                        <li
+                          className={`flex ${
+                            index + 1 !== enumList?.length && 'mb-[10px]'
+                          }`}
+                          key={index}
+                        >
+                          <div className="w-[80%] flex justify-between">
+                            <InputNumber
+                              placeholder={t(
+                                'monitor.intergrations.originalValue'
+                              )}
+                              className="w-[160px]"
+                              min={0}
+                              value={item.id}
+                              onChange={(e) => handleEnumIdChange(e, index)}
+                            />
+                            <Input
+                              placeholder={t(
+                                'monitor.intergrations.mappedValue'
+                              )}
+                              className="w-[160px]"
+                              value={item.name as string}
+                              onChange={(e) => {
+                                handleEnumNameChange(e, index);
+                              }}
+                            />
+                          </div>
+                          <Button
+                            icon={<PlusOutlined />}
+                            className="ml-[10px]"
+                            onClick={addEnumItem}
+                          ></Button>
+                          {!!index && (
+                            <Button
+                              icon={<MinusOutlined />}
+                              className="ml-[10px]"
+                              onClick={() => deleteEnumItem(index)}
+                            ></Button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </Form.Item>
+                )
+              }
             </Form.Item>
             <Form.Item<MetricInfo>
               label={t('common.description')}

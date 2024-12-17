@@ -76,6 +76,9 @@ const Configure = () => {
       title: t('common.unit'),
       dataIndex: 'unit',
       key: 'unit',
+      render: (_, record) => (
+        <>{record.data_type === 'Enum' ? '--' : record.unit || '--'}</>
+      ),
     },
     {
       title: t('common.descripition'),

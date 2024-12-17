@@ -265,7 +265,9 @@
       "condition": "条件",
       "rule": "规则",
       "ruleTips": "用于设置访问资产所有权组织的规则对于每个资产模型是唯一的",
-      "generateConfiguration": "生成配置"
+      "generateConfiguration": "生成配置",
+      "originalValue": "原始值",
+      "mappedValue": "映射值"
     }
   }
 }
