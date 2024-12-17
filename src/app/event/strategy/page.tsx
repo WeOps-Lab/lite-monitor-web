@@ -35,9 +35,9 @@ import SelectAssets from './selectAssets';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useConditionList } from '@/constants/monitor';
 import {
-  METHOD_LIST,
+  useMethodList,
   PERIOD_LIST,
-  SCHEDULE_LIST,
+  useScheduleList,
   COMPARISON_METHOD,
   LEVEL_MAP,
   useLevelList,
@@ -52,8 +52,10 @@ const defaultGroup = ['instance_id'];
 const StrategyOperation = () => {
   const { t } = useTranslation();
   const { get, post, put, isLoading } = useApiClient();
+  const METHOD_LIST = useMethodList();
   const CONDITION_LIST = useConditionList();
   const LEVEL_LIST = useLevelList();
+  const SCHEDULE_LIST = useScheduleList();
   const commonContext = useCommon();
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
@@ -478,7 +480,7 @@ const StrategyOperation = () => {
                             <span className="text-[var(--color-primary)] px-[4px]">
                               {source.values.length}
                             </span>
-                            {t('monitor.asset')}(s)
+                            {t('monitor.assets')}
                             <Button
                               className="ml-[10px]"
                               icon={<PlusOutlined />}

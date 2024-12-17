@@ -102,6 +102,49 @@ const useLevelList = (): ListItem[] => {
   );
 };
 
+const useMethodList = (): ListItem[] => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { label: t('monitor.events.sum'), value: 'sum' },
+      { label: t('monitor.events.avg'), value: 'avg' },
+      { label: t('monitor.events.max'), value: 'max' },
+      { label: t('monitor.events.min'), value: 'min' },
+    ],
+    [t]
+  );
+};
+
+const useScheduleList = (): ListItem[] => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { label: t('monitor.events.minutes'), value: 'min' },
+      { label: t('monitor.events.hours'), value: 'hour' },
+      { label: t('monitor.events.days'), value: 'day' },
+    ],
+    [t]
+  );
+};
+
+const useInterfaceLabelMap = (): ObjectIconMap => {
+  const { t } = useTranslation();
+  return useMemo(
+    () => ({
+      interface: t('monitor.views.interface'),
+      ifOperStatus: t('monitor.views.ifOperStatus'),
+      ifHighSpeed: t('monitor.views.ifHighSpeed'),
+      ifInErrors: t('monitor.views.ifInErrors'),
+      ifOutErrors: t('monitor.views.ifOutErrors'),
+      ifInUcastPkts: t('monitor.views.ifInUcastPkts'),
+      ifOutUcastPkts: t('monitor.views.ifOutUcastPkts'),
+      ifInOctets: t('monitor.views.ifInOctets'),
+      ifOutOctets: t('monitor.views.ifOutOctets'),
+    }),
+    [t]
+  );
+};
+
 const LEVEL_MAP: LevelMap = {
   critical: '#F43B2C',
   error: '#D97007',
@@ -1085,32 +1128,6 @@ const INDEX_CONFIG = [
   },
 ];
 
-const INTERFACE_LABEL_MAP: ObjectIconMap = {
-  interface: 'Interface',
-  ifOperStatus: 'Status',
-  ifHighSpeed: 'Bandwidth',
-  ifInErrors: 'In Errors',
-  ifOutErrors: 'Out Errors',
-  ifInUcastPkts: 'In Ucast',
-  ifOutUcastPkts: 'Out Ucast',
-  ifInOctets: 'In traffic',
-  ifOutOctets: 'Out traffic',
-};
-
-const METHOD_LIST: ListItem[] = [
-  { label: 'SUM', value: 'sum' },
-  { label: 'AVG', value: 'avg' },
-  { label: 'MAX', value: 'max' },
-  { label: 'MIN', value: 'min' },
-  //   { label: 'NEW', value: 'new' },
-];
-
-const SCHEDULE_LIST: ListItem[] = [
-  { label: 'Minute(s)', value: 'min' },
-  { label: 'Hour(s)', value: 'hour' },
-  { label: 'Day(s)', value: 'day' },
-];
-
 const SCHEDULE_UNIT_MAP: UnitMap = {
   minMin: 1,
   minMax: 59,
@@ -1203,15 +1220,15 @@ const OBJECT_ICON_MAP: ObjectIconMap = {
 export {
   UNIT_LIST,
   INDEX_CONFIG,
-  METHOD_LIST,
-  SCHEDULE_LIST,
   PERIOD_LIST,
   COMPARISON_METHOD,
   LEVEL_MAP,
   SCHEDULE_UNIT_MAP,
   MONITOR_GROUPS_MAP,
   OBJECT_ICON_MAP,
-  INTERFACE_LABEL_MAP,
+  useInterfaceLabelMap,
+  useScheduleList,
+  useMethodList,
   useLevelList,
   useKeyMetricLabelMap,
   useConditionList,

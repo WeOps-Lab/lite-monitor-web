@@ -21,11 +21,12 @@ import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
-import { INDEX_CONFIG, INTERFACE_LABEL_MAP } from '@/constants/monitor';
+import { INDEX_CONFIG, useInterfaceLabelMap } from '@/constants/monitor';
 
 const Overview = () => {
   const { get, isLoading } = useApiClient();
   const { t } = useTranslation();
+  const INTERFACE_LABEL_MAP = useInterfaceLabelMap();
   const searchParams = useSearchParams();
   const monitorObject: React.Key = searchParams.get('monitorObjId') || '';
   const instId: React.Key = searchParams.get('instance_id') || '';

@@ -123,6 +123,7 @@
     "objectType": "类型",
     "calculatedMetric": "计算指标",
     "asset": "资产",
+    "assets": "个资产",
     "assetValidate": "资产不能为空",
     "include": "包括",
     "exclude": "不包括",
@@ -150,7 +151,16 @@
       "node_cpu_utilization": "CPU使用率",
       "node_memory_utilization": "内存使用率",
       "cluster_pod_count": "集群Pod总数",
-      "cluster_node_count": "集群节点数"
+      "cluster_node_count": "集群节点数",
+      "interface": "接口",
+      "ifOperStatus": "操作状态",
+      "ifHighSpeed": "带宽",
+      "ifInErrors": "每秒接收错误数据包数",
+      "ifOutErrors": "每秒发送错误数据包数",
+      "ifInUcastPkts": "每秒接收单播数据包数",
+      "ifOutUcastPkts": "每秒发送单播数据包数",
+      "ifInOctets": "每秒接收流量",
+      "ifOutOctets": "每秒发送流量"
     },
     "events": {
       "event": "事件",
@@ -213,7 +223,14 @@
       "email": "电子邮件",
       "createPolicy": "创建策略",
       "editPolicy": "编辑策略",
-      "alertEndTime": "告警结束时间"
+      "alertEndTime": "告警结束时间",
+      "minutes": "分钟",
+      "hours": "小时",
+      "days": "天",
+      "sum": "和",
+      "avg": "平均值",
+      "max": "最大值",
+      "min": "最小值"
     },
     "intergrations": {
       "intergration": "集成",

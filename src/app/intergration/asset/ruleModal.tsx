@@ -197,7 +197,7 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
                       <span className="text-[var(--color-primary)] px-[4px]">
                         {instList.length}
                       </span>
-                      {t('monitor.asset')}(s)
+                      {t('monitor.assets')}
                       <Button
                         className="ml-[10px]"
                         icon={<PlusOutlined />}

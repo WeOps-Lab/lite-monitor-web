@@ -123,6 +123,7 @@
     "objectType": "Type",
     "calculatedMetric": "Calculated Metric",
     "asset": "Asset",
+    "assets": "asset(s)",
     "assetValidate": "The Asset cannot be empty",
     "include": "Include",
     "exclude": "Exclude",
@@ -150,7 +151,16 @@
       "node_cpu_utilization": "CPU",
       "node_memory_utilization": "Memory",
       "cluster_pod_count": "Pod Count",
-      "cluster_node_count": "Node Conut"
+      "cluster_node_count": "Node Conut",
+      "interface": "Interface",
+      "ifOperStatus": "Status",
+      "ifHighSpeed": "Bandwidth",
+      "ifInErrors": "In Errors",
+      "ifOutErrors": "Out Errors",
+      "ifInUcastPkts": "In Ucast",
+      "ifOutUcastPkts": "Out Ucast",
+      "ifInOctets": "In traffic",
+      "ifOutOctets": "Out traffic"
     },
     "events": {
       "event": "Event",
@@ -213,7 +223,14 @@
       "email": "Email",
       "createPolicy": "Create Policy",
       "editPolicy": "Edit Policy",
-      "alertEndTime": "End Time of Alert"
+      "alertEndTime": "End Time of Alert",
+      "minutes": "Minute(s)",
+      "hours": "Hour(s)",
+      "days": "Day(s)",
+      "sum": "SUM",
+      "avg": "AVG",
+      "max": "MAX",
+      "min": "MIN"
     },
     "intergrations": {
       "intergration": "Intergration",
