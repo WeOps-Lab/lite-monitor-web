@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Cascader, CascaderProps } from 'antd';
 const { SHOW_CHILD } = Cascader;
+import { useTranslation } from '@/utils/i18n';
 
 interface CascaderOption {
   value: string;
@@ -30,17 +31,20 @@ const findPath = (options: CascaderOption[], value: string): string[] => {
 interface CustomCascaderProps
   extends Omit<CascaderProps<any>, 'value' | 'onChange'> {
   value?: string[] | string;
-  onChange?: (value: string[] | string) => void;
   multiple?: boolean;
+  onChange?: (value: string[] | string) => void;
 }
 
 const CustomCascader: React.FC<CustomCascaderProps> = ({
+  placeholder = '',
   value = [],
-  onChange,
   options = [],
   multiple = false,
+  onChange,
   ...props
 }) => {
+  const { t } = useTranslation();
+
   const [internalValue, setInternalValue] = useState<string[][] | string[]>(
     multiple ? [] : []
   );
@@ -78,6 +82,7 @@ const CustomCascader: React.FC<CustomCascaderProps> = ({
   return (
     <Cascader
       {...props}
+      placeholder={placeholder || t('common.organizations')}
       value={internalValue}
       onChange={handleChange}
       showCheckedStrategy={SHOW_CHILD}

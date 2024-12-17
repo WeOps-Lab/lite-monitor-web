@@ -95,6 +95,7 @@
     "import": "Import",
     "export": "Export",
     "more": "More",
+    "organizations": "Organizations",
     "cutomTable": {
       "fieldSetting": "List field settings"
     },
