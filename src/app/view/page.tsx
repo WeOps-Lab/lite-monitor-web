@@ -69,7 +69,7 @@ const Intergration = () => {
       ),
     },
     {
-      title: t('common.time'),
+      title: t('monitor.views.reportTime'),
       dataIndex: 'time',
       key: 'time',
       render: (_, { time }) => (
@@ -242,7 +242,7 @@ const Intergration = () => {
           }
         });
         const originColumns = deepClone(columns);
-        const indexToInsert = originColumns.length - 2;
+        const indexToInsert = originColumns.length - 1;
         originColumns.splice(indexToInsert, 0, ..._columns);
         setTableColumn(originColumns);
       }
@@ -315,13 +315,13 @@ const Intergration = () => {
     const groupedData = data.reduce((acc, item) => {
       if (!acc[item.type]) {
         acc[item.type] = {
-          label: item.type,
+          label: item.display_type,
           value: item.type,
           list: [],
         };
       }
       acc[item.type].list.push({
-        label: item.name,
+        label: item.display_name,
         key: item.id,
       });
       return acc;

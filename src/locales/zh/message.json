@@ -161,7 +161,8 @@
       "ifInUcastPkts": "每秒接收单播数据包数",
       "ifOutUcastPkts": "每秒发送单播数据包数",
       "ifInOctets": "每秒接收流量",
-      "ifOutOctets": "每秒发送流量"
+      "ifOutOctets": "每秒发送流量",
+      "reportTime": "上报时间"
     },
     "events": {
       "event": "事件",
@@ -231,7 +232,8 @@
       "sum": "和",
       "avg": "平均值",
       "max": "最大值",
-      "min": "最小值"
+      "min": "最小值",
+      "newValue": "最新值"
     },
     "intergrations": {
       "intergration": "集成",

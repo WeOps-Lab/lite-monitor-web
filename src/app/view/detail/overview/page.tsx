@@ -15,13 +15,13 @@ import {
   SearchParams,
   InterfaceTableItem,
 } from '@/types/monitor';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ChartData } from '@/types';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { INDEX_CONFIG, useInterfaceLabelMap } from '@/constants/monitor';
+import Icon from '@/components/icon';
 
 const Overview = () => {
   const { get, isLoading } = useApiClient();
@@ -409,7 +409,7 @@ const Overview = () => {
                   style={metricItem.style}
                 >
                   <div className="flex justify-between items-center mb-[10px]">
-                    <span className="text-[14px]">
+                    <span className="text-[14px] relative">
                       <span className="font-[600] mr-[2px]">
                         {metricItem.display_name}
                       </span>
@@ -418,15 +418,23 @@ const Overview = () => {
                           ? `（${findUnitNameById(metricItem.unit)}）`
                           : ''}
                       </span>
-                      {metricItem.description && (
+                      {metricItem.display_description && (
                         <Tooltip
                           placement="topLeft"
-                          title={metricItem.description as string}
+                          title={metricItem.display_description as string}
                         >
-                          <QuestionCircleOutlined
-                            className="text-[12px] relative cursor-pointer text-[var(--color-text-2)]"
-                            style={{ top: '-6px' }}
-                          />
+                          <div
+                            className="absolute cursor-pointer"
+                            style={{
+                              top: '-3px',
+                              right: '-14px',
+                            }}
+                          >
+                            <Icon
+                              type="a-shuoming2"
+                              className="text-[16px] text-[var(--color-text-2)]"
+                            />
+                          </div>
                         </Tooltip>
                       )}
                     </span>

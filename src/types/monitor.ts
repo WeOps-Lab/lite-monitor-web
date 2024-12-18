@@ -55,6 +55,8 @@ export interface ObectItem {
   plugin_id?: number;
   plugin_description: string;
   description: string;
+  display_name?: string;
+  display_type?: string;
   [key: string]: unknown;
 }
 
@@ -62,7 +64,9 @@ export interface PluginItem {
   id: number;
   name: string;
   description: string;
+  display_name?: string;
   monitor_object: number[];
+  display_description?: string;
   [key: string]: unknown;
 }
 
@@ -73,6 +77,7 @@ export interface MetricItem {
   name: string;
   type: string;
   display_name?: string;
+  display_description?: string;
   dimensions: any[];
   query?: string;
   unit?: string;
@@ -107,6 +112,7 @@ export interface EnumItem {
 
 export interface IndexViewItem {
   name?: string;
+  display_name?: string;
   id: number;
   isLoading?: boolean;
   child?: any[];

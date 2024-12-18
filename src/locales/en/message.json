@@ -161,7 +161,8 @@
       "ifInUcastPkts": "In Ucast",
       "ifOutUcastPkts": "Out Ucast",
       "ifInOctets": "In traffic",
-      "ifOutOctets": "Out traffic"
+      "ifOutOctets": "Out traffic",
+      "reportTime": "Report Time"
     },
     "events": {
       "event": "Event",
@@ -231,7 +232,8 @@
       "sum": "SUM",
       "avg": "AVG",
       "max": "MAX",
-      "min": "MIN"
+      "min": "MIN",
+      "newValue": "NEW"
     },
     "intergrations": {
       "intergration": "Intergration",

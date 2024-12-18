@@ -23,6 +23,7 @@ interface ListItem {
   id: string;
   name: string;
   child: MetricItem[];
+  is_pre: boolean;
 }
 
 const Configure = () => {
@@ -100,7 +101,11 @@ const Configure = () => {
           >
             {t('common.edit')}
           </Button>
-          <Button type="link" onClick={() => showDeleteConfirm(record)}>
+          <Button
+            type="link"
+            disabled={record.is_pre}
+            onClick={() => showDeleteConfirm(record)}
+          >
             {t('common.delete')}
           </Button>
         </>
@@ -123,7 +128,7 @@ const Configure = () => {
           .filter((item: ObectItem) => item.type === 'K8S')
           .sort((a: ObectItem, b: ObectItem) => a.id - b.id)
           .map((item: ObectItem) => ({
-            label: item.name,
+            label: item.display_name,
             value: item.id,
           }));
         _objId = _items[0]?.value;
@@ -179,6 +184,7 @@ const Configure = () => {
   const getInitData = async (objId = activeTab) => {
     const params = {
       monitor_object_id: +objId,
+      monitor_plugin_id: +pluginID,
     };
     const getGroupList = get(`/api/metrics_group/`, {
       params: {
@@ -328,7 +334,7 @@ const Configure = () => {
                   <Button
                     type="link"
                     size="small"
-                    disabled={!!metricItem.child?.length}
+                    disabled={!!metricItem.child?.length || metricItem.is_pre}
                     icon={<DeleteOutlined />}
                     onClick={() => showGroupDeleteConfirm(metricItem)}
                   ></Button>

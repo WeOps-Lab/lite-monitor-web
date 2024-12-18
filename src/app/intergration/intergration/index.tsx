@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { Spin, Input, Button, Segmented, Tag, message } from 'antd';
+import { Spin, Input, Button, Segmented, Tag, message, Tooltip } from 'antd';
 import useApiClient from '@/utils/request';
 import intergrationStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
@@ -119,7 +119,7 @@ const Intergration = () => {
     const groupedData = data.reduce((acc, item) => {
       if (!acc[item.type]) {
         acc[item.type] = {
-          label: item.type,
+          label: item.display_type || '--',
           value: item.type,
           list: [],
         };
@@ -128,9 +128,9 @@ const Intergration = () => {
         if ((plugin.monitor_object || []).includes(item.id)) {
           acc[item.type].list.push({
             ...item,
-            plugin_name: plugin?.name,
+            plugin_name: plugin?.display_name,
             plugin_id: plugin?.id,
-            plugin_description: plugin?.description,
+            plugin_description: plugin?.display_description || '--',
           });
         }
       });
@@ -238,12 +238,21 @@ const Intergration = () => {
                 }`}
               >
                 <div className="flex items-center space-x-4 my-2">
-                  <Icon type={OBJECT_ICON_MAP[app.name]} className="text-6xl" />
-                  <div>
-                    <h2 className="text-xl font-bold m-0">
-                      {app.plugin_name || '--'}
-                    </h2>
-                    <Tag className="mt-[4px]">{app.name || '--'}</Tag>
+                  <Icon
+                    type={OBJECT_ICON_MAP[app.name]}
+                    className="text-[48px] min-w-[48px]"
+                  />
+                  <div
+                    style={{
+                      width: 'calc(100% - 60px)',
+                    }}
+                  >
+                    <Tooltip placement="top" title={app.plugin_name}>
+                      <h2 className="text-xl font-bold m-0 hide-text">
+                        {app.plugin_name || '--'}
+                      </h2>
+                    </Tooltip>
+                    <Tag className="mt-[4px]">{app.display_name || '--'}</Tag>
                   </div>
                 </div>
                 <p

@@ -195,13 +195,13 @@ const Asset = () => {
     const groupedData = data.reduce((acc, item) => {
       if (!acc[item.type]) {
         acc[item.type] = {
-          title: item.type,
+          title: item.display_type || '--',
           key: item.type,
           children: [],
         };
       }
       acc[item.type].children.push({
-        title: item.name,
+        title: item.display_name || '--',
         key: item.id,
         children: [],
       });
@@ -312,13 +312,24 @@ const Asset = () => {
         </Spin>
         <Spin spinning={ruleLoading}>
           <div className={assetStyle.rule}>
-            <div className={assetStyle.ruleTips}>
+            <div className={`${assetStyle.ruleTips} relative`}>
               {t('monitor.intergrations.rule')}
               <Tooltip
                 placement="top"
                 title={t('monitor.intergrations.ruleTips')}
               >
-                <QuestionCircleOutlined className={assetStyle.ruleIcon} />
+                <div
+                  className="absolute cursor-pointer"
+                  style={{
+                    top: '-3px',
+                    right: '-2px',
+                  }}
+                >
+                  <Icon
+                    type="a-shuoming2"
+                    className="text-[16px] text-[var(--color-text-2)]"
+                  />
+                </div>
               </Tooltip>
             </div>
             <ul className={assetStyle.ruleList}>

@@ -440,7 +440,7 @@ const Search: React.FC = () => {
                 >
                   {objects.map((item) => (
                     <Option value={item.name} key={item.id}>
-                      {item.name}
+                      {item.display_name}
                     </Option>
                   ))}
                 </Select>

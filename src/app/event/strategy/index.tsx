@@ -228,13 +228,13 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
     const groupedData = data.reduce((acc, item) => {
       if (!acc[item.type]) {
         acc[item.type] = {
-          title: item.type,
+          title: item.display_type || '--',
           key: item.type,
           children: [],
         };
       }
       acc[item.type].children.push({
-        title: item.name,
+        title: item.display_name || '--',
         key: item.id,
         children: [],
       });

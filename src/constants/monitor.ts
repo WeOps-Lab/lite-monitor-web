@@ -110,6 +110,7 @@ const useMethodList = (): ListItem[] => {
       { label: t('monitor.events.avg'), value: 'avg' },
       { label: t('monitor.events.max'), value: 'max' },
       { label: t('monitor.events.min'), value: 'min' },
+      { label: t('monitor.events.newValue'), value: 'new' },
     ],
     [t]
   );
@@ -701,9 +702,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -761,9 +762,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -821,9 +822,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -881,9 +882,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -941,9 +942,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -1001,9 +1002,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -1061,9 +1062,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
   {
@@ -1121,9 +1122,9 @@ const INDEX_CONFIG = [
       },
     ],
     tableDiaplay: [
-      { type: 'value', key: 'sysUpTime' },
       { type: 'value', key: 'iftotalInOctets' },
       { type: 'value', key: 'iftotalOutOctets' },
+      { type: 'value', key: 'sysUpTime' },
     ],
   },
 ];

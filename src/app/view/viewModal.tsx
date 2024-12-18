@@ -8,11 +8,7 @@ import React, {
   useEffect,
 } from 'react';
 import { Button, Spin, Select, Tooltip } from 'antd';
-import {
-  BellOutlined,
-  SearchOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
+import { BellOutlined, SearchOutlined } from '@ant-design/icons';
 import OperateDrawer from '@/components/operate-drawer';
 import TimeSelector from '@/components/time-selector';
 import LineChart from '@/components/charts/lineChart';
@@ -29,6 +25,7 @@ import {
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, findUnitNameById } from '@/utils/common';
 import dayjs, { Dayjs } from 'dayjs';
+import Icon from '@/components/icon';
 
 interface ModalProps {
   monitorObject: React.Key;
@@ -382,7 +379,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                 >
                   <Collapse
                     className="mb-[10px]"
-                    title={metricItem.name || ''}
+                    title={metricItem.display_name || ''}
                     isOpen={metricItem.id === expandId}
                     onToggle={(expanded) =>
                       toggleGroup(expanded, metricItem.id)
@@ -395,7 +392,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                           className="w-[49%] border border-[var(--color-border-1)] p-[10px] mb-[10px]"
                         >
                           <div className="flex justify-between items-center">
-                            <span className="text-[14px]">
+                            <span className="text-[14px] relative">
                               <span className="font-[600] mr-[2px]">
                                 {item.display_name}
                               </span>
@@ -408,12 +405,20 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                               </span>
                               <Tooltip
                                 placement="topLeft"
-                                title={item.description}
+                                title={item.display_description}
                               >
-                                <QuestionCircleOutlined
-                                  className="text-[12px] relative cursor-pointer text-[var(--color-text-2)]"
-                                  style={{ top: '-6px' }}
-                                />
+                                <div
+                                  className="absolute cursor-pointer inline-block"
+                                  style={{
+                                    top: '-3px',
+                                    right: '-14px',
+                                  }}
+                                >
+                                  <Icon
+                                    type="a-shuoming2"
+                                    className="text-[16px] text-[var(--color-text-2)]"
+                                  />
+                                </div>
                               </Tooltip>
                             </span>
                             <div className="text-[var(--color-text-3)]">
