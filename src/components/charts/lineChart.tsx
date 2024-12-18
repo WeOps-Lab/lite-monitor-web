@@ -10,11 +10,15 @@ import {
   ReferenceArea,
 } from 'recharts';
 import CustomTooltip from './customTooltips';
-import { generateUniqueRandomColor, formatTime } from '@/utils/common';
+import {
+  generateUniqueRandomColor,
+  formatTime,
+  isStringArray,
+} from '@/utils/common';
 import chartLineStyle from './index.module.less';
 import dayjs, { Dayjs } from 'dayjs';
 import DimensionFilter from './dimensionFilter';
-import { ChartData } from '@/types';
+import { ChartData, ListItem } from '@/types';
 
 interface LineChartProps {
   data: ChartData[];
@@ -128,6 +132,15 @@ const LineChart: React.FC<LineChartProps> = ({
             axisLine={false}
             tickLine={false}
             tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
+            tickFormatter={(tick) => {
+              if (isStringArray(unit)) {
+                const unitName = JSON.parse(unit).find(
+                  (item: ListItem) => item.id === tick
+                )?.name;
+                return unitName ? unitName : tick;
+              }
+              return tick;
+            }}
           />
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <Tooltip

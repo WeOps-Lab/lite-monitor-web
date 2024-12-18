@@ -2,6 +2,7 @@ import React from 'react';
 import { TooltipProps } from 'recharts';
 import customTooltipStyle from './index.module.less';
 import dayjs from 'dayjs';
+import { getEnumValue } from '@/utils/common';
 interface CustomToolTipProps extends Omit<TooltipProps<any, string>, 'unit'> {
   unit?: string;
   visible?: boolean;
@@ -33,14 +34,18 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
                   marginRight: '5px',
                 }}
               ></span>
-              {item.payload.title}
+              {(item.payload.details?.[item.dataKey] || [])
+                .filter((item: any) => item.name !== 'instance_name')
+                .map((detail: any) => `${detail.label}${detail.value}`)
+                .join('-') ||
+                (item.payload.details?.[item.dataKey] || [])
+                  .map((detail: any) => detail.value)
+                  .join('-')}
               <span className="font-[600] ml-[10px]">
-                {typeof item.value === 'number'
-                  ? item.value.toFixed(2)
-                  : item.value}
+                {getEnumValue(unit, item.value)}
               </span>
             </div>
-            <ul className="text-[12px] ml-[15px] text-[var(--color-text-3)]">
+            {/* <ul className="text-[12px] ml-[15px] text-[var(--color-text-3)]">
               {(item.payload.details?.[item.dataKey] || [])
                 .filter((item: any) => item.name !== 'instance_name')
                 .map((detail: any) => (
@@ -48,7 +53,7 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
                     <span>{`${detail.label}: ${detail.value}`}</span>
                   </li>
                 ))}
-            </ul>
+            </ul> */}
           </div>
         ))}
       </div>

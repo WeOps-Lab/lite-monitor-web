@@ -17,7 +17,13 @@ import {
 } from '@/types/monitor';
 import { ChartData } from '@/types';
 import { useTranslation } from '@/utils/i18n';
-import { deepClone, findUnitNameById, calculateMetrics } from '@/utils/common';
+import {
+  deepClone,
+  findUnitNameById,
+  calculateMetrics,
+  getEnumValue,
+  isStringArray,
+} from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { INDEX_CONFIG, useInterfaceLabelMap } from '@/constants/monitor';
@@ -40,6 +46,7 @@ const Overview = () => {
   const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<MetricItem[]>([]);
+  const [originMetricData, setOriginMetricData] = useState<MetricItem[]>([]);
   const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
 
   useEffect(() => {
@@ -76,7 +83,7 @@ const Overview = () => {
         const interfaceConfig = indexList.find(
           (item) => item.indexId === 'interfaces'
         );
-        const metricData = res
+        const _metricData = res
           .filter((item: MetricItem) =>
             indexList.find(
               (indexItem) =>
@@ -96,8 +103,9 @@ const Overview = () => {
             }
             return { ...item, viewData: [] };
           });
-        setMetricData(metricData);
-        fetchViewData(metricData, id);
+        setMetricData(_metricData);
+        setOriginMetricData(_metricData);
+        fetchViewData(_metricData, id);
       });
     } catch (error) {
       setLoading(false);
@@ -252,8 +260,7 @@ const Overview = () => {
   };
 
   const handleSearch = (type?: string) => {
-    const _metricData = deepClone(metricData);
-    setMetricData(_metricData);
+    const _metricData = deepClone(originMetricData);
     fetchViewData(_metricData, instId);
   };
 
@@ -312,6 +319,27 @@ const Overview = () => {
     return tableData;
   };
 
+  const getMultipleColumns = (displayDimension: string[]) => {
+    return ['interface', ...displayDimension].map((item: any) => {
+      const unit =
+        originMetricData.find((tex) => tex.name === item)?.unit || '';
+      return {
+        title: INTERFACE_LABEL_MAP[item],
+        dataIndex: item,
+        key: item,
+        render: (_: unknown, record: any) => (
+          <>
+            {isStringArray(unit)
+              ? getEnumValue(unit, record[item])
+              : record[item]
+                ? record[item] + unit
+                : '--'}
+          </>
+        ),
+      };
+    });
+  };
+
   const renderChart = (metricItem: any) => {
     switch (metricItem.displayType) {
       case 'barChart':
@@ -336,6 +364,7 @@ const Overview = () => {
         return (
           <SingleValue
             fontSize={30}
+            unit={metricItem.unit}
             value={
               calculateMetrics(metricItem.viewData || []).latestValue || '--'
             }
@@ -361,13 +390,7 @@ const Overview = () => {
           <CustomTable
             pagination={false}
             dataSource={metricItem.viewData || []}
-            columns={['interface', ...metricItem.displayDimension].map(
-              (item: any) => ({
-                title: INTERFACE_LABEL_MAP[item],
-                dataIndex: item,
-                key: item,
-              })
-            )}
+            columns={getMultipleColumns(metricItem.displayDimension)}
             scroll={{ y: 300 }}
             rowKey="id"
           />

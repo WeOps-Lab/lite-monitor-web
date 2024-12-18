@@ -26,14 +26,14 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
     {
       value: value,
       color:
-        segments.find((segment) => value <= segment.value)?.color || '#1890FF',
+        segments.find((segment) => value <= segment.value)?.color || '#F43B2C',
     }, // 根据值动态设置颜色
     { value: max - value, color: 'var(--color-fill-3)' }, // 透明的剩余部分
   ];
 
   // 获取当前值对应的颜色
   const currentColor =
-    segments.find((segment) => value <= segment.value)?.color || '#1890FF';
+    segments.find((segment) => value <= segment.value)?.color || '#F43B2C';
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 

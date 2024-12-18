@@ -3,6 +3,7 @@ import {
   OriginOrganization,
   OriginSubGroupItem,
   SubGroupItem,
+  ListItem,
 } from '@/types';
 import dayjs from 'dayjs';
 import { UNIT_LIST } from '@/constants/monitor';
@@ -263,4 +264,30 @@ export const findLabelById = (data: any[], key: string): string | null => {
     }
   }
   return null;
+};
+
+// 判断一个字符串是否是字符串的数组
+export const isStringArray = (input: string): boolean => {
+  try {
+    if (typeof input !== 'string') {
+      return false;
+    }
+    const parsed = JSON.parse(input);
+    if (!Array.isArray(parsed)) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+// 根据指标枚举获取值
+export const getEnumValue = (input: string, id: number | string) => {
+  if (isStringArray(input)) {
+    return (
+      JSON.parse(input).find((item: ListItem) => item.id === id)?.name || id
+    );
+  }
+  return typeof id === 'number' ? id.toFixed(2) : id;
 };

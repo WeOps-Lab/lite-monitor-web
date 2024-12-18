@@ -1,8 +1,10 @@
 import React from 'react';
+import { getEnumValue } from '@/utils/common';
 
 interface SingleValueDisplayProps {
   value: number | string;
   unit?: string;
+  showUnit?: string;
   label?: string;
   color?: string;
   fontSize?: number; // 新增属性，用于控制字体大小
@@ -14,6 +16,7 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
   value,
   unit,
   label,
+  showUnit = false,
   color = 'var(--color-text-1)',
   fontSize = 24, // 默认字体大小
   unitFontSize = 16, // 默认单位字体大小
@@ -25,8 +28,8 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
         className="flex items-center justify-center font-bold"
         style={{ color, fontSize }}
       >
-        {typeof value === 'number' ? value.toFixed(2) : value}
-        {unit && (
+        {getEnumValue(unit || '', value)}
+        {showUnit && (
           <span className="ml-[4px]" style={{ fontSize: unitFontSize }}>
             {unit}
           </span>
