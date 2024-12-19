@@ -1,5 +1,9 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { CaretRightOutlined, CaretDownOutlined } from '@ant-design/icons';
+import {
+  CaretRightOutlined,
+  CaretDownOutlined,
+  HolderOutlined,
+} from '@ant-design/icons';
 import classNames from 'classnames';
 
 interface AccordionProps {
@@ -8,7 +12,11 @@ interface AccordionProps {
   className?: string;
   isOpen?: boolean;
   icon?: JSX.Element;
+  sortable?: boolean;
   onToggle?: (isOpen: boolean) => void;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 
 const Collapse: React.FC<AccordionProps> = ({
@@ -17,7 +25,11 @@ const Collapse: React.FC<AccordionProps> = ({
   isOpen = true,
   icon,
   className = '',
+  sortable = false,
   onToggle,
+  onDragStart,
+  onDragOver,
+  onDrop,
 }) => {
   const [open, setOpen] = useState(isOpen);
   const collapseClass = classNames('text-[12px]', className);
@@ -35,12 +47,21 @@ const Collapse: React.FC<AccordionProps> = ({
   };
 
   return (
-    <div className={collapseClass}>
+    <div
+      className={collapseClass}
+      draggable={sortable}
+      onDragStart={sortable ? onDragStart : undefined}
+      onDragOver={sortable ? onDragOver : undefined}
+      onDrop={sortable ? onDrop : undefined}
+    >
       <div
         className="flex justify-between items-center p-[10px] bg-[var(--color-fill-1)] cursor-pointer"
         onClick={toggleAccordion}
       >
-        <div>
+        <div className="flex items-center">
+          {sortable && (
+            <HolderOutlined className="font-[800] text-[16px] mr-[6px] cursor-move" />
+          )}
           <span className="text-[var(--color-text-3)] mr-[6px]">
             {open ? <CaretDownOutlined /> : <CaretRightOutlined />}
           </span>

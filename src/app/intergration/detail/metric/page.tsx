@@ -18,7 +18,9 @@ import Collapse from '@/components/collapse';
 import GroupModal from './groupModal';
 import MetricModal from './metricModal';
 import { useSearchParams } from 'next/navigation';
+import { deepClone } from '@/utils/common';
 const { confirm } = Modal;
+
 interface ListItem {
   id: string;
   name: string;
@@ -27,7 +29,7 @@ interface ListItem {
 }
 
 const Configure = () => {
-  const { get, del, isLoading } = useApiClient();
+  const { get, del, isLoading, post } = useApiClient();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const groupName = searchParams.get('name');
@@ -41,6 +43,7 @@ const Configure = () => {
   const [groupList, setGroupList] = useState<ListItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
   const [items, setItems] = useState<IntergrationItem[]>([]);
+  const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
 
   const columns: ColumnItem[] = [
     {
@@ -279,6 +282,51 @@ const Configure = () => {
     getInitData(val);
   };
 
+  const onDragStart = (e: React.DragEvent<HTMLDivElement>, id: string) => {
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingItemId(id);
+  };
+
+  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (draggingItemId) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const onDrop = async (
+    e: React.DragEvent<HTMLDivElement>,
+    targetId: string
+  ) => {
+    e.preventDefault();
+    if (draggingItemId && draggingItemId !== targetId) {
+      const draggingIndex = metricData.findIndex(
+        (item) => item.id === draggingItemId
+      );
+      const targetIndex = metricData.findIndex((item) => item.id === targetId);
+      const reorderedData = deepClone(metricData);
+      const [draggedItem] = reorderedData.splice(draggingIndex, 1);
+      reorderedData.splice(targetIndex, 0, draggedItem);
+      if (draggingIndex !== -1 && targetIndex !== -1) {
+        try {
+          setLoading(true);
+          const updatedOrder = reorderedData.map(
+            (item: MetricItem, index: number) => ({
+              id: item.id,
+              sort_order: index,
+            })
+          );
+          await post('/api/metrics_group/set_order/', updatedOrder);
+          message.success(t('common.updateSuccess'));
+          getInitData();
+        } catch (error) {
+          setLoading(false);
+        }
+      }
+      setDraggingItemId(null);
+    }
+  };
+
   return (
     <div className={metricStyle.metric}>
       {groupName === 'Cluster' && (
@@ -321,6 +369,10 @@ const Configure = () => {
             <Collapse
               className="mb-[10px]"
               key={metricItem.id}
+              sortable
+              onDragStart={(e) => onDragStart(e, metricItem.id)}
+              onDragOver={onDragOver}
+              onDrop={(e) => onDrop(e, metricItem.id)}
               title={metricItem.name || ''}
               isOpen={!index}
               icon={
