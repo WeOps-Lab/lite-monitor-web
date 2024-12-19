@@ -36,7 +36,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useConditionList } from '@/constants/monitor';
 import {
   useMethodList,
-  PERIOD_LIST,
   useScheduleList,
   COMPARISON_METHOD,
   LEVEL_MAP,
@@ -82,6 +81,7 @@ const StrategyOperation = () => {
   const [metricsLoading, setMetricsLoading] = useState<boolean>(false);
   const [labels, setLabels] = useState<string[]>([]);
   const [unit, setUnit] = useState<string>('min');
+  const [periodUnit, setPeriodUnit] = useState<string>('min');
   const [conditions, setConditions] = useState<FilterItem[]>([]);
   const [noDataAlert, setNoDataAlert] = useState<number | null>(null);
   const [noDataLevel, setNoDataLevel] = useState<string>();
@@ -125,7 +125,7 @@ const StrategyOperation = () => {
       form.setFieldsValue({
         notice_type: 'email',
         notice: false,
-        period: 300,
+        period: 5,
         schedule: 5,
       });
       setMetric(searchParams.get('metricId') || null);
@@ -145,6 +145,7 @@ const StrategyOperation = () => {
       metric,
       source,
       schedule,
+      period,
       filter,
       threshold: thresholdList,
       no_data_alert,
@@ -156,6 +157,7 @@ const StrategyOperation = () => {
       ...data,
       recovery_condition: recovery_condition || null,
       schedule: schedule?.value || null,
+      period: period?.value || null,
     });
     const _metrics = metrics.find((item) => item.id === metric);
     const _labels = (_metrics?.dimensions || []).map((item) => item.name);
@@ -168,6 +170,7 @@ const StrategyOperation = () => {
       const target = thresholdList.find((tex) => tex.level === item.level);
       if (target) {
         item.value = target.value;
+        item.method = target.method;
       }
     });
     setThreshold(_threshold || []);
@@ -181,6 +184,7 @@ const StrategyOperation = () => {
     setNoDataLevel(no_data_level || '');
     setOpenNoData(!!no_data_alert);
     setUnit(schedule?.type || '');
+    setPeriodUnit(period?.type || '');
   };
 
   const openInstModal = () => {
@@ -292,6 +296,13 @@ const StrategyOperation = () => {
     });
   };
 
+  const handlePeriodUnitChange = (val: string) => {
+    setPeriodUnit(val);
+    form.setFieldsValue({
+      period: null,
+    });
+  };
+
   const handleThresholdMethodChange = (val: string, index: number) => {
     const _conditions = deepClone(threshold);
     _conditions[index].method = val;
@@ -356,6 +367,10 @@ const StrategyOperation = () => {
       _values.schedule = {
         type: unit,
         value: values.schedule,
+      };
+      _values.period = {
+        type: periodUnit,
+        value: values.period,
       };
       if (openNoData) {
         _values.no_data_alert = noDataAlert;
@@ -681,19 +696,24 @@ const StrategyOperation = () => {
                             { required: true, message: t('common.required') },
                           ]}
                         >
-                          <Select
-                            allowClear
-                            style={{
-                              width: '300px',
-                            }}
-                            placeholder={t('monitor.events.period')}
-                          >
-                            {PERIOD_LIST.map((item: ListItem) => (
-                              <Option value={item.value} key={item.value}>
-                                {item.label}
-                              </Option>
-                            ))}
-                          </Select>
+                          <InputNumber
+                            min={SCHEDULE_UNIT_MAP[`${periodUnit}Min`]}
+                            max={SCHEDULE_UNIT_MAP[`${periodUnit}Max`]}
+                            precision={0}
+                            addonAfter={
+                              <Select
+                                value={periodUnit}
+                                style={{ width: 120 }}
+                                onChange={handlePeriodUnitChange}
+                              >
+                                {SCHEDULE_LIST.map((item) => (
+                                  <Option key={item.value} value={item.value}>
+                                    {item.label}
+                                  </Option>
+                                ))}
+                              </Select>
+                            }
+                          />
                         </Form.Item>
                         <div className="text-[var(--color-text-3)] mt-[10px]">
                           {t('monitor.events.setPeriod')}

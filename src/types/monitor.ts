@@ -186,7 +186,10 @@ export interface StrategyFields {
     type: string;
     value: number;
   };
-  period?: number;
+  period?: {
+    type: string;
+    value: number;
+  };
   algorithm?: string;
   threshold: ThresholdField[];
   recovery_condition?: number;
