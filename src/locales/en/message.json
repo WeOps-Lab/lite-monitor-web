@@ -233,7 +233,9 @@
       "avg": "AVG",
       "max": "MAX",
       "min": "MIN",
-      "newValue": "NEW"
+      "newValue": "NEW",
+      "activeAlarms": "Active Alarms",
+      "historicalAlarms": "Historical Alarms"
     },
     "intergrations": {
       "intergration": "Intergration",

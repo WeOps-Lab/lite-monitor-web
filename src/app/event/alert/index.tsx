@@ -9,6 +9,7 @@ import {
   Tag,
   Modal,
   message,
+  Tabs,
 } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
@@ -20,6 +21,7 @@ import {
   Pagination,
   TableDataItem,
   UserItem,
+  TabItem,
 } from '@/types';
 import { AlertProps } from '@/types/monitor';
 import { AlertOutlined } from '@ant-design/icons';
@@ -32,6 +34,18 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useCommon } from '@/context/common';
 import alertStyle from './index.module.less';
 import { LEVEL_MAP, useLevelList, useStateMap } from '@/constants/monitor';
+
+const INIT_HISTORY_FILTERS = {
+  level: [],
+  state: [],
+  notify: [],
+};
+
+const INIT_ACTIVE_FILTERS = {
+  level: [],
+  state: ['new'],
+  notify: [],
+};
 
 const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const { get, patch, isLoading } = useApiClient();
@@ -60,11 +74,18 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
   const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
   const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
-  const [filters, setFilters] = useState<FiltersConfig>({
-    level: [],
-    state: [],
-    notify: [],
-  });
+  const [filters, setFilters] = useState<FiltersConfig>(INIT_ACTIVE_FILTERS);
+  const [tabs, setTabs] = useState<TabItem[]>([
+    {
+      label: t('monitor.events.activeAlarms'),
+      key: 'activeAlarms',
+    },
+    {
+      label: t('monitor.events.historicalAlarms'),
+      key: 'historicalAlarms',
+    },
+  ]);
+  const [activeTab, setActiveTab] = useState<string>('activeAlarms');
 
   const columns: ColumnItem[] = [
     {
@@ -203,6 +224,15 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
     pagination.pageSize,
   ]);
 
+  const changeTab = (val: string) => {
+    setActiveTab(val);
+    if (val === 'activeAlarms') {
+      setFilters(INIT_ACTIVE_FILTERS);
+      return;
+    }
+    setFilters(INIT_HISTORY_FILTERS);
+  };
+
   const getUsers = (id: string) => {
     return userList.find((item) => item.id === id)?.username || '--';
   };
@@ -235,7 +265,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
 
   const getParams = () => {
     return {
-      status_in: filters.state.join(','),
+      status_in: filters.state.join(',') || 'recovered,closed',
       level_in: filters.level.join(','),
       content: searchText,
       page: pagination.current,
@@ -299,97 +329,6 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
         total: data.count,
       }));
     } finally {
-      //   setTableData([
-      //     {
-      //       id: 3,
-      //       created_at: '2024-12-05T16:54:00+0800',
-      //       updated_at: '2024-12-05T16:54:00+0800',
-      //       policy_id: 10,
-      //       monitor_instance_id: 'lite',
-      //       alert_type: 'alert',
-      //       level: 'critical',
-      //       value: 8800.0,
-      //       content: 'OS-Host  cpu_summary.usage > 98',
-      //       status: 'new',
-      //       start_event_id: 60,
-      //       start_event_time: '2024-12-05T16:54:00+0800',
-      //       end_event_id: null,
-      //       end_event_time: null,
-      //       operator: 'system',
-      //       policy: {
-      //         id: 10,
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-12-04T17:28:55+0800',
-      //         updated_at: '2024-12-05T17:30:06+0800',
-      //         filter: [
-      //           {
-      //             name: 'cpu',
-      //             value: '1',
-      //             method: '!=',
-      //           },
-      //           {
-      //             name: 'cpu',
-      //             value: '0',
-      //             method: '=~',
-      //           },
-      //         ],
-      //         name: '123',
-      //         organizations: ['dde252a5-73c3-4b6f-8f3b-7c3ef95cee83'],
-      //         source: {
-      //           type: 'organization',
-      //           values: ['dde252a5-73c3-4b6f-8f3b-7c3ef95cee83'],
-      //         },
-      //         schedule: {
-      //           type: 'min',
-      //           value: 1,
-      //         },
-      //         period: 60,
-      //         algorithm: 'sum',
-      //         threshold: [
-      //           {
-      //             level: 'critical',
-      //             value: 99,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'error',
-      //             value: 999,
-      //             method: '>',
-      //           },
-      //           {
-      //             level: 'warning',
-      //             value: 9999,
-      //             method: '>',
-      //           },
-      //         ],
-      //         recovery_condition: 1,
-      //         no_data_alert: 0,
-      //         no_data_level: 'critical',
-      //         notice: true,
-      //         notice_type: 'email',
-      //         notice_users: [
-      //           'c5719e53-d368-4412-b12e-c135b09bfa35',
-      //           '7532d08d-928b-4ac4-b07f-36cb4a91f8cc',
-      //           '21ce969d-e31d-4f3f-8e0a-287846d89cf2',
-      //         ],
-      //         monitor_object: 1,
-      //         metric: 1,
-      //       },
-      //       monitor_instance: {
-      //         id: 'lite',
-      //         created_by: '',
-      //         updated_by: '',
-      //         created_at: '2024-11-26T10:55:59+0800',
-      //         updated_at: '2024-11-26T10:55:59+0800',
-      //         name: 'k8s-lite-cluster',
-      //         interval: 10,
-      //         agent_id: 'k3s-node-2',
-      //         auto: true,
-      //         monitor_object: 4,
-      //       },
-      //     },
-      //   ]);
       setTableLoading(false);
     }
   };
@@ -441,15 +380,16 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       <Spin spinning={pageLoading}>
         <div className={alertStyle.alert}>
           <div className={alertStyle.filters}>
-            <h3 className="font-[800] mb-[20px]">
+            <h3 className="font-[800] mb-[15px] text-[15px]">
               {t('monitor.events.filterItems')}
             </h3>
             <div className="mb-[15px]">
-              <h4 className="font-[600] text-[var(--color-text-3)] mb-[10px]">
+              <h4 className="font-[600] text-[14px] text-[var(--color-text-3)] mb-[10px]">
                 {t('monitor.events.level')}
               </h4>
               <Checkbox.Group
                 className="ml-[20px]"
+                value={filters.level}
                 onChange={(checkeds) => onFilterChange(checkeds, 'level')}
               >
                 <Space direction="vertical">
@@ -481,43 +421,31 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                 </Space>
               </Checkbox.Group>
             </div>
-            <div className="mb-[15px]">
-              <h4 className="font-[600] text-[var(--color-text-3)] mb-[10px]">
-                {t('monitor.events.state')}
-              </h4>
-              <Checkbox.Group
-                className="ml-[20px]"
-                onChange={(checkeds) => onFilterChange(checkeds, 'state')}
-              >
-                <Space direction="vertical">
-                  <Checkbox value="new">{t('monitor.events.new')}</Checkbox>
-                  <Checkbox value="recovered">
-                    {t('monitor.events.recovery')}
-                  </Checkbox>
-                  <Checkbox value="closed">
-                    {t('monitor.events.closed')}
-                  </Checkbox>
-                </Space>
-              </Checkbox.Group>
-            </div>
-            {/* <div className="mb-[15px]">
-              <h4 className="font-[600] text-[var(--color-text-3)] mb-[10px]">
-                {t('monitor.events.notify')}
-              </h4>
-              <Checkbox.Group
-                className="ml-[20px]"
-                onChange={(checkeds) => onFilterChange(checkeds, 'notify')}
-              >
-                <Space direction="vertical">
-                  <Checkbox value="Notified">{t('monitor.events.notified')}</Checkbox>
-                  <Checkbox value="Unnotified">
-                    {t('monitor.events.unnotified')}
-                  </Checkbox>
-                </Space>
-              </Checkbox.Group>
-            </div> */}
+            {activeTab === 'historicalAlarms' && (
+              <div className="mb-[15px]">
+                <h4 className="font-[600] text-[var(--color-text-3)] text-[14px] mb-[10px]">
+                  {t('monitor.events.state')}
+                </h4>
+                <Checkbox.Group
+                  value={filters.state}
+                  className="ml-[20px]"
+                  onChange={(checkeds) => onFilterChange(checkeds, 'state')}
+                >
+                  <Space direction="vertical">
+                    {/* <Checkbox value="new">{t('monitor.events.new')}</Checkbox> */}
+                    <Checkbox value="recovered">
+                      {t('monitor.events.recovery')}
+                    </Checkbox>
+                    <Checkbox value="closed">
+                      {t('monitor.events.closed')}
+                    </Checkbox>
+                  </Space>
+                </Checkbox.Group>
+              </div>
+            )}
           </div>
           <div className={alertStyle.table}>
+            <Tabs activeKey={activeTab} items={tabs} onChange={changeTab} />
             <div className="flex justify-between mb-[10px]">
               <Input
                 allowClear

@@ -233,7 +233,9 @@
       "avg": "平均值",
       "max": "最大值",
       "min": "最小值",
-      "newValue": "最新值"
+      "newValue": "最新值",
+      "activeAlarms": "活跃告警",
+      "historicalAlarms": "历史告警"
     },
     "intergrations": {
       "intergration": "集成",
