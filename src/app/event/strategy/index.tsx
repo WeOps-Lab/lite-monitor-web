@@ -208,6 +208,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
         data = await get(`/api/monitor_object/`, {
           params: {
             name: text || '',
+            add_policy_count: true,
           },
         });
       }
@@ -234,7 +235,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
         };
       }
       acc[item.type].children.push({
-        title: item.display_name || '--',
+        title: (item.display_name || '--') + `(${item.policy_count})`,
         key: item.id,
         children: [],
       });

@@ -57,7 +57,11 @@ const Event = () => {
   };
 
   const getObjects = async () => {
-    const data: ObectItem[] = await get('/api/monitor_object/');
+    const data: ObectItem[] = await get('/api/monitor_object/', {
+      params: {
+        add_policy_count: true,
+      },
+    });
     setObjects(data);
   };
 

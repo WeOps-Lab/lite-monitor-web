@@ -21,8 +21,7 @@ import {
   deepClone,
   findUnitNameById,
   calculateMetrics,
-  getEnumValue,
-  isStringArray,
+  getEnumValueUnit,
 } from '@/utils/common';
 import { useSearchParams } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
@@ -328,13 +327,7 @@ const Overview = () => {
         dataIndex: item,
         key: item,
         render: (_: unknown, record: any) => (
-          <>
-            {isStringArray(unit)
-              ? getEnumValue(unit, record[item])
-              : record[item]
-                ? record[item] + unit
-                : '--'}
-          </>
+          <>{getEnumValueUnit(unit, record[item])}</>
         ),
       };
     });

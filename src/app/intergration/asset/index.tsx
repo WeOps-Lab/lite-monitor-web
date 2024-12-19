@@ -14,12 +14,7 @@ import {
 } from '@/types';
 import { ObectItem, RuleInfo, ObjectInstItem } from '@/types/monitor';
 import CustomTable from '@/components/custom-table';
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import Icon from '@/components/icon';
 import RuleModal from './ruleModal';
 const { Search } = Input;
@@ -173,6 +168,7 @@ const Asset = () => {
       const data = await get(`/api/monitor_object/`, {
         params: {
           name: text || '',
+          add_instance_count: true,
         },
       });
       setObjects(data);
@@ -201,7 +197,7 @@ const Asset = () => {
         };
       }
       acc[item.type].children.push({
-        title: item.display_name || '--',
+        title: `${item.display_name || '--'}(${item.instance_count ?? 0})`,
         key: item.id,
         children: [],
       });

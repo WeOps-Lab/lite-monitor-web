@@ -291,3 +291,16 @@ export const getEnumValue = (input: string, id: number | string) => {
   }
   return typeof id === 'number' ? id.toFixed(2) : id;
 };
+
+// 根据指标枚举获取值+单位
+export const getEnumValueUnit = (input: string, id: number | string) => {
+  if (isStringArray(input)) {
+    return (
+      JSON.parse(input).find((item: ListItem) => item.id === +id)?.name ||
+      (id ?? '--')
+    );
+  }
+  if (!id) return '--';
+  const unit = findUnitNameById(input);
+  return typeof id === 'number' ? id.toFixed(2) + unit : id + unit;
+};

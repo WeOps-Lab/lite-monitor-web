@@ -38,14 +38,14 @@ const ImportModal = forwardRef<ModalRef, ModalConfig>(({ onSuccess }, ref) => {
   };
 
   const customRequest = async (options: any) => {
-    const { file, onSuccess } = options;
+    const { file, onSuccess: onHandleSuccess } = options;
     // 解析文件
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const json = JSON.parse(reader.result as string);
         setParsedData(json); // 存储解析后的数据
-        onSuccess('Ok');
+        onHandleSuccess('Ok');
       } catch (error) {
         setParsedData(null);
         message.error('Failed to parse JSON file');

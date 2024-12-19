@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Spin, Input, Button, Segmented, Tabs, Progress } from 'antd';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
-import { deepClone } from '@/utils/common';
+import { deepClone, getEnumValueUnit } from '@/utils/common';
 import { useRouter } from 'next/navigation';
 import { IntergrationItem, ObectItem, MetricItem } from '@/types/monitor';
 import CustomCascader from '@/components/custom-cascader';
@@ -208,24 +208,6 @@ const Intergration = () => {
                   />
                 ),
               };
-            case 'enum':
-              return {
-                title:
-                  KEY_METRIC_LABEL_MAP[target?.name] ||
-                  target?.display_name ||
-                  '--',
-                dataIndex: target?.name,
-                key: target?.name,
-                width: 200,
-                render: (_: unknown, record: TableDataItem) => (
-                  <>
-                    {(item.list || []).find(
-                      (listItem: ListItem) =>
-                        listItem.value === record[target?.name]
-                    )?.label || '--'}
-                  </>
-                ),
-              };
             default:
               return {
                 title:
@@ -236,7 +218,14 @@ const Intergration = () => {
                 key: target?.name,
                 width: 200,
                 render: (_: unknown, record: TableDataItem) => (
-                  <>{record[target?.name] || '--'}</>
+                  <>
+                    {getEnumValueUnit(
+                      target?.unit,
+                      isNaN(+record[target?.name])
+                        ? record[target?.name]
+                        : +record[target?.name]
+                    )}
+                  </>
                 ),
               };
           }

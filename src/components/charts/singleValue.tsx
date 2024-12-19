@@ -1,5 +1,5 @@
 import React from 'react';
-import { getEnumValue } from '@/utils/common';
+import { getEnumValue, findUnitNameById } from '@/utils/common';
 
 interface SingleValueDisplayProps {
   value: number | string;
@@ -31,7 +31,7 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
         {getEnumValue(unit || '', value)}
         {showUnit && (
           <span className="ml-[4px]" style={{ fontSize: unitFontSize }}>
-            {unit}
+            {findUnitNameById(unit)}
           </span>
         )}
       </div>
