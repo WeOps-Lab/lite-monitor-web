@@ -69,11 +69,9 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
     pageSize: 20,
   });
   const [frequence, setFrequence] = useState<number>(0);
-  const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
-  const lastTime: number = dayjs().valueOf();
-  const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
+  const [timeRange, setTimeRange] = useState<number[]>([]);
   const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
-  const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
+  const [timeRangeValue, setTimeRangeValue] = useState<number | null>(null);
   const [filters, setFilters] = useState<FiltersConfig>(INIT_ACTIVE_FILTERS);
   const [tabs, setTabs] = useState<TabItem[]>([
     {
@@ -270,8 +268,8 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       content: searchText,
       page: pagination.current,
       page_size: pagination.pageSize,
-      created_at_after: dayjs(timeRange[0]).toISOString(),
-      created_at_before: dayjs(timeRange[1]).toISOString(),
+      created_at_after: timeRange[0] ? dayjs(timeRange[0]).toISOString() : '',
+      created_at_before: timeRange[1] ? dayjs(timeRange[1]).toISOString() : '',
     };
   };
 
@@ -456,6 +454,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                 onClear={clearText}
               />
               <TimeSelector
+                clearable
                 value={{
                   timesValue: times,
                   timeRangeValue,
@@ -466,7 +465,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
               />
             </div>
             <CustomTable
-              scroll={{ y: 'calc(100vh - 300px)', x: 'calc(100vw - 300px)' }}
+              scroll={{ y: 'calc(100vh - 360px)', x: 'calc(100vw - 300px)' }}
               columns={columns}
               dataSource={tableData}
               pagination={pagination}
