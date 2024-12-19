@@ -187,48 +187,46 @@ const Intergration = () => {
           const target = (res[1] || []).find(
             (tex: MetricItem) => tex.name === item.key
           );
-          switch (item.type) {
-            case 'progress':
-              return {
-                title:
-                  KEY_METRIC_LABEL_MAP[target?.name] ||
-                  target?.display_name ||
-                  '--',
-                dataIndex: target?.name,
-                key: target?.name,
-                width: 300,
-                render: (_: unknown, record: TableDataItem) => (
-                  <Progress
-                    strokeLinecap="butt"
-                    showInfo={!!record[target?.name]}
-                    format={(percent) => `${percent}%`}
-                    percent={getPercent(record[target?.name] || 0)}
-                    percentPosition={{ align: 'start', type: 'outer' }}
-                    size={[260, 20]}
-                  />
-                ),
-              };
-            default:
-              return {
-                title:
-                  KEY_METRIC_LABEL_MAP[target?.name] ||
-                  target?.display_name ||
-                  '--',
-                dataIndex: target?.name,
-                key: target?.name,
-                width: 200,
-                render: (_: unknown, record: TableDataItem) => (
-                  <>
-                    {getEnumValueUnit(
-                      target?.unit,
-                      isNaN(+record[target?.name])
-                        ? record[target?.name]
-                        : +record[target?.name]
-                    )}
-                  </>
-                ),
-              };
+          if (item.type === 'progress') {
+            return {
+              title:
+                KEY_METRIC_LABEL_MAP[target?.name] ||
+                target?.display_name ||
+                '--',
+              dataIndex: target?.name,
+              key: target?.name,
+              width: 300,
+              render: (_: unknown, record: TableDataItem) => (
+                <Progress
+                  strokeLinecap="butt"
+                  showInfo={!!record[target?.name]}
+                  format={(percent) => `${percent}%`}
+                  percent={getPercent(record[target?.name] || 0)}
+                  percentPosition={{ align: 'start', type: 'outer' }}
+                  size={[260, 20]}
+                />
+              ),
+            };
           }
+          return {
+            title:
+              KEY_METRIC_LABEL_MAP[target?.name] ||
+              target?.display_name ||
+              '--',
+            dataIndex: target?.name,
+            key: target?.name,
+            width: 200,
+            render: (_: unknown, record: TableDataItem) => (
+              <>
+                {getEnumValueUnit(
+                  target?.unit,
+                  isNaN(+record[target?.name])
+                    ? record[target?.name]
+                    : +record[target?.name]
+                )}
+              </>
+            ),
+          };
         });
         const originColumns = deepClone(columns);
         const indexToInsert = originColumns.length - 1;

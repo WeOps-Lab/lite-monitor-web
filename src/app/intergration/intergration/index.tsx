@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Spin, Input, Button, Segmented, Tag, message, Tooltip } from 'antd';
 import useApiClient from '@/utils/request';
 import intergrationStyle from './index.module.less';
+import { SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
 import { deepClone } from '@/utils/common';
@@ -262,6 +263,7 @@ const Intergration = () => {
                 </p>
                 <div className="w-full h-[32px] flex justify-center items-end">
                   <Button
+                    icon={<SettingOutlined />}
                     type="primary"
                     className="w-full rounded-md transition-opacity duration-300"
                     onClick={(e) => {
@@ -269,7 +271,7 @@ const Intergration = () => {
                       linkToDetial(app);
                     }}
                   >
-                    <Icon type="shezhi" /> {t('common.setting')}
+                    {t('common.setting')}
                   </Button>
                 </div>
               </div>
