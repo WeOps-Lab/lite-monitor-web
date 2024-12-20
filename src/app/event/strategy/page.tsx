@@ -127,6 +127,7 @@ const StrategyOperation = () => {
         notice: false,
         period: 5,
         schedule: 5,
+        recovery_condition: 5,
       });
       setMetric(searchParams.get('metricId') || null);
       setSource({

@@ -302,5 +302,5 @@ export const getEnumValueUnit = (input: string, id: number | string) => {
   }
   if (!id) return '--';
   const unit = findUnitNameById(input);
-  return typeof id === 'number' ? id.toFixed(2) + unit : id + unit;
+  return typeof id === 'number' ? `${id.toFixed(2)} ${unit}` : `${id} ${unit}`;
 };

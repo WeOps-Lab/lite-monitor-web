@@ -25,6 +25,7 @@ interface ListItem {
   id: string;
   name: string;
   child: MetricItem[];
+  display_name?: string;
   is_pre: boolean;
 }
 
@@ -64,8 +65,8 @@ const Configure = () => {
         <>
           {record.dimensions?.length
             ? record.dimensions
-              .map((item: DimensionItem) => item.name)
-              .join(',')
+                .map((item: DimensionItem) => item.name)
+                .join(',')
             : '--'}
         </>
       ),
@@ -86,9 +87,9 @@ const Configure = () => {
     },
     {
       title: t('common.descripition'),
-      dataIndex: 'description',
-      key: 'description',
-      render: (_, record) => <>{record.description || '--'}</>,
+      dataIndex: 'display_description',
+      key: 'display_description',
+      render: (_, record) => <>{record.display_description || '--'}</>,
     },
     {
       title: t('common.action'),
@@ -100,6 +101,7 @@ const Configure = () => {
           <Button
             type="link"
             className="mr-[10px]"
+            disabled={record.is_pre}
             onClick={() => openMetricModal('edit', record)}
           >
             {t('common.edit')}
@@ -373,13 +375,14 @@ const Configure = () => {
               onDragStart={(e) => onDragStart(e, metricItem.id)}
               onDragOver={onDragOver}
               onDrop={(e) => onDrop(e, metricItem.id)}
-              title={metricItem.name || ''}
+              title={metricItem.display_name || ''}
               isOpen={!index}
               icon={
                 <div>
                   <Button
                     type="link"
                     size="small"
+                    disabled={metricItem.is_pre}
                     icon={<EditOutlined />}
                     onClick={() => openGroupModal('edit', metricItem)}
                   ></Button>

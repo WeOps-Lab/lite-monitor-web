@@ -197,6 +197,7 @@ const Intergration = () => {
               width: 300,
               render: (_: unknown, record: TableDataItem) => (
                 <Progress
+                  className="flex"
                   strokeLinecap="butt"
                   showInfo={!!record[target?.name]}
                   format={(percent) => `${percent}%`}

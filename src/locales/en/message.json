@@ -215,7 +215,7 @@
       "threshold": "Threshold",
       "setThreshold": "Detect values based on threshold levels of monitoring metrics",
       "whenResultIs": "When Result is",
-      "recoveryCondition": "When there is no data reported for",
+      "recoveryCondition": "Restored if the condition is not met for",
       "consecutivePeriods": "consecutive periods.",
       "setRecovery": "When the conditions are met, the generated alerts will be automatically resolved.",
       "nodata": "No Data",
