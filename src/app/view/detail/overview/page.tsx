@@ -211,9 +211,10 @@ const Overview = () => {
           ..._data,
           {
             ...interfaceData[0],
-            display_name: 'Interfaces',
+            display_name: t('monitor.views.interface'),
             unit: '',
             description: '',
+            display_description: '',
             viewData: interfaceViewData,
           },
         ];
@@ -384,7 +385,7 @@ const Overview = () => {
             pagination={false}
             dataSource={metricItem.viewData || []}
             columns={getMultipleColumns(metricItem.displayDimension)}
-            scroll={{ y: 300 }}
+            scroll={{ y: 280 }}
             rowKey="id"
           />
         );
@@ -448,7 +449,7 @@ const Overview = () => {
                           >
                             <Icon
                               type="a-shuoming2"
-                              className="text-[16px] text-[var(--color-text-2)]"
+                              className="text-[14px] text-[var(--color-text-3)]"
                             />
                           </div>
                         </Tooltip>

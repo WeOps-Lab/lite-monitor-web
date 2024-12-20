@@ -318,25 +318,28 @@ const Asset = () => {
                   className="absolute cursor-pointer"
                   style={{
                     top: '-3px',
-                    right: '-2px',
+                    right: '4px',
                   }}
                 >
                   <Icon
                     type="a-shuoming2"
-                    className="text-[16px] text-[var(--color-text-2)]"
+                    className="text-[14px] text-[var(--color-text-3)]"
                   />
                 </div>
               </Tooltip>
             </div>
             <ul className={assetStyle.ruleList}>
               <li
-                className={`${assetStyle.ruleItem} ${assetStyle.add}`}
+                className={`${assetStyle.ruleItem} ${assetStyle.add} shadow-sm rounded-sm`}
                 onClick={() => openRuleModal('add')}
               >
                 <PlusOutlined />
               </li>
               {ruleList.map((item) => (
-                <li key={item.id} className={assetStyle.ruleItem}>
+                <li
+                  key={item.id}
+                  className={`${assetStyle.ruleItem} shadow-sm rounded-sm`}
+                >
                   <div className={assetStyle.editItem}>
                     <Icon
                       className={assetStyle.icon}

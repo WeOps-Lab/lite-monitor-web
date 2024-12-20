@@ -416,7 +416,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                                 >
                                   <Icon
                                     type="a-shuoming2"
-                                    className="text-[16px] text-[var(--color-text-2)]"
+                                    className="text-[14px] text-[var(--color-text-3)]"
                                   />
                                 </div>
                               </Tooltip>
