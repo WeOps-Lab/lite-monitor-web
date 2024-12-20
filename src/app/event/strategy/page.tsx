@@ -453,7 +453,9 @@ const StrategyOperation = () => {
                       </Form.Item>
                       <Form.Item<StrategyFields>
                         label={
-                          <span className="w-[100px]">{t('common.group')}</span>
+                          <span className="w-[100px]">
+                            {t('common.organizations')}
+                          </span>
                         }
                         name="organizations"
                         rules={[

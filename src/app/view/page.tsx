@@ -60,7 +60,7 @@ const Intergration = () => {
       key: 'instance_name',
     },
     {
-      title: t('common.group'),
+      title: t('common.organizations'),
       dataIndex: 'organization',
       key: 'organization',
       render: (_, { organization }) => (

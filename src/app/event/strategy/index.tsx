@@ -60,7 +60,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       key: 'name',
     },
     {
-      title: t('common.group'),
+      title: t('common.organizations'),
       dataIndex: 'organizations',
       key: 'organizations',
       render: (_, { organizations }) => (
