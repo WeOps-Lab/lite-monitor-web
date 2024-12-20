@@ -65,8 +65,8 @@ const Configure = () => {
         <>
           {record.dimensions?.length
             ? record.dimensions
-                .map((item: DimensionItem) => item.name)
-                .join(',')
+              .map((item: DimensionItem) => item.name)
+              .join(',')
             : '--'}
         </>
       ),
