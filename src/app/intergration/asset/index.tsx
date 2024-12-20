@@ -1,6 +1,15 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { Spin, Input, Button, Tree, Modal, message, Tooltip } from 'antd';
+import {
+  Spin,
+  Input,
+  Button,
+  Tree,
+  Modal,
+  message,
+  Tooltip,
+  Dropdown,
+} from 'antd';
 import useApiClient from '@/utils/request';
 import assetStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
@@ -351,16 +360,45 @@ const Asset = () => {
                     />
                     <span>{item.name}</span>
                     <div className={assetStyle.operate}>
-                      <Button
-                        type="link"
-                        icon={<EditOutlined />}
-                        onClick={() => openRuleModal('edit', item)}
-                      />
-                      <Button
-                        type="link"
-                        icon={<DeleteOutlined />}
-                        onClick={() => showDeleteConfirm(item)}
-                      />
+                      <Dropdown
+                        menu={{
+                          items: [
+                            {
+                              key: 'edit',
+                              label: (
+                                <a
+                                  className="text-[12px]"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={() => openRuleModal('edit', item)}
+                                >
+                                  {t('common.edit')}
+                                </a>
+                              ),
+                            },
+                            {
+                              key: 'delete',
+                              label: (
+                                <a
+                                  className="text-[12px]"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={() => showDeleteConfirm(item)}
+                                >
+                                  {t('common.delete')}
+                                </a>
+                              ),
+                            },
+                          ],
+                        }}
+                      >
+                        <div>
+                          <Icon
+                            className={assetStyle.moreIcon}
+                            type="sangedian-copy"
+                          />
+                        </div>
+                      </Dropdown>
                     </div>
                   </div>
                 </li>

@@ -75,6 +75,7 @@ export interface OriginOrganization {
 export interface TabItem {
   key: string;
   label: string;
+  name?: string;
   children?: JSX.Element | string;
 }
 

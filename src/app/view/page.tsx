@@ -15,7 +15,6 @@ import {
   ModalRef,
   Pagination,
   TableDataItem,
-  ListItem,
 } from '@/types';
 import { useKeyMetricLabelMap } from '@/constants/monitor';
 import CustomTable from '@/components/custom-table';
@@ -309,6 +308,7 @@ const Intergration = () => {
       }
       acc[item.type].list.push({
         label: item.display_name,
+        name: item.name,
         key: item.id,
       });
       return acc;
@@ -322,7 +322,7 @@ const Intergration = () => {
 
   const linkToDetial = (app: ObectItem) => {
     const row = deepClone(app);
-    row.name = apps.find((item) => item.key === objectId)?.label;
+    row.name = apps.find((item) => item.key === objectId)?.name;
     row.monitorObjId = apps.find((item) => item.key === objectId)?.key || '';
     const params = new URLSearchParams(row);
     const targetUrl = `/view/detail/overview?${params.toString()}`;
