@@ -604,7 +604,7 @@ const INDEX_CONFIG = [
     tableDiaplay: [
       { type: 'value', key: 'node_status_condition' },
       { type: 'progress', key: 'node_cpu_utilization' },
-      { type: 'progress', key: 'node_app_memory_usage' },
+      { type: 'progress', key: 'node_memory_utilization' },
     ],
   },
   {
