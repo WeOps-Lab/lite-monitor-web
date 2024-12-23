@@ -50,16 +50,19 @@ const Configure = () => {
     {
       title: t('common.id'),
       dataIndex: 'name',
+      width: 100,
       key: 'name',
     },
     {
       title: t('common.name'),
       dataIndex: 'display_name',
+      width: 100,
       key: 'display_name',
     },
     {
       title: t('monitor.intergrations.dimension'),
       dataIndex: 'dimensions',
+      width: 100,
       key: 'dimensions',
       render: (_, record) => (
         <>
@@ -75,11 +78,13 @@ const Configure = () => {
       title: t('monitor.intergrations.dataType'),
       dataIndex: 'data_type',
       key: 'data_type',
+      width: 100,
       render: (_, record) => <>{record.data_type || '--'}</>,
     },
     {
       title: t('common.unit'),
       dataIndex: 'unit',
+      width: 100,
       key: 'unit',
       render: (_, record) => (
         <>{record.data_type === 'Enum' ? '--' : record.unit || '--'}</>

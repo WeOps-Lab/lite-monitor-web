@@ -217,14 +217,7 @@ const Intergration = () => {
             key: target?.name,
             width: 200,
             render: (_: unknown, record: TableDataItem) => (
-              <>
-                {getEnumValueUnit(
-                  target?.unit,
-                  isNaN(+record[target?.name])
-                    ? record[target?.name]
-                    : +record[target?.name]
-                )}
-              </>
+              <>{getEnumValueUnit(target?.unit, record[target?.name])}</>
             ),
           };
         });

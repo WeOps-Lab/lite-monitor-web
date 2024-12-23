@@ -14,7 +14,7 @@ import {
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone, getRandomColor } from '@/utils/common';
-import { findUnitNameById } from '@/utils/common';
+import { getEnumValueUnit } from '@/utils/common';
 import {
   ColumnItem,
   ModalRef,
@@ -69,9 +69,11 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
     pageSize: 20,
   });
   const [frequence, setFrequence] = useState<number>(0);
-  const [timeRange, setTimeRange] = useState<number[]>([]);
+  const beginTime: number = dayjs().subtract(1440, 'minute').valueOf();
+  const lastTime: number = dayjs().valueOf();
+  const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
   const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
-  const [timeRangeValue, setTimeRangeValue] = useState<number | null>(null);
+  const [timeRangeValue, setTimeRangeValue] = useState<number | null>(1440);
   const [filters, setFilters] = useState<FiltersConfig>(INIT_ACTIVE_FILTERS);
   const [tabs, setTabs] = useState<TabItem[]>([
     {
@@ -109,20 +111,26 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       title: t('monitor.events.title'),
       dataIndex: 'title',
       key: 'title',
-      render: (_, record) => <>{record.content || '--'}</>,
+      render: (_, record) => <>{record.policy?.name || '--'}</>,
     },
     {
-      title: t('monitor.events.index'),
+      title: t('monitor.metric'),
       dataIndex: 'index',
       key: 'index',
-      render: (_, record) => <>{showMetricName(record)}</>,
+      render: (_, record) => <>{record.metric?.display_name || '--'}</>,
+    },
+    {
+      title: t('monitor.events.assetType'),
+      dataIndex: 'assetType',
+      key: 'assetType',
+      render: (_, record) => <>{showObjName(record)}</>,
     },
     {
       title: t('monitor.value'),
       dataIndex: 'value',
       key: 'value',
       render: (_, record) => (
-        <>{(record.value?.toFixed(2) ?? '--') + getUnit(record)}</>
+        <>{getEnumValueUnit(record.metric?.unit, record.value)}</>
       ),
     },
     {
@@ -140,7 +148,13 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       dataIndex: 'notify',
       key: 'notify',
       render: (_, record) => (
-        <>{record.policy?.notice ? 'Notified' : 'Unnotified'}</>
+        <>
+          {t(
+            `monitor.events.${
+              record.policy?.notice ? 'notified' : 'unnotified'
+            }`
+          )}
+        </>
       ),
     },
     {
@@ -228,11 +242,8 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       setFilters(INIT_ACTIVE_FILTERS);
       return;
     }
+    setTimeRange([beginTime, lastTime]);
     setFilters(INIT_HISTORY_FILTERS);
-  };
-
-  const getUsers = (id: string) => {
-    return userList.find((item) => item.id === id)?.username || '--';
   };
 
   const showAlertCloseConfirm = (row: TableDataItem) => {
@@ -262,51 +273,27 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   };
 
   const getParams = () => {
-    return {
+    const params = {
       status_in: filters.state.join(',') || 'recovered,closed',
       level_in: filters.level.join(','),
       content: searchText,
       page: pagination.current,
       page_size: pagination.pageSize,
-      created_at_after: timeRange[0] ? dayjs(timeRange[0]).toISOString() : '',
-      created_at_before: timeRange[1] ? dayjs(timeRange[1]).toISOString() : '',
+      created_at_after: '',
+      created_at_before: '',
     };
-  };
-
-  const showTitle = (row: TableDataItem) => {
-    const objectName =
-      objects.find((item) => item.id === row.monitor_instance?.monitor_object)
-        ?.name || '--';
-    const instName = row.monitor_instance?.name || '--';
-    const condition = (row.policy?.threshold || []).find(
-      (item: TableDataItem) => item.level === row.level
-    );
-    let _condition = '--';
-    if (condition) {
-      _condition = condition.method + (condition.value?.toFixed(2) ?? '--');
+    if (activeTab === 'historicalAlarms') {
+      params.created_at_after = dayjs(timeRange[0]).toISOString();
+      params.created_at_before = dayjs(timeRange[1]).toISOString();
     }
-    return `${objectName}（${instName}）${showMetricName(
-      row
-    )} ${_condition}${getUnit(row)}`;
+    return params;
   };
 
-  const getUnit = (row: TableDataItem) => {
-    return findUnitNameById(
-      metrics.find((item) => item.id === row.policy?.metric)?.unit || ''
-    );
-  };
-
-  const showMetricName = (row: TableDataItem) => {
+  const showObjName = (row: TableDataItem) => {
     return (
-      metrics.find((item) => item.id === row.policy?.metric)?.display_name ||
-      '--'
+      objects.find((item) => item.id === row.monitor_instance?.monitor_object)
+        ?.display_name || '--'
     );
-  };
-
-  const showNotifiers = (row: TableDataItem) => {
-    return (row.policy?.notice_users || [])
-      .map((item: string) => getUsers(item))
-      .join(',');
   };
 
   const handleTableChange = (pagination: any) => {
@@ -345,8 +332,8 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       type: 'add',
       form: {
         ...row,
-        alertTitle: showTitle(row),
-        alertValue: (row.value?.toFixed(2) ?? '--') + getUnit(row),
+        alertTitle: showObjName(row),
+        alertValue: getEnumValueUnit(row.metric?.unit, row.value),
       },
     });
   };
@@ -454,11 +441,11 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                 onClear={clearText}
               />
               <TimeSelector
-                clearable
                 value={{
                   timesValue: times,
                   timeRangeValue,
                 }}
+                onlyRefresh={activeTab === 'activeAlarms'}
                 onChange={(value) => onTimeChange(value)}
                 onFrequenceChange={onFrequenceChange}
                 onRefresh={onRefresh}

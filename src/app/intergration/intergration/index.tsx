@@ -135,7 +135,7 @@ const Intergration = () => {
           });
         }
       });
-      acc[item.type].label = `${item.type}(${acc[item.type].list.length})`;
+      acc[item.type].label = `${item.display_type}(${acc[item.type].list.length})`;
       return acc;
     }, {} as Record<string, IntergrationItem>);
     const _list = Object.values(groupedData);

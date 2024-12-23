@@ -24,7 +24,7 @@ import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import useApiClient from '@/utils/request';
 import Information from './information';
 import CustomTable from '@/components/custom-table';
-import { findUnitNameById } from '@/utils/common';
+import { getEnumValueUnit } from '@/utils/common';
 import { LEVEL_MAP, useLevelList, useStateMap } from '@/constants/monitor';
 
 const AlertDetail = forwardRef<ModalRef, ModalConfig>(
@@ -82,20 +82,20 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         title: t('monitor.events.eventName'),
         dataIndex: 'content',
         key: 'content',
-        render: (_, record) => <>{record.content || '--'}</>,
+        render: () => <>{formData.policy?.name || '--'}</>,
       },
       {
         title: t('monitor.events.index'),
         dataIndex: 'index',
         key: 'index',
-        render: () => <>{showMetricName()}</>,
+        render: () => <>{formData.metric?.display_name || '--'}</>,
       },
       {
         title: t('monitor.value'),
         dataIndex: 'value',
         key: 'value',
         render: (_, record) => (
-          <>{(record.value?.toFixed(2) ?? '--') + getUnit()}</>
+          <>{getEnumValueUnit(formData.metric?.unit, record.value)}</>
         ),
       },
     ];
@@ -120,20 +120,6 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         getTableData();
       }
     }, [pagination.current, pagination.pageSize]);
-
-    const getUnit = () => {
-      return findUnitNameById(
-        metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
-          ?.unit || ''
-      );
-    };
-
-    const showMetricName = () => {
-      return (
-        metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
-          ?.display_name || '--'
-      );
-    };
 
     const getParams = () => {
       const target =
@@ -288,7 +274,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
                   {LEVEL_LIST.find((item) => item.value === formData.level)
                     ?.label || '--'}
                 </Tag>
-                <b>{formData.content || '--'}</b>
+                <b>{formData.policy?.name || '--'}</b>
               </div>
               <ul className="flex mt-[10px]">
                 <li className="mr-[20px]">

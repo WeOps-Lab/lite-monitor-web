@@ -6,7 +6,7 @@ import { useTranslation } from '@/utils/i18n';
 import informationStyle from './index.module.less';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import LineChart from '@/components/charts/lineChart';
-import { MetricItem, ObectItem } from '@/types/monitor';
+import { ObectItem } from '@/types/monitor';
 import { findUnitNameById, showGroupName } from '@/utils/common';
 import { useCommon } from '@/context/common';
 import { Modal, message, Button } from 'antd';
@@ -17,7 +17,6 @@ const Information: React.FC<TableDataItem> = ({
   formData,
   chartData,
   objects,
-  metrics,
   userList,
   onClose,
 }) => {
@@ -29,15 +28,6 @@ const Information: React.FC<TableDataItem> = ({
   const commonContext = useCommon();
   const authList = useRef(commonContext?.authOrganizations || []);
   const organizationList: Organization[] = authList.current;
-
-  const getIndexName = () => {
-    const target = metrics.find(
-      (item: MetricItem) => item.id === formData.policy?.metric
-    );
-    if (target) {
-      return `${target.display_name}（${findUnitNameById(target.unit)}）`;
-    }
-  };
 
   const checkDetail = (row: TableDataItem) => {
     const params = {
@@ -124,7 +114,7 @@ const Information: React.FC<TableDataItem> = ({
           {objects.find(
             (item: ObectItem) =>
               item.id === formData.monitor_instance?.monitor_object
-          )?.name || '--'}
+          )?.display_name || '--'}
         </Descriptions.Item>
         <Descriptions.Item label={t('monitor.asset')}>
           <div className="flex justify-between">
@@ -155,7 +145,11 @@ const Information: React.FC<TableDataItem> = ({
           </Descriptions.Item>
         )}
         <Descriptions.Item label={t('monitor.events.notify')}>
-          {formData.policy.notice ? 'Notified' : 'Unnotified'}
+          {t(
+            `monitor.events.${
+              formData.policy?.notice ? 'notified' : 'unnotified'
+            }`
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t('common.operator')}>
           {formData.operator || '--'}
@@ -177,9 +171,11 @@ const Information: React.FC<TableDataItem> = ({
         <h3 className="font-[600] text-[16px] mb-[15px]">
           {t('monitor.views.indexView')}
         </h3>
-        <div className="text-[12px]">{getIndexName()}</div>
+        <div className="text-[12px]">{`${
+          formData.metric?.display_name
+        }（${findUnitNameById(formData.metric?.unit)}）`}</div>
         <div className="h-[250px]">
-          <LineChart data={chartData} />
+          <LineChart data={chartData} unit={formData.metric?.unit} />
         </div>
       </div>
     </div>

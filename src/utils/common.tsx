@@ -300,7 +300,7 @@ export const getEnumValueUnit = (input: string, id: number | string) => {
       (id ?? '--')
     );
   }
-  if (!id) return '--';
+  if (!id && id !== 0) return '--';
   const unit = findUnitNameById(input);
-  return typeof id === 'number' ? `${id.toFixed(2)} ${unit}` : `${id} ${unit}`;
+  return isNaN(+id) ? `${id} ${unit}` : `${(+id).toFixed(2)} ${unit}`;
 };

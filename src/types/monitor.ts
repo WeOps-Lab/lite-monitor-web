@@ -214,7 +214,7 @@ export interface LevelMap {
 
 export interface StateMap {
   new: string;
-  recovery: string;
+  recovered: string;
   closed: string;
   [key: string]: any;
 }

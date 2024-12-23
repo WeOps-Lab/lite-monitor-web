@@ -75,7 +75,7 @@ const Asset = () => {
       ),
     },
     {
-      title: t('common.time'),
+      title: t('monitor.views.reportTime'),
       dataIndex: 'time',
       key: 'time',
       render: (_, { time }) => (

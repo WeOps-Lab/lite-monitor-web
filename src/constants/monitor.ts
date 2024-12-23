@@ -83,7 +83,7 @@ const useStateMap = (): StateMap => {
   return useMemo(
     () => ({
       new: t('monitor.events.new'),
-      recovery: t('monitor.events.recovery'),
+      recovered: t('monitor.events.recovery'),
       closed: t('monitor.events.closed'),
     }),
     [t]
