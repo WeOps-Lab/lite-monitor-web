@@ -129,7 +129,14 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
 
     const getParams = (query: string, id: string) => {
       const params: SearchParams = {
-        query: query.replace(/__\$labels__/g, `instance_id="${id}"`),
+        query: query.replace(
+          /__\$labels__/g,
+          monitorName === 'Pod'
+            ? `uid="${id}"`
+            : monitorName === 'Node'
+              ? `node="${id}"`
+              : `instance_id="${id}"`
+        ),
       };
       const startTime = timeRange.at(0);
       const endTime = timeRange.at(1);

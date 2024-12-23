@@ -164,7 +164,17 @@ const Search: React.FC = () => {
     }
     let query = '';
     if (instanceId?.length) {
-      query += `instance_id=~"${instanceId.join('|')}"`;
+      switch (object) {
+        case 'Pod':
+          query += `uid=~"${instanceId.join('|')}"`;
+          break;
+        case 'Node':
+          query += `node=~"${instanceId.join('|')}"`;
+          break;
+        default:
+          query += `instance_id=~"${instanceId.join('|')}"`;
+          break;
+      }
     }
     if (conditions?.length) {
       const conditionQueries = conditions

@@ -113,7 +113,14 @@ const Overview = () => {
 
   const getParams = (query: string, id: string) => {
     const params: SearchParams = {
-      query: query.replace(/__\$labels__/g, `instance_id="${id}"`),
+      query: query.replace(
+        /__\$labels__/g,
+        groupName === 'Pod'
+          ? `uid="${id}"`
+          : groupName === 'Node'
+            ? `node="${id}"`
+            : `instance_id="${id}"`
+      ),
     };
     const startTime = timeRange.at(0);
     const endTime = timeRange.at(1);

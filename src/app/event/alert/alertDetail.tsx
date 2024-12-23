@@ -18,7 +18,12 @@ import {
   ColumnItem,
   Pagination,
 } from '@/types';
-import { ChartDataItem, SearchParams, MetricItem } from '@/types/monitor';
+import {
+  ChartDataItem,
+  SearchParams,
+  MetricItem,
+  ObectItem,
+} from '@/types/monitor';
 import { AlertOutlined } from '@ant-design/icons';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
 import useApiClient from '@/utils/request';
@@ -126,10 +131,20 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         metrics.find((item: MetricItem) => item.id === formData.policy?.metric)
           ?.query || '';
       const _query: string = target;
+      const instId = formData.monitor_instance?.id;
+      const objName =
+        objects.find(
+          (item: ObectItem) =>
+            item.id === formData.monitor_instance?.monitor_object
+        )?.name || '';
       const params: SearchParams = {
         query: _query.replace(
           /__\$labels__/g,
-          `instance_id="${formData.monitor_instance?.id}"`
+          objName === 'Pod'
+            ? `uid="${instId}"`
+            : objName === 'Node'
+              ? `node="${instId}"`
+              : `instance_id="${instId}"`
         ),
       };
       const startTime = new Date(formData.start_event_time).getTime();

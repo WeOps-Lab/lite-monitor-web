@@ -43,12 +43,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
     fieldRef.current?.showModal();
   };
 
-  const paginationConfig = !pagination
-    ? false
-    : {
-      ...pagination,
-      hideOnSinglePage: true,
-    };
+  const paginationConfig = !pagination ? false : pagination;
 
   return (
     <div className={customTableStyle.customTable}>

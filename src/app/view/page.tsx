@@ -402,7 +402,7 @@ const Intergration = () => {
       <ViewModal
         ref={viewRef}
         monitorObject={objectId}
-        monitorName={apps.find((item) => item.key === objectId)?.label || ''}
+        monitorName={apps.find((item) => item.key === objectId)?.name || ''}
         monitorId={apps.find((item) => item.key === objectId)?.key || ''}
       />
     </div>
