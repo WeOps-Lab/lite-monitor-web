@@ -397,8 +397,7 @@ const Search: React.FC = () => {
             ellipsis: {
               showTitle: true,
             },
-          }))
-          .filter((item) => item.key !== 'index');
+          }));
         const _columns = deepClone(tableColumns);
         if (_columns[0]) _columns[0].fixed = 'left';
         setColumns(_columns);
