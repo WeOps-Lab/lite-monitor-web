@@ -49,6 +49,7 @@ const Search: React.FC = () => {
   const [labels, setLabels] = useState<string[]>([]);
   const [object, setObject] = useState<string | undefined>(url_obj_name as any);
   const [objects, setObjects] = useState<ObectItem[]>([]);
+  const [objectsOptions, setObjectsOptions] = useState<ObectItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>('area');
   const [conditions, setConditions] = useState<ConditionItem[]>([]);
   const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
@@ -92,6 +93,21 @@ const Search: React.FC = () => {
     try {
       setObjLoading(true);
       const data: ObectItem[] = await get('/api/monitor_object/');
+      const groupedData = data.reduce((acc, item) => {
+        if (!acc[item.type]) {
+          acc[item.type] = {
+            label: item.display_type,
+            title: item.type,
+            options: [],
+          };
+        }
+        acc[item.type].options.push({
+          label: item.display_name,
+          value: item.name,
+        });
+        return acc;
+      }, {} as Record<string, any>);
+      setObjectsOptions(Object.values(groupedData));
       setObjects(data);
     } finally {
       setObjLoading(false);
@@ -361,7 +377,18 @@ const Search: React.FC = () => {
           value: item.value[1] ?? '--',
           index,
         }));
+        const metricTarget =
+          metrics.find((item) => item.name === metric)?.dimensions || [];
+        const colKeys = Array.from(
+          new Set(
+            metricTarget
+              .map((item) => item.name)
+              .concat(['instance_name', 'instance_id', 'value'])
+          )
+        );
+
         const tableColumns = Object.keys(_tableData[0] || {})
+          .filter((item) => colKeys.includes(item))
           .map((item) => ({
             title: item,
             dataIndex: item,
@@ -436,14 +463,9 @@ const Search: React.FC = () => {
                   showSearch
                   loading={objLoading}
                   value={object}
+                  options={objectsOptions}
                   onChange={handleObjectChange}
-                >
-                  {objects.map((item) => (
-                    <Option value={item.name} key={item.id}>
-                      {item.display_name}
-                    </Option>
-                  ))}
-                </Select>
+                />
                 <Select
                   mode="multiple"
                   placeholder={t('monitor.instance')}

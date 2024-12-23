@@ -36,6 +36,7 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
               ></span>
               {(item.payload.details?.[item.dataKey] || [])
                 .filter((item: any) => item.name !== 'instance_name')
+                .sort((a: any, b: any) => b.value - a.value)
                 .map((detail: any) => `${detail.label}：${detail.value}`)
                 .join('-') ||
                 (item.payload.details?.[item.dataKey] || [])
