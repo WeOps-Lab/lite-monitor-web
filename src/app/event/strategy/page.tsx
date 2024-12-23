@@ -774,7 +774,7 @@ const StrategyOperation = () => {
                           { validator: validateThreshold, required: true },
                         ]}
                       >
-                        <div className="w-[220px] bg-[var(--color-bg-1)] border shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-3 relative cursor-pointer group">
+                        <div className="w-[220px] bg-[var(--color-bg-1)] border-2 border-blue-300 shadow-md transition-shadow duration-300 ease-in-out rounded-lg p-3 relative cursor-pointer group">
                           <div className="flex items-center space-x-4 my-1">
                             <Icon
                               type={OBJECT_ICON_MAP[monitorName as string]}

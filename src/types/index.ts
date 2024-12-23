@@ -35,6 +35,7 @@ export interface CascaderItem {
 export interface TreeItem {
   title: JSX.Element | string;
   key: string | number;
+  label?: string;
   children: TreeItem[];
 }
 

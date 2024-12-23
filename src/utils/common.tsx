@@ -254,7 +254,7 @@ export const calculateMetrics = (data: any[], key = 'value1') => {
 export const findLabelById = (data: any[], key: string): string | null => {
   for (const node of data) {
     if (node.key === key) {
-      return node.title;
+      return node.label;
     }
     if (node.children) {
       const result = findLabelById(node.children, key);

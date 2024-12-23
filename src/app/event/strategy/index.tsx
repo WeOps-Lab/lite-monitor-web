@@ -236,6 +236,7 @@ const Strategy: React.FC<AlertProps> = ({ objects }) => {
       }
       acc[item.type].children.push({
         title: (item.display_name || '--') + `(${item.policy_count})`,
+        label: item.name || '--',
         key: item.id,
         children: [],
       });
