@@ -284,23 +284,23 @@ export const isStringArray = (input: string): boolean => {
 
 // 根据指标枚举获取值
 export const getEnumValue = (input: string, id: number | string) => {
+  if (!id && id !== 0) return '--';
   if (isStringArray(input)) {
     return (
       JSON.parse(input).find((item: ListItem) => item.id === id)?.name || id
     );
   }
-  return typeof id === 'number' ? id.toFixed(2) : id;
+  return isNaN(+id) ? id : (+id).toFixed(2);
 };
 
 // 根据指标枚举获取值+单位
 export const getEnumValueUnit = (input: string, id: number | string) => {
+  if (!id && id !== 0) return '--';
   if (isStringArray(input)) {
     return (
-      JSON.parse(input).find((item: ListItem) => item.id === +id)?.name ||
-      (id ?? '--')
+      JSON.parse(input).find((item: ListItem) => item.id === +id)?.name || id
     );
   }
-  if (!id && id !== 0) return '--';
   const unit = findUnitNameById(input);
   return isNaN(+id) ? `${id} ${unit}` : `${(+id).toFixed(2)} ${unit}`;
 };
