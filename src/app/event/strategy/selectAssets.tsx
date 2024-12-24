@@ -38,7 +38,6 @@ const convertCascaderToTreeData = (cascaderData: any) => {
 
 const filterTreeData = (treeData: any, searchText: string) => {
   if (!searchText) return treeData;
-
   return treeData
     .map((item: any) => {
       const { title, children } = item;
@@ -57,6 +56,39 @@ const filterTreeData = (treeData: any, searchText: string) => {
       return null;
     })
     .filter((item: any) => item !== null);
+};
+
+const getLabelByKey = (key: string, treeData: any): string => {
+  for (const node of treeData) {
+    if (node.key === key) {
+      return node.title;
+    }
+    if (node.children?.length) {
+      const foundLabel = getLabelByKey(key, node.children);
+      if (foundLabel) return foundLabel;
+    }
+  }
+  return '';
+};
+
+const getParentKeys = (
+  key: string,
+  treeData: any,
+  parentKeys: string[] = []
+) => {
+  for (const node of treeData) {
+    if (node.key === key) {
+      return parentKeys;
+    }
+    if (node.children?.length) {
+      const result: any = getParentKeys(key, node.children, [
+        ...parentKeys,
+        node.key,
+      ]);
+      if (result) return result;
+    }
+  }
+  return null;
 };
 
 const SelectAssets = forwardRef<ModalRef, ModalConfig>(
@@ -95,6 +127,10 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
     >([]);
     const [selectedTreeKeys, setSelectedTreeKeys] = useState<string[]>([]);
     const [treeSearchText, setTreeSearchText] = useState<string>('');
+    const [originalSelectedTreeKeys, setOriginalSelectedTreeKeys] = useState<
+      string[]
+    >([]);
+    const [originalTreeData, setOriginalTreeData] = useState<any[]>([]);
     const columns: ColumnItem[] = [
       {
         title: t('common.name'),
@@ -141,6 +177,8 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
           setSelectedRowKeys(values);
         } else {
           setSelectedTreeKeys(values);
+          setOriginalSelectedTreeKeys(values);
+          setOriginalTreeData(convertCascaderToTreeData(organizationList));
         }
       },
     }));
@@ -198,6 +236,9 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
     const handleCancel = () => {
       setGroupVisible(false);
       setSelectedRowKeys([]); // 清空选中项
+      setSelectedTreeKeys([]); // 清空选中项
+      setSearchText('');
+      setTreeSearchText('');
     };
 
     const handleTableChange = (pagination: any) => {
@@ -206,20 +247,49 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
 
     const handleClearSelection = () => {
       setSelectedRowKeys([]); // 清空选中项
+      setSelectedTreeKeys([]); // 清空选中项
     };
 
     const handleRemoveItem = (key: string) => {
-      const newSelectedRowKeys = selectedRowKeys.filter((item) => item !== key);
-      setSelectedRowKeys(newSelectedRowKeys);
+      if (isInstance) {
+        const newSelectedRowKeys = selectedRowKeys.filter(
+          (item) => item !== key
+        );
+        setSelectedRowKeys(newSelectedRowKeys);
+      } else {
+        const parentKeys = getParentKeys(key, treeData) || [];
+        const keysToRemove = [key, ...parentKeys];
+        const newSelectedTreeKeys = selectedTreeKeys.filter(
+          (item) => !keysToRemove.includes(item)
+        );
+        setSelectedTreeKeys(newSelectedTreeKeys);
+        setOriginalSelectedTreeKeys(newSelectedTreeKeys);
+      }
     };
 
     const handleOrganizationSelect = (selectedKeys: any) => {
-      setSelectedTreeKeys(selectedKeys);
+      const newSelectedKeys = selectedKeys.filter((key: string) =>
+        isLeafNode(key, filteredTreeData)
+      );
+      setSelectedTreeKeys(newSelectedKeys);
+      setOriginalSelectedTreeKeys(newSelectedKeys);
     };
 
     const clearText = () => {
       setSearchText('');
       fetchData('clear');
+    };
+
+    const isLeafNode = (key: string, treeData: any): boolean => {
+      for (const node of treeData) {
+        if (node.key === key) {
+          return !node.children || node.children.length === 0;
+        } else if (node.children) {
+          const found = isLeafNode(key, node.children);
+          if (found) return found;
+        }
+      }
+      return false;
     };
 
     return (
@@ -245,8 +315,8 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
         >
           <div>
             <Tabs activeKey={activeTab} items={tabs} onChange={changeTab} />
-            {isInstance ? (
-              <div className={selectInstanceStyle.selectInstance}>
+            <div className={selectInstanceStyle.selectInstance}>
+              {isInstance ? (
                 <div className={selectInstanceStyle.instanceList}>
                   <div className="flex items-center justify-between mb-[10px]">
                     <CustomCascader
@@ -281,29 +351,55 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
                     onChange={handleTableChange}
                   />
                 </div>
-                <div className={selectInstanceStyle.previewList}>
-                  <div className="flex items-center justify-between mb-[10px]">
-                    <span>
-                      {t('common.selected')}（
-                      <span className="text-[var(--color-primary)] px-[4px]">
-                        {selectedRowKeys.length}
-                      </span>
-                      {t('common.items')}）
+              ) : (
+                <div className="w-[550px]">
+                  <Input
+                    value={treeSearchText}
+                    className="w-[320px] mb-[10px]"
+                    placeholder={t('common.searchPlaceHolder')}
+                    onChange={(e) => setTreeSearchText(e.target.value)}
+                  />
+                  <Tree
+                    checkable
+                    showLine
+                    onCheck={handleOrganizationSelect}
+                    checkedKeys={selectedTreeKeys}
+                    treeData={filteredTreeData}
+                    defaultExpandAll
+                  />
+                </div>
+              )}
+              <div className={selectInstanceStyle.previewList}>
+                <div className="flex items-center justify-between mb-[10px]">
+                  <span>
+                    {t('common.selected')}（
+                    <span className="text-[var(--color-primary)] px-[4px]">
+                      {isInstance
+                        ? selectedRowKeys.length
+                        : selectedTreeKeys.filter((key) =>
+                          isLeafNode(key, treeData)
+                        ).length}
                     </span>
-                    <span
-                      className="text-[var(--color-primary)] cursor-pointer"
-                      onClick={handleClearSelection}
-                    >
-                      {t('common.clear')}
-                    </span>
-                  </div>
-                  <ul className={selectInstanceStyle.list}>
-                    {selectedRowKeys.map((key) => {
+                    {t('common.items')}）
+                  </span>
+                  <span
+                    className="text-[var(--color-primary)] cursor-pointer"
+                    onClick={handleClearSelection}
+                  >
+                    {t('common.clear')}
+                  </span>
+                </div>
+                <ul className={selectInstanceStyle.list}>
+                  {isInstance
+                    ? selectedRowKeys.map((key) => {
                       const item = tableData.find(
                         (data) => data.instance_id === key
                       );
                       return (
-                        <li className={selectInstanceStyle.listItem} key={key}>
+                        <li
+                          className={selectInstanceStyle.listItem}
+                          key={key}
+                        >
                           <span>{item?.instance_name || '--'}</span>
                           <CloseOutlined
                             className={`text-[12px] ${selectInstanceStyle.operate}`}
@@ -311,26 +407,24 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
                           />
                         </li>
                       );
-                    })}
-                  </ul>
-                </div>
+                    })
+                    : selectedTreeKeys
+                      .filter((key) => isLeafNode(key, treeData))
+                      .map((key) => (
+                        <li
+                          className={selectInstanceStyle.listItem}
+                          key={key}
+                        >
+                          <span>{getLabelByKey(key, treeData)}</span>
+                          <CloseOutlined
+                            className={`text-[12px] ${selectInstanceStyle.operate}`}
+                            onClick={() => handleRemoveItem(key)}
+                          />
+                        </li>
+                      ))}
+                </ul>
               </div>
-            ) : (
-              <div>
-                <Input
-                  className="w-[320px] mb-[10px]"
-                  placeholder={t('common.searchPlaceHolder')}
-                  onChange={(e) => setTreeSearchText(e.target.value)}
-                />
-                <Tree
-                  checkable
-                  onCheck={handleOrganizationSelect}
-                  checkedKeys={selectedTreeKeys}
-                  treeData={filteredTreeData}
-                  defaultExpandAll
-                />
-              </div>
-            )}
+            </div>
           </div>
         </OperateModal>
       </div>
