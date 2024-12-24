@@ -7,7 +7,7 @@ import {
 } from '@/types';
 import { MetricItem } from '@/types/monitor';
 import dayjs from 'dayjs';
-import { UNIT_LIST } from '@/constants/monitor';
+import { UNIT_LIST, APPOINT_METRIC_IDS } from '@/constants/monitor';
 
 // 深克隆
 export const deepClone = (obj: any, hash = new WeakMap()) => {
@@ -286,20 +286,20 @@ export const isStringArray = (input: string): boolean => {
 // 根据指标枚举获取值
 export const getEnumValue = (metric: MetricItem, id: number | string) => {
   const { unit: input = '', name } = metric || {};
-  const metricIds = ['cluster_pod_count', 'cluster_node_count'];
   if (!id && id !== 0) return '--';
   if (isStringArray(input)) {
     return (
       JSON.parse(input).find((item: ListItem) => item.id === id)?.name || id
     );
   }
-  return isNaN(+id) || metricIds.includes(name) ? id : (+id).toFixed(2);
+  return isNaN(+id) || APPOINT_METRIC_IDS.includes(name)
+    ? id
+    : (+id).toFixed(2);
 };
 
 // 根据指标枚举获取值+单位
 export const getEnumValueUnit = (metric: MetricItem, id: number | string) => {
   const { unit: input = '', name } = metric || {};
-  const metricIds = ['cluster_pod_count', 'cluster_node_count'];
   if (!id && id !== 0) return '--';
   if (isStringArray(input)) {
     return (
@@ -307,7 +307,7 @@ export const getEnumValueUnit = (metric: MetricItem, id: number | string) => {
     );
   }
   const unit = findUnitNameById(input);
-  return isNaN(+id) || metricIds.includes(name)
+  return isNaN(+id) || APPOINT_METRIC_IDS.includes(name)
     ? `${id} ${unit}`
     : `${(+id).toFixed(2)} ${unit}`;
 };

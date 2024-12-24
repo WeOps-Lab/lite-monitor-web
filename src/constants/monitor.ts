@@ -1218,6 +1218,11 @@ const OBJECT_ICON_MAP: ObjectIconMap = {
   'Audit System': 'AuditSystem',
 };
 
+const APPOINT_METRIC_IDS: string[] = [
+  'cluster_pod_count',
+  'cluster_node_count',
+];
+
 export {
   UNIT_LIST,
   INDEX_CONFIG,
@@ -1227,6 +1232,7 @@ export {
   SCHEDULE_UNIT_MAP,
   MONITOR_GROUPS_MAP,
   OBJECT_ICON_MAP,
+  APPOINT_METRIC_IDS,
   useInterfaceLabelMap,
   useScheduleList,
   useMethodList,
