@@ -357,10 +357,10 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
               allowClear
               showSearch
               options={originMetricData.map((item) => ({
-                label: item.name,
+                label: item.display_name,
                 title: item.name,
                 options: (item.child || []).map((tex) => ({
-                  label: tex.name,
+                  label: tex.display_name,
                   value: tex.id,
                 })),
               }))}

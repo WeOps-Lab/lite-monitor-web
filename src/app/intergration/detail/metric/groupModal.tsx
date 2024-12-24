@@ -109,7 +109,7 @@ const GroupMoadal = forwardRef<ModalRef, GroupModalProps>(
         >
           <Form ref={formRef} name="basic">
             <Form.Item<GroupInfo>
-              label="Name"
+              label={t('common.name')}
               name="name"
               rules={[{ required: true, message: t('common.required') }]}
             >
