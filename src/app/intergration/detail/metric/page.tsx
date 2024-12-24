@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Input, Button, Modal, message, Spin, Segmented } from 'antd';
+import { Input, Button, Modal, message, Spin, Segmented, Empty } from 'antd';
 import useApiClient from '@/utils/request';
 import metricStyle from './index.module.less';
 import { useTranslation } from '@/utils/i18n';
@@ -372,43 +372,47 @@ const Configure = () => {
       </div>
       <Spin spinning={loading}>
         <div className={metricStyle.metricTable}>
-          {metricData.map((metricItem, index) => (
-            <Collapse
-              className="mb-[10px]"
-              key={metricItem.id}
-              sortable
-              onDragStart={(e) => onDragStart(e, metricItem.id)}
-              onDragOver={onDragOver}
-              onDrop={(e) => onDrop(e, metricItem.id)}
-              title={metricItem.display_name || ''}
-              isOpen={!index}
-              icon={
-                <div>
-                  <Button
-                    type="link"
-                    size="small"
-                    disabled={metricItem.is_pre}
-                    icon={<EditOutlined />}
-                    onClick={() => openGroupModal('edit', metricItem)}
-                  ></Button>
-                  <Button
-                    type="link"
-                    size="small"
-                    disabled={!!metricItem.child?.length || metricItem.is_pre}
-                    icon={<DeleteOutlined />}
-                    onClick={() => showGroupDeleteConfirm(metricItem)}
-                  ></Button>
-                </div>
-              }
-            >
-              <CustomTable
-                pagination={false}
-                dataSource={metricItem.child || []}
-                columns={columns}
-                rowKey="id"
-              />
-            </Collapse>
-          ))}
+          {!!metricData.length ? (
+            metricData.map((metricItem, index) => (
+              <Collapse
+                className="mb-[10px]"
+                key={metricItem.id}
+                sortable
+                onDragStart={(e) => onDragStart(e, metricItem.id)}
+                onDragOver={onDragOver}
+                onDrop={(e) => onDrop(e, metricItem.id)}
+                title={metricItem.display_name || ''}
+                isOpen={!index}
+                icon={
+                  <div>
+                    <Button
+                      type="link"
+                      size="small"
+                      disabled={metricItem.is_pre}
+                      icon={<EditOutlined />}
+                      onClick={() => openGroupModal('edit', metricItem)}
+                    ></Button>
+                    <Button
+                      type="link"
+                      size="small"
+                      disabled={!!metricItem.child?.length || metricItem.is_pre}
+                      icon={<DeleteOutlined />}
+                      onClick={() => showGroupDeleteConfirm(metricItem)}
+                    ></Button>
+                  </div>
+                }
+              >
+                <CustomTable
+                  pagination={false}
+                  dataSource={metricItem.child || []}
+                  columns={columns}
+                  rowKey="id"
+                />
+              </Collapse>
+            ))
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
         </div>
       </Spin>
       <GroupModal

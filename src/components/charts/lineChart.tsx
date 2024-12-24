@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Empty } from 'antd';
 import {
   XAxis,
   YAxis,
@@ -58,10 +59,14 @@ const LineChart: React.FC<LineChartProps> = ({
   const [colors, setColors] = useState<string[]>([]);
   const [visibleAreas, setVisibleAreas] = useState<string[]>([]);
   const [details, setDetails] = useState<Record<string, any>>({});
+  const [hasDimension, setHasDimension] = useState<boolean>(false);
 
   useEffect(() => {
     const chartKeys = getChartAreaKeys(data);
     const chartDetails = getDetails(data);
+    setHasDimension(
+      !Object.values(chartDetails || {}).every((item) => !item.length)
+    );
     setDetails(chartDetails);
     setVisibleAreas(chartKeys); // 默认显示所有area
     if (colors.length) return;
@@ -110,71 +115,79 @@ const LineChart: React.FC<LineChartProps> = ({
 
   return (
     <div className="flex w-full h-full">
-      <ResponsiveContainer className={chartLineStyle.chart}>
-        <AreaChart
-          data={data}
-          margin={{
-            top: 10,
-            right: 0,
-            left: 0,
-            bottom: 0,
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-        >
-          <XAxis
-            dataKey="time"
-            tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-            tickFormatter={(tick) => formatTime(tick, minTime, maxTime)}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
-            tickFormatter={(tick) => {
-              if (isStringArray(unit)) {
-                const unitName = JSON.parse(unit).find(
-                  (item: ListItem) => item.id === tick
-                )?.name;
-                return unitName ? unitName : tick;
-              }
-              return tick;
-            }}
-          />
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <Tooltip
-            content={<CustomTooltip unit={unit} visible={!isDragging} />}
-          />
-          {getChartAreaKeys(data).map((key, index) => (
-            <Area
-              key={index}
-              type="monotone"
-              dataKey={key}
-              stroke={colors[index]}
-              fillOpacity={0}
-              fill={colors[index]}
-              hide={!visibleAreas.includes(key)}
-            />
-          ))}
-          {isDragging && startX !== null && endX !== null && (
-            <ReferenceArea
-              x1={Math.min(startX, endX)}
-              x2={Math.max(startX, endX)}
-              strokeOpacity={0.3}
-              fill="rgba(0, 0, 255, 0.1)"
+      {!!data.length ? (
+        <>
+          <ResponsiveContainer className={chartLineStyle.chart}>
+            <AreaChart
+              data={data}
+              margin={{
+                top: 10,
+                right: 0,
+                left: 0,
+                bottom: 0,
+              }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+            >
+              <XAxis
+                dataKey="time"
+                tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
+                tickFormatter={(tick) => formatTime(tick, minTime, maxTime)}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
+                tickFormatter={(tick) => {
+                  if (isStringArray(unit)) {
+                    const unitName = JSON.parse(unit).find(
+                      (item: ListItem) => item.id === tick
+                    )?.name;
+                    return unitName ? unitName : tick;
+                  }
+                  return tick;
+                }}
+              />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <Tooltip
+                content={<CustomTooltip unit={unit} visible={!isDragging} />}
+              />
+              {getChartAreaKeys(data).map((key, index) => (
+                <Area
+                  key={index}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={colors[index]}
+                  fillOpacity={0}
+                  fill={colors[index]}
+                  hide={!visibleAreas.includes(key)}
+                />
+              ))}
+              {isDragging && startX !== null && endX !== null && (
+                <ReferenceArea
+                  x1={Math.min(startX, endX)}
+                  x2={Math.max(startX, endX)}
+                  strokeOpacity={0.3}
+                  fill="rgba(0, 0, 255, 0.1)"
+                />
+              )}
+            </AreaChart>
+          </ResponsiveContainer>
+          {showDimensionFilter && hasDimension && (
+            <DimensionFilter
+              data={data}
+              colors={colors}
+              visibleAreas={visibleAreas}
+              details={details}
+              onLegendClick={handleLegendClick}
             />
           )}
-        </AreaChart>
-      </ResponsiveContainer>
-      {showDimensionFilter && (
-        <DimensionFilter
-          data={data}
-          colors={colors}
-          visibleAreas={visibleAreas}
-          details={details}
-          onLegendClick={handleLegendClick}
-        />
+        </>
+      ) : (
+        <div className={`${chartLineStyle.chart} ${chartLineStyle.noData}`}>
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </div>
       )}
     </div>
   );

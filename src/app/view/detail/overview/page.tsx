@@ -291,12 +291,11 @@ const Overview = () => {
     if (data.length === 0) return [];
     const latestData = data[data.length - 1];
     const { details } = latestData;
-    const createName = (details: any[]) => {
-      return details
+    const createName = (details: any[]) =>
+      details
         .filter((item) => item.name !== 'instance_name')
         .map((detail) => `${detail.label}${detail.value}`)
-        .join('-');
-    };
+        .join('-') || '--';
     const tableData = [];
     for (const key in latestData) {
       if (key.startsWith('value')) {
@@ -433,35 +432,42 @@ const Overview = () => {
                   style={metricItem.style}
                 >
                   <div className="flex justify-between items-center mb-[10px]">
-                    <span className="text-[14px] relative">
-                      <span className="font-[600] mr-[2px]">
+                    <div className="text-[14px] w-full flex items-center">
+                      <div
+                        className="font-[600] mr-[2px] hide-text max-w-[90%]"
+                        title={metricItem.display_name}
+                      >
                         {metricItem.display_name}
-                      </span>
-                      <span className="text-[var(--color-text-3)] text-[12px]">
+                      </div>
+                      <span className="text-[var(--color-text-3)] text-[12px] relative">
                         {findUnitNameById(metricItem.unit)
                           ? `（${findUnitNameById(metricItem.unit)}）`
                           : ''}
-                      </span>
-                      {metricItem.display_description && (
-                        <Tooltip
-                          placement="topLeft"
-                          title={metricItem.display_description as string}
-                        >
-                          <div
-                            className="absolute cursor-pointer"
-                            style={{
-                              top: '-3px',
-                              right: '-14px',
-                            }}
+                        {metricItem.display_description && (
+                          <Tooltip
+                            placement="topLeft"
+                            title={metricItem.display_description as string}
                           >
-                            <Icon
-                              type="a-shuoming2"
-                              className="text-[14px] text-[var(--color-text-3)]"
-                            />
-                          </div>
-                        </Tooltip>
-                      )}
-                    </span>
+                            <div
+                              className="absolute cursor-pointer"
+                              style={{
+                                top: !findUnitNameById(metricItem.unit)
+                                  ? '-12px'
+                                  : '-3px',
+                                right: !findUnitNameById(metricItem.unit)
+                                  ? '-13px'
+                                  : '-8px',
+                              }}
+                            >
+                              <Icon
+                                type="a-shuoming2"
+                                className="text-[14px] text-[var(--color-text-3)]"
+                              />
+                            </div>
+                          </Tooltip>
+                        )}
+                      </span>
+                    </div>
                   </div>
                   <div
                     className="flex justify-center items-center h-full"

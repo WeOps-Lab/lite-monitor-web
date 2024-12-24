@@ -25,7 +25,7 @@ const getChartAreaKeys = (arr: any[]) => {
 const dimensionLael = (detail: any) => {
   const arr = (detail || [])
     .filter((item: any) => item.name !== 'instance_name')
-    .map((item: any) => `${item.label}${item.value}`);
+    .map((item: any) => `${item.label}: ${item.value}`);
   return arr.join('-') || '--';
 };
 
@@ -62,7 +62,10 @@ const DimensionFilter: React.FC<DimensionFilterProps> = ({
                   : 'var(--ant-color-bg-container-disabled)',
               }}
             ></span>
-            <span className={`${chartStyle.dimeLabel} hide-text`}>
+            <span
+              className={`${chartStyle.dimeLabel} hide-text`}
+              title={dimensionLael(details[key as any])}
+            >
               {dimensionLael(details[key as any])}
             </span>
           </li>
