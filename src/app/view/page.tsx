@@ -220,7 +220,7 @@ const Intergration = () => {
             key: target?.name,
             width: 200,
             render: (_: unknown, record: TableDataItem) => (
-              <>{getEnumValueUnit(target?.unit, record[target?.name])}</>
+              <>{getEnumValueUnit(target, record[target?.name])}</>
             ),
           };
         });

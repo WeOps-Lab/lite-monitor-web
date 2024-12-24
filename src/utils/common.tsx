@@ -5,6 +5,7 @@ import {
   SubGroupItem,
   ListItem,
 } from '@/types';
+import { MetricItem } from '@/types/monitor';
 import dayjs from 'dayjs';
 import { UNIT_LIST } from '@/constants/monitor';
 
@@ -283,18 +284,22 @@ export const isStringArray = (input: string): boolean => {
 };
 
 // 根据指标枚举获取值
-export const getEnumValue = (input: string, id: number | string) => {
+export const getEnumValue = (metric: MetricItem, id: number | string) => {
+  const { unit: input = '', name } = metric || {};
+  const metricIds = ['cluster_pod_count', 'cluster_node_count'];
   if (!id && id !== 0) return '--';
   if (isStringArray(input)) {
     return (
       JSON.parse(input).find((item: ListItem) => item.id === id)?.name || id
     );
   }
-  return isNaN(+id) ? id : (+id).toFixed(2);
+  return isNaN(+id) || metricIds.includes(name) ? id : (+id).toFixed(2);
 };
 
 // 根据指标枚举获取值+单位
-export const getEnumValueUnit = (input: string, id: number | string) => {
+export const getEnumValueUnit = (metric: MetricItem, id: number | string) => {
+  const { unit: input = '', name } = metric || {};
+  const metricIds = ['cluster_pod_count', 'cluster_node_count'];
   if (!id && id !== 0) return '--';
   if (isStringArray(input)) {
     return (
@@ -302,5 +307,7 @@ export const getEnumValueUnit = (input: string, id: number | string) => {
     );
   }
   const unit = findUnitNameById(input);
-  return isNaN(+id) ? `${id} ${unit}` : `${(+id).toFixed(2)} ${unit}`;
+  return isNaN(+id) || metricIds.includes(name)
+    ? `${id} ${unit}`
+    : `${(+id).toFixed(2)} ${unit}`;
 };

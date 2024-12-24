@@ -327,14 +327,13 @@ const Overview = () => {
 
   const getMultipleColumns = (displayDimension: string[]) => {
     return ['interface', ...displayDimension].map((item: any) => {
-      const unit =
-        originMetricData.find((tex) => tex.name === item)?.unit || '';
+      const target = originMetricData.find((tex) => tex.name === item);
       return {
         title: INTERFACE_LABEL_MAP[item],
         dataIndex: item,
         key: item,
         render: (_: unknown, record: any) => (
-          <>{getEnumValueUnit(unit, record[item])}</>
+          <>{getEnumValueUnit(target as MetricItem, record[item])}</>
         ),
       };
     });
@@ -365,6 +364,7 @@ const Overview = () => {
           <SingleValue
             fontSize={30}
             unit={metricItem.unit}
+            metric={metricItem}
             value={
               calculateMetrics(metricItem.viewData || []).latestValue || '--'
             }
@@ -399,6 +399,7 @@ const Overview = () => {
         return (
           <LineChart
             data={metricItem.viewData || []}
+            metric={metricItem}
             unit={metricItem.unit}
             showDimensionFilter
             onXRangeChange={onXRangeChange}

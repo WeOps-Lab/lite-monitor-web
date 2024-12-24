@@ -20,10 +20,12 @@ import chartLineStyle from './index.module.less';
 import dayjs, { Dayjs } from 'dayjs';
 import DimensionFilter from './dimensionFilter';
 import { ChartData, ListItem } from '@/types';
+import { MetricItem } from '@/types/monitor';
 
 interface LineChartProps {
   data: ChartData[];
   unit?: string;
+  metric?: MetricItem;
   showDimensionFilter?: boolean;
   onXRangeChange?: (arr: [Dayjs, Dayjs]) => void;
 }
@@ -50,6 +52,7 @@ const LineChart: React.FC<LineChartProps> = ({
   data,
   unit = '',
   showDimensionFilter = false,
+  metric = {},
   onXRangeChange,
 }) => {
   const [startX, setStartX] = useState<number | null>(null);
@@ -151,7 +154,13 @@ const LineChart: React.FC<LineChartProps> = ({
               />
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <Tooltip
-                content={<CustomTooltip unit={unit} visible={!isDragging} />}
+                content={
+                  <CustomTooltip
+                    unit={unit}
+                    visible={!isDragging}
+                    metric={metric as MetricItem}
+                  />
+                }
               />
               {getChartAreaKeys(data).map((key, index) => (
                 <Area

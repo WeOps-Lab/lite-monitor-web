@@ -445,6 +445,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
                           </div>
                           <div className="h-[200px] mt-[10px]">
                             <LineChart
+                              metric={item}
                               data={item.viewData || []}
                               unit={item.unit}
                               onXRangeChange={onXRangeChange}

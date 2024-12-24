@@ -3,9 +3,11 @@ import { TooltipProps } from 'recharts';
 import customTooltipStyle from './index.module.less';
 import dayjs from 'dayjs';
 import { getEnumValue } from '@/utils/common';
+import { MetricItem } from '@/types/monitor';
 interface CustomToolTipProps extends Omit<TooltipProps<any, string>, 'unit'> {
   unit?: string;
   visible?: boolean;
+  metric?: MetricItem;
 }
 
 const CustomTooltip: React.FC<CustomToolTipProps> = ({
@@ -13,6 +15,7 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
   payload,
   label,
   unit = '',
+  metric = {},
   visible = true,
 }) => {
   if (active && payload?.length && visible) {
@@ -43,7 +46,7 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
                   .map((detail: any) => detail.value)
                   .join('-')}
               <span className="font-[600] ml-[10px]">
-                {getEnumValue(unit, item.value)}
+                {getEnumValue(metric as MetricItem, item.value)}
               </span>
             </div>
             {/* <ul className="text-[12px] ml-[15px] text-[var(--color-text-3)]">

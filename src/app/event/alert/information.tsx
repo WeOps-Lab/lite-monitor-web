@@ -175,7 +175,11 @@ const Information: React.FC<TableDataItem> = ({
           formData.metric?.display_name
         }（${findUnitNameById(formData.metric?.unit)}）`}</div>
         <div className="h-[250px]">
-          <LineChart data={chartData} unit={formData.metric?.unit} />
+          <LineChart
+            data={chartData}
+            unit={formData.metric?.unit}
+            metric={formData.metric}
+          />
         </div>
       </div>
     </div>

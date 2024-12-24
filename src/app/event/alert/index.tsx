@@ -136,7 +136,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       dataIndex: 'value',
       key: 'value',
       render: (_, record) => (
-        <>{getEnumValueUnit(record.metric?.unit, record.value)}</>
+        <>{getEnumValueUnit(record.metric, record.value)}</>
       ),
     },
     {
@@ -339,7 +339,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       form: {
         ...row,
         alertTitle: showObjName(row),
-        alertValue: getEnumValueUnit(row.metric?.unit, row.value),
+        alertValue: getEnumValueUnit(row.metric, row.value),
       },
     });
   };

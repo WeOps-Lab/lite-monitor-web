@@ -631,6 +631,7 @@ const Search: React.FC = () => {
                 </div>
               )}
               <LineChart
+                metric={metrics.find((item) => item.name === metric)}
                 data={processData(chartData)}
                 unit={unit}
                 onXRangeChange={onXRangeChange}

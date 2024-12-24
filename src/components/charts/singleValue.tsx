@@ -1,5 +1,6 @@
 import React from 'react';
 import { getEnumValue, findUnitNameById } from '@/utils/common';
+import { MetricItem } from '@/types/monitor';
 
 interface SingleValueDisplayProps {
   value: number | string;
@@ -10,6 +11,7 @@ interface SingleValueDisplayProps {
   fontSize?: number; // 新增属性，用于控制字体大小
   unitFontSize?: number; // 新增属性，用于控制单位的字体大小
   labelFontSize?: number; // 新增属性，用于控制标签的字体大小
+  metric?: MetricItem;
 }
 
 const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
@@ -21,6 +23,7 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
   fontSize = 24, // 默认字体大小
   unitFontSize = 16, // 默认单位字体大小
   labelFontSize = 14, // 默认标签字体大小
+  metric = {},
 }) => {
   return (
     <div className="bg-[var(--color-bg-1)]">
@@ -28,7 +31,7 @@ const SingleValueDisplay: React.FC<SingleValueDisplayProps> = ({
         className="flex items-center justify-center font-bold"
         style={{ color, fontSize }}
       >
-        {getEnumValue(unit || '', value)}
+        {getEnumValue(metric as MetricItem, value)}
         {showUnit && (
           <span className="ml-[4px]" style={{ fontSize: unitFontSize }}>
             {findUnitNameById(unit)}

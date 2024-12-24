@@ -100,7 +100,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
         dataIndex: 'value',
         key: 'value',
         render: (_, record) => (
-          <>{getEnumValueUnit(formData.metric?.unit, record.value)}</>
+          <>{getEnumValueUnit(formData.metric, record.value)}</>
         ),
       },
     ];
