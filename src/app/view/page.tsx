@@ -57,12 +57,14 @@ const Intergration = () => {
     {
       title: t('common.name'),
       dataIndex: 'instance_name',
+      width: 100,
       key: 'instance_name',
     },
     {
       title: t('monitor.group'),
       dataIndex: 'organization',
       key: 'organization',
+      width: 120,
       render: (_, { organization }) => (
         <>{showGroupName(organization, organizationList)}</>
       ),
@@ -71,6 +73,7 @@ const Intergration = () => {
       title: t('monitor.views.reportTime'),
       dataIndex: 'time',
       key: 'time',
+      width: 120,
       render: (_, { time }) => (
         <>{time ? convertToLocalizedTime(new Date(time * 1000) + '') : '--'}</>
       ),
@@ -200,7 +203,7 @@ const Intergration = () => {
                   className="flex"
                   strokeLinecap="butt"
                   showInfo={!!record[target?.name]}
-                  format={(percent) => `${percent}%`}
+                  format={(percent) => `${percent?.toFixed(2)}%`}
                   percent={getPercent(record[target?.name] || 0)}
                   percentPosition={{ align: 'start', type: 'outer' }}
                   size={[260, 20]}
@@ -388,7 +391,7 @@ const Intergration = () => {
               />
             </div>
             <CustomTable
-              scroll={{ y: 'calc(100vh - 370px)', x: 'calc(100vw - 100px)' }}
+              scroll={{ y: 'calc(100vh - 370px)', x: 'calc(100vw - 90px)' }}
               columns={tableColumn}
               dataSource={tableData}
               pagination={pagination}
