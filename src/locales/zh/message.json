@@ -128,6 +128,7 @@
     "assetValidate": "资产不能为空",
     "include": "包括",
     "exclude": "不包括",
+    "group": "组织",
     "search": {
       "searchCriteria": "搜索条件",
       "object": "对象",

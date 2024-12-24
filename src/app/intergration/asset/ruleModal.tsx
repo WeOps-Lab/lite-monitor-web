@@ -218,7 +218,7 @@ const RuleModal = forwardRef<ModalRef, ModalProps>(
               }
             </Form.Item>
             <Form.Item<RuleInfo>
-              label={t('common.organizations')}
+              label={t('monitor.group')}
               name="organizations"
               rules={[{ required: true, message: t('common.required') }]}
             >

@@ -67,7 +67,7 @@ const Asset = () => {
       key: 'instance_name',
     },
     {
-      title: t('common.organizations'),
+      title: t('monitor.group'),
       dataIndex: 'organization',
       key: 'organization',
       render: (_, { organization }) => (

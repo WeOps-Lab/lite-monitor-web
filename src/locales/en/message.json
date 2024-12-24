@@ -128,6 +128,7 @@
     "assetValidate": "The Asset cannot be empty",
     "include": "Include",
     "exclude": "Exclude",
+    "group": "Group",
     "search": {
       "searchCriteria": "Search Criteria",
       "object": "Object",

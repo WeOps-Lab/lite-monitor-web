@@ -112,7 +112,7 @@ const SelectAssets = forwardRef<ModalRef, ModalConfig>(
         key: 'instance',
       },
       {
-        label: t('common.organizations'),
+        label: t('monitor.group'),
         key: 'organization',
       },
     ]);

@@ -82,7 +82,7 @@ const CustomCascader: React.FC<CustomCascaderProps> = ({
   return (
     <Cascader
       {...props}
-      placeholder={placeholder || t('common.organizations')}
+      placeholder={placeholder || t('monitor.group')}
       value={internalValue}
       onChange={handleChange}
       showCheckedStrategy={SHOW_CHILD}
