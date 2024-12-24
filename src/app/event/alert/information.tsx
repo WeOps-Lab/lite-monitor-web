@@ -134,7 +134,7 @@ const Information: React.FC<TableDataItem> = ({
             organizationList
           )}
         </Descriptions.Item>
-        <Descriptions.Item label={t('monitor.events.strategy')}>
+        <Descriptions.Item label={t('monitor.events.strategyName')}>
           {formData.policy?.name || '--'}
         </Descriptions.Item>
         {formData.status === 'closed' && (

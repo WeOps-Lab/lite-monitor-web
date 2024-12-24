@@ -45,7 +45,7 @@ const AlertDetail = forwardRef<ModalRef, ModalConfig>(
     const [chartData, setChartData] = useState<ChartDataItem[]>([]);
     const [tabs, setTabs] = useState<TabItem[]>([
       {
-        label: t('monitor.events.information'),
+        label: t('common.detail'),
         key: 'information',
       },
       {

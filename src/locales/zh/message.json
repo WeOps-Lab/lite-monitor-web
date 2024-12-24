@@ -236,7 +236,8 @@
       "min": "最小值",
       "newValue": "最新值",
       "activeAlarms": "活跃告警",
-      "historicalAlarms": "历史告警"
+      "historicalAlarms": "历史告警",
+      "strategyName": "策略名称"
     },
     "intergrations": {
       "intergration": "集成",

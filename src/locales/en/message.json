@@ -236,7 +236,8 @@
       "min": "MIN",
       "newValue": "NEW",
       "activeAlarms": "Active Alarms",
-      "historicalAlarms": "Historical Alarms"
+      "historicalAlarms": "Historical Alarms",
+      "strategyName": "Policy Name"
     },
     "intergrations": {
       "intergration": "Intergration",

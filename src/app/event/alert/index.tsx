@@ -108,22 +108,28 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
       ),
     },
     {
-      title: t('monitor.events.title'),
+      title: t('monitor.events.strategyName'),
       dataIndex: 'title',
       key: 'title',
       render: (_, record) => <>{record.policy?.name || '--'}</>,
     },
     {
-      title: t('monitor.metric'),
-      dataIndex: 'index',
-      key: 'index',
-      render: (_, record) => <>{record.metric?.display_name || '--'}</>,
+      title: t('monitor.asset'),
+      dataIndex: 'asset',
+      key: 'asset',
+      render: (_, record) => <>{record.monitor_instance?.name || '--'}</>,
     },
     {
       title: t('monitor.events.assetType'),
       dataIndex: 'assetType',
       key: 'assetType',
       render: (_, record) => <>{showObjName(record)}</>,
+    },
+    {
+      title: t('monitor.metric'),
+      dataIndex: 'index',
+      key: 'index',
+      render: (_, record) => <>{record.metric?.display_name || '--'}</>,
     },
     {
       title: t('monitor.value'),
@@ -452,7 +458,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
               />
             </div>
             <CustomTable
-              scroll={{ y: 'calc(100vh - 360px)', x: 'calc(100vw - 300px)' }}
+              scroll={{ y: 'calc(100vh - 380px)', x: 'calc(100vw - 300px)' }}
               columns={columns}
               dataSource={tableData}
               pagination={pagination}
