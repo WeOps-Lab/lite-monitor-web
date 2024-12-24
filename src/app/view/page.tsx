@@ -180,7 +180,7 @@ const Intergration = () => {
         ...prev,
         total: res[0]?.count || 0,
       }));
-      const _objectName = apps.find((item) => item.key === objectId)?.label;
+      const _objectName = apps.find((item) => item.key === objectId)?.name;
       if (_objectName) {
         const filterMetrics =
           INDEX_CONFIG.find((item) => item.name === _objectName)
