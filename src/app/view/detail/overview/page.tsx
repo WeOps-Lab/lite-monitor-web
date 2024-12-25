@@ -15,7 +15,7 @@ import {
   SearchParams,
   InterfaceTableItem,
 } from '@/types/monitor';
-import { ChartData } from '@/types';
+import { ChartData, TimeSelectorDefaultValue } from '@/types';
 import { useTranslation } from '@/utils/i18n';
 import {
   deepClone,
@@ -42,11 +42,14 @@ const Overview = () => {
   const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
   const lastTime: number = dayjs().valueOf();
   const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
-  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
   const [frequence, setFrequence] = useState<number>(0);
   const [metricData, setMetricData] = useState<MetricItem[]>([]);
   const [originMetricData, setOriginMetricData] = useState<MetricItem[]>([]);
-  const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
+  const [timeDefaultValue, setTimeDefaultValue] =
+    useState<TimeSelectorDefaultValue>({
+      selectValue: 15,
+      rangePickerVaule: null,
+    });
 
   useEffect(() => {
     clearTimer();
@@ -272,8 +275,11 @@ const Overview = () => {
   };
 
   const onXRangeChange = (arr: [Dayjs, Dayjs]) => {
-    setTimes(arr);
-    setTimeRangeValue(0);
+    setTimeDefaultValue((pre) => ({
+      ...pre,
+      rangePickerVaule: arr,
+      selectValue: 0,
+    }));
     const _times = arr.map((item) => dayjs(item).valueOf());
     setTimeRange(_times);
   };
@@ -412,10 +418,7 @@ const Overview = () => {
     <div className="bg-[var(--color-bg-1)] p-[20px]">
       <div className="flex justify-end mb-[15px]">
         <TimeSelector
-          value={{
-            timesValue: times,
-            timeRangeValue,
-          }}
+          defaultValue={timeDefaultValue}
           onChange={(value) => onTimeChange(value)}
           onFrequenceChange={onFrequenceChange}
           onRefresh={onRefresh}

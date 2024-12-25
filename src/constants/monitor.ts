@@ -1223,6 +1223,14 @@ const APPOINT_METRIC_IDS: string[] = [
   'cluster_node_count',
 ];
 
+const METHOD_LIST: ListItem[] = [
+  { label: 'SUM', value: 'sum' },
+  { label: 'AVG', value: 'avg' },
+  { label: 'MAX', value: 'max' },
+  { label: 'MIN', value: 'min' },
+  { label: 'NEW', value: 'new' },
+];
+
 export {
   UNIT_LIST,
   INDEX_CONFIG,
@@ -1233,6 +1241,7 @@ export {
   MONITOR_GROUPS_MAP,
   OBJECT_ICON_MAP,
   APPOINT_METRIC_IDS,
+  METHOD_LIST,
   useInterfaceLabelMap,
   useScheduleList,
   useMethodList,

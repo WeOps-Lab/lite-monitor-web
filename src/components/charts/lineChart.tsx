@@ -27,6 +27,7 @@ interface LineChartProps {
   unit?: string;
   metric?: MetricItem;
   showDimensionFilter?: boolean;
+  allowSelect?: boolean;
   onXRangeChange?: (arr: [Dayjs, Dayjs]) => void;
 }
 
@@ -53,6 +54,7 @@ const LineChart: React.FC<LineChartProps> = ({
   unit = '',
   showDimensionFilter = false,
   metric = {},
+  allowSelect = true,
   onXRangeChange,
 }) => {
   const [startX, setStartX] = useState<number | null>(null);
@@ -63,6 +65,10 @@ const LineChart: React.FC<LineChartProps> = ({
   const [visibleAreas, setVisibleAreas] = useState<string[]>([]);
   const [details, setDetails] = useState<Record<string, any>>({});
   const [hasDimension, setHasDimension] = useState<boolean>(false);
+  // 获取数据中的最小和最大时间
+  const times = data.map((d) => d.time);
+  const minTime = +new Date(Math.min(...times));
+  const maxTime = +new Date(Math.max(...times));
 
   useEffect(() => {
     const chartKeys = getChartAreaKeys(data);
@@ -77,21 +83,39 @@ const LineChart: React.FC<LineChartProps> = ({
     setColors(generatedColors);
   }, [data]);
 
+  useEffect(() => {
+    if (!allowSelect) return;
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (isDragging) {
+        handleMouseUp(e);
+      }
+    };
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, startX, endX]);
+
   const handleMouseDown = (e: any) => {
-    setStartX(e.activeLabel || null);
+    if (!allowSelect) return;
+    setStartX((pre) => e.activeLabel || pre);
     setIsDragging(true);
+    document.body.style.userSelect = 'none'; // 禁用文本选择
   };
 
   const handleMouseMove = (e: any) => {
+    if (!allowSelect) return;
     if (isDragging) {
-      setEndX(e.activeLabel || null);
+      setEndX((pre) => e.activeLabel || pre);
     } else {
       setActiveIndex(e.activeTooltipIndex || null);
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: any) => {
+    if (!allowSelect) return;
     setIsDragging(false);
+    document.body.style.userSelect = ''; // 重新启用文本选择
     if (startX !== null && endX !== null) {
       const selectedTimeRange: [Dayjs, Dayjs] = [
         dayjs(Math.min(startX, endX) * 1000),
@@ -102,11 +126,6 @@ const LineChart: React.FC<LineChartProps> = ({
     setStartX(null);
     setEndX(null);
   };
-
-  // 获取数据中的最小和最大时间
-  const times = data.map((d) => d.time);
-  const minTime = +new Date(Math.min(...times));
-  const maxTime = +new Date(Math.max(...times));
 
   const handleLegendClick = (key: string) => {
     setVisibleAreas((prevVisibleAreas) =>
@@ -173,7 +192,10 @@ const LineChart: React.FC<LineChartProps> = ({
                   hide={!visibleAreas.includes(key)}
                 />
               ))}
-              {isDragging && startX !== null && endX !== null && (
+              {isDragging &&
+                startX !== null &&
+                endX !== null &&
+                allowSelect && (
                 <ReferenceArea
                   x1={Math.min(startX, endX)}
                   x2={Math.max(startX, endX)}

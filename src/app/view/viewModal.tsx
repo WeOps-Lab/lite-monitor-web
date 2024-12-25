@@ -14,7 +14,7 @@ import TimeSelector from '@/components/time-selector';
 import LineChart from '@/components/charts/lineChart';
 import Collapse from '@/components/collapse';
 import useApiClient from '@/utils/request';
-import { ModalRef, ChartData } from '@/types';
+import { ModalRef, ChartData, TimeSelectorDefaultValue } from '@/types';
 import {
   MetricItem,
   GroupInfo,
@@ -45,7 +45,11 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
     const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
     const lastTime: number = dayjs().valueOf();
     const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
-    const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
+    const [timeDefaultValue, setTimeDefaultValue] =
+      useState<TimeSelectorDefaultValue>({
+        selectValue: 15,
+        rangePickerVaule: null,
+      });
     const [frequence, setFrequence] = useState<number>(0);
     const [metricData, setMetricData] = useState<IndexViewItem[]>([]);
     const [originMetricData, setOriginMetricData] = useState<IndexViewItem[]>(
@@ -53,7 +57,6 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
     );
     const [instId, setInstId] = useState<string>('');
     const [expandId, setExpandId] = useState<number>(0);
-    const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
 
     useImperativeHandle(ref, () => ({
       showModal: ({ title, form }) => {
@@ -306,8 +309,11 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
     };
 
     const onXRangeChange = (arr: [Dayjs, Dayjs]) => {
-      setTimes(arr);
-      setTimeRangeValue(0);
+      setTimeDefaultValue((pre) => ({
+        ...pre,
+        rangePickerVaule: arr,
+        selectValue: 0,
+      }));
       const _times = arr.map((item) => dayjs(item).valueOf());
       setTimeRange(_times);
     };
@@ -367,10 +373,7 @@ const ViewModal = forwardRef<ModalRef, ModalProps>(
               onChange={handleMetricIdChange}
             ></Select>
             <TimeSelector
-              value={{
-                timesValue: times,
-                timeRangeValue,
-              }}
+              defaultValue={timeDefaultValue}
               onChange={(value) => onTimeChange(value)}
               onFrequenceChange={onFrequenceChange}
               onRefresh={onRefresh}

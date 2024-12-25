@@ -11,7 +11,12 @@ import { useTranslation } from '@/utils/i18n';
 import Icon from '@/components/icon';
 import LineChart from '@/components/charts/lineChart';
 import CustomTable from '@/components/custom-table';
-import { ListItem, ColumnItem, ChartData } from '@/types';
+import {
+  ListItem,
+  ColumnItem,
+  ChartData,
+  TimeSelectorDefaultValue,
+} from '@/types';
 import { Dayjs } from 'dayjs';
 import {
   ObectItem,
@@ -55,8 +60,11 @@ const Search: React.FC = () => {
   const beginTime: number = dayjs().subtract(15, 'minute').valueOf();
   const lastTime: number = dayjs().valueOf();
   const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
-  const [timeRangeValue, setTimeRangeValue] = useState<number>(15);
-  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
+  const [timeDefaultValue, setTimeDefaultValue] =
+    useState<TimeSelectorDefaultValue>({
+      selectValue: 15,
+      rangePickerVaule: null,
+    });
   const [columns, setColumns] = useState<ColumnItem[]>([]);
   const [tableData, setTableData] = useState<TableDataItem[]>([]);
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
@@ -419,8 +427,11 @@ const Search: React.FC = () => {
   };
 
   const onXRangeChange = (arr: [Dayjs, Dayjs]) => {
-    setTimes(arr);
-    setTimeRangeValue(0);
+    setTimeDefaultValue((pre) => ({
+      ...pre,
+      rangePickerVaule: arr,
+      selectValue: 0,
+    }));
     const _times = arr.map((item) => dayjs(item).valueOf());
     setTimeRange(_times);
     handleSearch('refresh', activeTab, _times);
@@ -430,10 +441,7 @@ const Search: React.FC = () => {
     <div className={searchStyle.search}>
       <div className={searchStyle.time}>
         <TimeSelector
-          value={{
-            timesValue: times,
-            timeRangeValue,
-          }}
+          defaultValue={timeDefaultValue}
           onChange={(value) => onTimeChange(value)}
           onFrequenceChange={onFrequenceChange}
           onRefresh={onRefresh}

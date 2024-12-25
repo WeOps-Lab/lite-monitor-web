@@ -1,3 +1,5 @@
+import { Dayjs } from 'dayjs';
+
 export interface ColumnItem {
   title: string;
   dataIndex: string;
@@ -103,4 +105,9 @@ export interface Pagination {
 export interface TableDataItem {
   id?: number | string;
   [key: string]: any;
+}
+
+export interface TimeSelectorDefaultValue {
+  selectValue: number | null;
+  rangePickerVaule: [Dayjs, Dayjs] | null;
 }

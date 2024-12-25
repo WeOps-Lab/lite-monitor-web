@@ -40,7 +40,6 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
   useEffect(() => {
     if (containerRef.current) {
       const { offsetWidth, offsetHeight } = containerRef.current;
-      console.log(offsetHeight);
       setContainerSize({ width: offsetWidth, height: offsetHeight });
     }
   }, []);

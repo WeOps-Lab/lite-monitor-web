@@ -6,22 +6,19 @@ import type { SelectProps, TimeRangePickerProps } from 'antd';
 import { useFrequencyList, useTimeRangeList } from '@/constants/monitor';
 import timeSelectorStyle from './index.module.less';
 import dayjs, { Dayjs } from 'dayjs';
-import { ListItem } from '@/types';
+import { ListItem, TimeSelectorDefaultValue } from '@/types';
 type LabelRender = SelectProps['labelRender'];
 const { RangePicker } = DatePicker;
 
 interface TimeSelectorProps {
-  showTime?: boolean; //ant design组件属性，是否显示时分秒
-  format?: string; //ant design组件属性，格式化
+  showTime?: boolean; //rangePicker组件属性，是否显示时分秒
+  format?: string; //rangePicker组件属性，格式化
   onlyRefresh?: boolean; // 仅显示刷新按钮
-  onlyTimeSelect?: boolean; // 仅显示时间组件
+  onlyTimeSelect?: boolean; // 仅显示时间组合组件
   customFrequencyList?: ListItem[];
   customTimeRangeList?: ListItem[];
   clearable?: boolean; // 组件的值是否能为空
-  value?: {
-    timeRangeValue: number | null; // 近一段时间的值类型
-    timesValue: [Dayjs, Dayjs] | null; // ant design日期组件回显所需要值类型
-  };
+  defaultValue?: TimeSelectorDefaultValue; // defaultValue为时间组合组件的默认值
   onFrequenceChange?: (frequence: number) => void;
   onRefresh?: () => void;
   onChange?: (range: number[]) => void;
@@ -33,9 +30,9 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   onlyRefresh = false,
   onlyTimeSelect = false,
   clearable = false,
-  value = {
-    timeRangeValue: 15,
-    timesValue: null,
+  defaultValue = {
+    selectValue: 15, // 显示select组件时，selectValue填customFrequencyList列表项中对应的value，selectValue为select组件的值。
+    rangePickerVaule: null, // 如果想显示为rangePicker组件，selectValue设置为0，rangePickerVaule为rangePicker组件的值。
   },
   customFrequencyList,
   customTimeRangeList,
@@ -46,25 +43,27 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   const TIME_RANGE_LIST = useTimeRangeList();
   const FREQUENCY_LIST = useFrequencyList();
   const [frequency, setFrequency] = useState<number>(0);
-  const [timeRange, setTimeRange] = useState<number | null>(
-    clearable ? null : 15
-  );
   const [rangePickerOpen, setRangePickerOpen] = useState<boolean>(false);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const selectRef = useRef<HTMLDivElement>(null);
-  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(value.timesValue);
+  const [selectValue, setSelectValue] = useState<number | null>(
+    clearable ? null : 15
+  );
+  const [rangePickerVaule, setRangePickerVaule] = useState<
+    [Dayjs, Dayjs] | null
+  >(defaultValue.rangePickerVaule);
 
   useEffect(() => {
-    if (value.timeRangeValue !== timeRange) {
-      setTimeRange(value.timeRangeValue);
+    if (
+      JSON.stringify(defaultValue.rangePickerVaule) !==
+      JSON.stringify(rangePickerVaule)
+    ) {
+      setRangePickerVaule(defaultValue.rangePickerVaule);
     }
-  }, [value.timeRangeValue]);
-
-  useEffect(() => {
-    if (JSON.stringify(value.timesValue) !== JSON.stringify(times)) {
-      setTimes(value.timesValue);
+    if (defaultValue.selectValue !== selectValue) {
+      setSelectValue(defaultValue.selectValue);
     }
-  }, [value.timesValue]);
+  }, [defaultValue.rangePickerVaule, defaultValue.selectValue]);
 
   const labelRender: LabelRender = (props) => {
     const { label } = props;
@@ -106,19 +105,20 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
     if (value) {
       const rangeTime = value.map((item) => dayjs(item).valueOf());
       onChange && onChange(rangeTime);
-      setTimes(value as [Dayjs, Dayjs]);
+      setRangePickerVaule(value as [Dayjs, Dayjs]);
       return;
     }
-    const rangeTime = value
-      ? [dayjs().subtract(15, 'minute').valueOf(), dayjs().valueOf()]
-      : [];
-    setTimeRange(clearable ? null : 15);
-    onChange && onChange(rangeTime);
+    const rangeTime = [
+      dayjs().subtract(15, 'minute').valueOf(),
+      dayjs().valueOf(),
+    ];
+    setSelectValue(clearable ? null : 15);
+    onChange && onChange(clearable ? [] : rangeTime);
   };
 
   const handleRangePickerOk: TimeRangePickerProps['onOk'] = (value) => {
     if (value && value.every((item) => !!item)) {
-      setTimeRange(0);
+      setSelectValue(0);
     }
   };
 
@@ -127,8 +127,8 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
       setRangePickerOpen(true);
       return;
     }
-    setTimes(null);
-    setTimeRange(value);
+    setRangePickerVaule(null);
+    setSelectValue(value);
     const rangeTime = value
       ? [dayjs().subtract(value, 'minute').valueOf(), dayjs().valueOf()]
       : [];
@@ -142,7 +142,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
           <Select
             allowClear={clearable}
             className={`w-[350px] ${timeSelectorStyle.frequence}`}
-            value={timeRange}
+            value={selectValue}
             options={customTimeRangeList || TIME_RANGE_LIST}
             open={dropdownOpen}
             onChange={handleTimeRangeChange}
@@ -150,13 +150,13 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
           />
           <RangePicker
             style={{
-              zIndex: rangePickerOpen || timeRange == 0 ? 1 : -1,
+              zIndex: rangePickerOpen || selectValue == 0 ? 1 : -1,
             }}
             className={`w-[350px] ${timeSelectorStyle.rangePicker}`}
             open={rangePickerOpen}
             showTime={showTime}
             format={format}
-            value={times}
+            value={rangePickerVaule}
             onOpenChange={handleRangePickerOpenChange}
             onChange={handleRangePickerChange}
             onOk={handleRangePickerOk}

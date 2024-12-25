@@ -190,7 +190,7 @@
       "firstAlertTime": "首次告警时间",
       "duration": "持续时间",
       "assetType": "资产类型",
-      "assetGroup": "资产组",
+      "assetGroup": "组织",
       "notifier": "通知者",
       "closeTitle": "确定要关闭此项目吗？",
       "closeContent": "关闭后数据无法恢复。",

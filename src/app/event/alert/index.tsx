@@ -22,6 +22,7 @@ import {
   TableDataItem,
   UserItem,
   TabItem,
+  TimeSelectorDefaultValue,
 } from '@/types';
 import { AlertProps } from '@/types/monitor';
 import { AlertOutlined } from '@ant-design/icons';
@@ -30,7 +31,7 @@ import CustomTable from '@/components/custom-table';
 import TimeSelector from '@/components/time-selector';
 import AlertDetail from './alertDetail';
 import { useLocalizedTime } from '@/hooks/useLocalizedTime';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useCommon } from '@/context/common';
 import alertStyle from './index.module.less';
 import { LEVEL_MAP, useLevelList, useStateMap } from '@/constants/monitor';
@@ -72,8 +73,11 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
   const beginTime: number = dayjs().subtract(1440, 'minute').valueOf();
   const lastTime: number = dayjs().valueOf();
   const [timeRange, setTimeRange] = useState<number[]>([beginTime, lastTime]);
-  const [times, setTimes] = useState<[Dayjs, Dayjs] | null>(null);
-  const [timeRangeValue, setTimeRangeValue] = useState<number | null>(1440);
+  const [timeDefaultValue, setTimeDefaultValue] =
+    useState<TimeSelectorDefaultValue>({
+      selectValue: 1440,
+      rangePickerVaule: null,
+    });
   const [filters, setFilters] = useState<FiltersConfig>(INIT_ACTIVE_FILTERS);
   const [tabs, setTabs] = useState<TabItem[]>([
     {
@@ -447,10 +451,7 @@ const Alert: React.FC<AlertProps> = ({ objects, metrics }) => {
                 onClear={clearText}
               />
               <TimeSelector
-                value={{
-                  timesValue: times,
-                  timeRangeValue,
-                }}
+                defaultValue={timeDefaultValue}
                 onlyRefresh={activeTab === 'activeAlarms'}
                 onChange={(value) => onTimeChange(value)}
                 onFrequenceChange={onFrequenceChange}

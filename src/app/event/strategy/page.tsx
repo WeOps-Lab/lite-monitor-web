@@ -35,9 +35,9 @@ import SelectAssets from './selectAssets';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useConditionList } from '@/constants/monitor';
 import {
-  useMethodList,
   useScheduleList,
   COMPARISON_METHOD,
+  METHOD_LIST,
   LEVEL_MAP,
   useLevelList,
   SCHEDULE_UNIT_MAP,
@@ -51,7 +51,6 @@ const defaultGroup = ['instance_id'];
 const StrategyOperation = () => {
   const { t } = useTranslation();
   const { get, post, put, isLoading } = useApiClient();
-  const METHOD_LIST = useMethodList();
   const CONDITION_LIST = useConditionList();
   const LEVEL_LIST = useLevelList();
   const SCHEDULE_LIST = useScheduleList();
