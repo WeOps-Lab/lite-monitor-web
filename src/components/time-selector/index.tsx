@@ -103,16 +103,20 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
 
   const handleRangePickerChange: TimeRangePickerProps['onChange'] = (value) => {
     if (value) {
+      setSelectValue(0);
       const rangeTime = value.map((item) => dayjs(item).valueOf());
       onChange && onChange(rangeTime);
       setRangePickerVaule(value as [Dayjs, Dayjs]);
       return;
     }
     const rangeTime = [
-      dayjs().subtract(15, 'minute').valueOf(),
+      dayjs()
+        .subtract(defaultValue.selectValue || 15, 'minute')
+        .valueOf(),
       dayjs().valueOf(),
     ];
-    setSelectValue(clearable ? null : 15);
+    setSelectValue(clearable ? null : defaultValue.selectValue || 15);
+    setRangePickerVaule(null);
     onChange && onChange(clearable ? [] : rangeTime);
   };
 
