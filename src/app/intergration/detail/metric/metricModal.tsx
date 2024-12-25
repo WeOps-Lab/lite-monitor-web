@@ -274,7 +274,7 @@ const MetricModal = forwardRef<ModalRef, ModalProps>(
               <Select>
                 {groupList.map((item) => (
                   <Option key={item.id} value={item.id}>
-                    {item.name}
+                    {item.display_name}
                   </Option>
                 ))}
               </Select>

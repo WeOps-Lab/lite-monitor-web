@@ -10,6 +10,7 @@ export interface ListItem {
   title?: string;
   label?: string;
   name?: string;
+  display_name?: string;
   id?: string | number;
   value?: string | number;
 }

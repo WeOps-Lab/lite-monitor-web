@@ -135,7 +135,9 @@ const Intergration = () => {
           });
         }
       });
-      acc[item.type].label = `${item.display_type}(${acc[item.type].list.length})`;
+      acc[item.type].label = `${item.display_type}(${
+        acc[item.type].list.length
+      })`;
       return acc;
     }, {} as Record<string, IntergrationItem>);
     const _list = Object.values(groupedData);
@@ -144,7 +146,7 @@ const Intergration = () => {
     }, []);
     return [
       {
-        label: `All(${objectList.length})`,
+        label: `${t('common.all')}(${objectList.length})`,
         value: 'All',
         list: objectList,
       },

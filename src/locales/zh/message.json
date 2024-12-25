@@ -96,6 +96,7 @@
     "export": "导出",
     "more": "详情",
     "organizations": "组织",
+    "all": "全部",
     "cutomTable": {
       "fieldSetting": "列表字段设置"
     },
