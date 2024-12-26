@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { Spin, Input, Button, Segmented, Tag, message, Tooltip } from 'antd';
+import { Spin, Input, Button, Segmented, Tag, message } from 'antd';
 import useApiClient from '@/utils/request';
 import intergrationStyle from './index.module.less';
 import { SettingOutlined } from '@ant-design/icons';
@@ -250,16 +250,18 @@ const Intergration = () => {
                       width: 'calc(100% - 60px)',
                     }}
                   >
-                    <Tooltip placement="top" title={app.plugin_name}>
-                      <h2 className="text-xl font-bold m-0 hide-text">
-                        {app.plugin_name || '--'}
-                      </h2>
-                    </Tooltip>
+                    <h2
+                      title={app.plugin_name}
+                      className="text-xl font-bold m-0 hide-text"
+                    >
+                      {app.plugin_name || '--'}
+                    </h2>
                     <Tag className="mt-[4px]">{app.display_name || '--'}</Tag>
                   </div>
                 </div>
                 <p
                   className={`mb-[15px] text-[var(--color-text-3)] text-[13px] ${intergrationStyle.lineClamp3}`}
+                  title={app.plugin_description || '--'}
                 >
                   {app.plugin_description || '--'}
                 </p>

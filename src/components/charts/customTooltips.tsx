@@ -4,6 +4,7 @@ import customTooltipStyle from './index.module.less';
 import dayjs from 'dayjs';
 import { getEnumValue } from '@/utils/common';
 import { MetricItem } from '@/types/monitor';
+
 interface CustomToolTipProps extends Omit<TooltipProps<any, string>, 'unit'> {
   unit?: string;
   visible?: boolean;
@@ -19,12 +20,19 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
   visible = true,
 }) => {
   if (active && payload?.length && visible) {
+    // 对payload进行排序
+    const sortedPayload = [...payload].sort((a, b) => {
+      const valueA = getEnumValue(metric as MetricItem, a.value);
+      const valueB = getEnumValue(metric as MetricItem, b.value);
+      return valueB - valueA; // 从大到小排序
+    });
+
     return (
       <div className={customTooltipStyle.customTooltip}>
         <p className="label font-[600]">{`${dayjs
           .unix(label)
           .format('YYYY-MM-DD HH:mm:ss')}`}</p>
-        {payload.map((item: any, index: number) => (
+        {sortedPayload.map((item: any, index: number) => (
           <div key={index}>
             <div className="flex items-center mt-[4px]">
               <span
@@ -39,7 +47,6 @@ const CustomTooltip: React.FC<CustomToolTipProps> = ({
               ></span>
               {(item.payload.details?.[item.dataKey] || [])
                 .filter((item: any) => item.name !== 'instance_name')
-                .sort((a: any, b: any) => b.value - a.value)
                 .map((detail: any) => `${detail.label}：${detail.value}`)
                 .join('-') ||
                 (item.payload.details?.[item.dataKey] || [])
