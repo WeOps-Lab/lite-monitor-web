@@ -135,6 +135,42 @@ const LineChart: React.FC<LineChartProps> = ({
     );
   };
 
+  const renderYAxisTick = (props: any) => {
+    const { x, y, payload } = props;
+    const tickWidth = 80; // 设置标签的最大宽度
+    const words = String(payload.value).split('');
+    const lines = [];
+    let currentLine = '';
+
+    words.forEach((word) => {
+      if ((currentLine + word).length < tickWidth / 10) {
+        currentLine += `${word}`;
+      } else {
+        lines.push(currentLine.trim());
+        currentLine = `${word}`;
+      }
+    });
+    lines.push(currentLine.trim());
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        {lines.map((line, index) => (
+          <text
+            key={index}
+            x={0}
+            y={0}
+            dy={index * 12}
+            textAnchor="end"
+            fill="var(--color-text-3)"
+            fontSize={14}
+          >
+            {line}
+          </text>
+        ))}
+      </g>
+    );
+  };
+
   return (
     <div className="flex w-full h-full">
       {!!data.length ? (
@@ -160,7 +196,7 @@ const LineChart: React.FC<LineChartProps> = ({
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: 'var(--color-text-3)', fontSize: 14 }}
+                tick={renderYAxisTick}
                 tickFormatter={(tick) => {
                   if (isStringArray(unit)) {
                     const unitName = JSON.parse(unit).find(
